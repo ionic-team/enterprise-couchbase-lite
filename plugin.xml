@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="@ionic-enterprise/couchbase-lite" version="1.0.6">
+    <name>@ionic-enterprise/couchbase-lite</name>
+    <description>Couchbase Lite integration for Ionic Enterprise</description>
+    <license>SEE LICENSE</license>
+    <keywords>Ionic,couchbase</keywords>
+    <issue>https://ionic.zendesk.com/hc/en-us</issue>
+    <js-module src="cordova/www/ioniccouchbaselite.js" name="couchbaselite">
+        <runs/>
+        <clobbers target="IonicCouchbaseLite"/>
+    </js-module>
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="IonicCouchbaseLite">
+                <param name="android-package" value="com.ionicframework.couchbase.IonicCouchbaseLite"/>
+                <param name="onload" value="true"/>
+            </feature>
+        </config-file>
+        <framework src="cordova/src/android/ioniccouchbaselite.gradle" custom="true" type="gradleReference"/>
+        <source-file src="cordova/src/android/com/ionicframework/couchbase/CBLConverter.java" target-dir="src/com/ionicframework/couchbase"/>
+        <source-file src="cordova/src/android/com/ionicframework/couchbase/CustomQuery.java" target-dir="src/com/ionicframework/couchbase"/>
+        <source-file src="cordova/src/android/com/ionicframework/couchbase/CustomResultContext.java" target-dir="src/com/ionicframework/couchbase"/>
+        <source-file src="cordova/src/android/com/ionicframework/couchbase/CustomResult.java" target-dir="src/com/ionicframework/couchbase"/>
+        <source-file src="cordova/src/android/com/ionicframework/couchbase/CustomResultSet.java" target-dir="src/com/ionicframework/couchbase"/>
+        <source-file src="cordova/src/android/com/ionicframework/couchbase/IonicCouchbaseLite.java" target-dir="src/com/ionicframework/couchbase"/>
+    </platform>
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="IonicCouchbaseLite">
+                <param name="ios-package" value="IonicCouchbaseLite" onload="true"/>
+            </feature>
+        </config-file>
+        <source-file src="cordova/src/ios/IonicCBL.m"/>
+        <header-file src="cordova/src/ios/IonicCBL.h"/>
+        <framework src="cordova/src/ios/CouchbaseLite.framework" custom="true" embed="true"/>
+    </platform>
+</plugin>
