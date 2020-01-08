@@ -1,7 +1,7 @@
 ---
 title: Couchbase Lite
 template: enterprise-plugin
-version: 1.0.6
+version: 1.1.0
 minor: 1.0.X
 ---
 
@@ -1098,6 +1098,13 @@ config.setPinnedServerCertificate(cert);</code></pre>
 
 
 
+## 1.1.0 (2020-01-08)
+
+
+### Features
+
+* add hook to remove unused archs from CouchbaseLite.framework 
+
 ### 1.0.6 (2019-12-17)
 
 
@@ -1105,4 +1112,3 @@ config.setPinnedServerCertificate(cert);</code></pre>
 
 * field mapping on all results for Android 818b4da
 * convert * to database name in . result 
-
