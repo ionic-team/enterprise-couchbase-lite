@@ -2,7 +2,7 @@
 title: Couchbase Lite
 template: enterprise-plugin
 version: PLUGIN_VERSION
-minor: 1.0.X
+minor: 1.1.X
 ---
 
 # Ionic Couchbase Lite
