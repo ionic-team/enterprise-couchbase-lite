@@ -34,5 +34,6 @@
         <source-file src="cordova/src/ios/IonicCBL.m"/>
         <header-file src="cordova/src/ios/IonicCBL.h"/>
         <framework src="cordova/src/ios/CouchbaseLite.framework" custom="true" embed="true"/>
+        <hook src="cordova/scripts/strip_archs.js" type="after_plugin_add" />
     </platform>
 </plugin>
