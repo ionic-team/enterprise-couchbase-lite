@@ -5,6 +5,7 @@
 //  Created by Max Lynch on 11/8/18.
 //
 
+#import <objc/runtime.h>
 #import <Foundation/Foundation.h>
 
 #import "IonicCBL.h"
