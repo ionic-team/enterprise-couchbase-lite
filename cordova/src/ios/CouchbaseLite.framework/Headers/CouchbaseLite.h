@@ -29,6 +29,8 @@ FOUNDATION_EXPORT const unsigned char CouchbaseLiteVersionString[];
 #import "CBLAuthenticator.h"
 #import "CBLBasicAuthenticator.h"
 #import "CBLBlob.h"
+#import "CBLConflict.h"
+#import "CBLConflictResolver.h"
 #import "CBLConsoleLogger.h"
 #import "CBLDatabase.h"
 #import "CBLDatabaseChange.h"

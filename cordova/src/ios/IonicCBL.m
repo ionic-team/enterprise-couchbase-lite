@@ -15,9 +15,14 @@
   NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
   SEL sel = NSSelectorFromString(@"initWithDatabase:JSONRepresentation:");
   id queryInstance = [CBLQuery alloc];
+
+  Ivar ivar = class_getInstanceVariable(CBLQuery.self, "_from");
+  object_setIvar(queryInstance, ivar, [CBLQueryDataSource database:database]);
+  
   id (*method)(id, SEL, id, id) = (void *)[queryInstance methodForSelector:sel];
   return method(queryInstance, sel, database, jsonData);
 }
+
 
 @end
 
