@@ -6,15 +6,13 @@ import com.couchbase.lite.AbstractReplicator;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Parameters;
-import com.couchbase.litecore.C4Database;
-import com.couchbase.litecore.C4Query;
-import com.couchbase.litecore.C4QueryEnumerator;
-import com.couchbase.litecore.C4QueryOptions;
-import com.couchbase.litecore.LiteCoreException;
-import com.couchbase.litecore.fleece.AllocSlice;
-import com.couchbase.litecore.fleece.Encoder;
-import com.couchbase.litecore.fleece.FLArrayIterator;
-import com.couchbase.litecore.fleece.FLValue;
+import com.couchbase.lite.internal.core.C4Database;
+import com.couchbase.lite.internal.core.C4Query;
+import com.couchbase.lite.internal.core.C4QueryEnumerator;
+import com.couchbase.lite.internal.core.C4QueryOptions;
+import com.couchbase.lite.LiteCoreException;
+import com.couchbase.lite.internal.fleece.AllocSlice;
+import com.couchbase.lite.internal.fleece.FLEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,9 +52,9 @@ public class CustomQuery {
       C4QueryOptions options = new C4QueryOptions();
       if (parameters == null) { parameters = new Parameters(); }
 
-      Encoder e = new Encoder();
+      FLEncoder e = new FLEncoder();
       e.write(new HashMap<>());
-      final AllocSlice params = e.finish();
+      final AllocSlice params = e.finish2();
       final C4QueryEnumerator c4enum;
       synchronized (getLock(database)) {
         check();

@@ -8,6 +8,7 @@ import com.couchbase.lite.Authenticator;
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.ConcurrencyControl;
+import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
@@ -82,6 +83,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   @Override
   public void pluginInitialize() {
     this.myClass = (Class<IonicCouchbaseLite>) this.getClass();
+    CouchbaseLite.init(cordova.getContext());
   }
 
   public boolean execute(final String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
@@ -519,7 +521,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     }
     Log.d(TAG, "Opening database: " + name);
 
-    DatabaseConfiguration c = new DatabaseConfiguration(this.cordova.getContext());
+    DatabaseConfiguration c = new DatabaseConfiguration();
 
     String directory = config.optString("directory", null);
 
@@ -624,7 +626,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     Database targetDb = null;
     JSONObject config = args.getJSONObject(3);
 
-    DatabaseConfiguration c = new DatabaseConfiguration(this.cordova.getContext());
+    DatabaseConfiguration c = new DatabaseConfiguration();
 
     String directory = config.optString("directory", null);
 

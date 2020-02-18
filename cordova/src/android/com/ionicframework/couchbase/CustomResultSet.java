@@ -5,10 +5,9 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.LogDomain;
 import com.couchbase.lite.internal.support.Log;
-import com.couchbase.litecore.C4QueryEnumerator;
-import com.couchbase.litecore.LiteCoreException;
-import com.couchbase.litecore.fleece.FLArrayIterator;
-import com.couchbase.litecore.fleece.FLValue;
+
+import com.couchbase.lite.internal.core.C4QueryEnumerator;
+import com.couchbase.lite.LiteCoreException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
