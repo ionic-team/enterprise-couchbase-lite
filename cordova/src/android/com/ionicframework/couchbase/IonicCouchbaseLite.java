@@ -8,6 +8,7 @@ import com.couchbase.lite.Authenticator;
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.ConcurrencyControl;
+import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
@@ -82,6 +83,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   @Override
   public void pluginInitialize() {
     this.myClass = (Class<IonicCouchbaseLite>) this.getClass();
+    CouchbaseLite.init(cordova.getContext());
   }
 
   public boolean execute(final String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
@@ -305,205 +307,6 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     }
   }
 
-  public void Query_Test(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
-    String name = args.getString(0);
-    Database database = getDatabase(name);
-
-    OrderBy query1 = QueryBuilder
-      .select(SelectResult.expression(Meta.id),
-        SelectResult.property("name"),
-        SelectResult.property("type"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("hotel")))
-      .orderBy(Ordering.expression(Meta.id));
-
-    String j1 = getQueryJson(query1);
-    String clientJ1 = args.getString(1);
-    if (!areEqual(clientJ1, j1)) {
-      reject(callbackContext, "String 1 didn't match with client. Expected: " + j1 + "\nReceived: " + clientJ1);
-      return;
-    }
-
-    Query query2 = QueryBuilder.select(SelectResult.all())
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("SDK")));
-
-    String j2 = getQueryJson(query2);
-    String clientJ2 = args.getString(2);
-    if (!areEqual(clientJ2, j2)) {
-      reject(callbackContext, "String 2 didn't match with client. Expected: " + j2 + "\nReceived: " + clientJ2);
-      return;
-    }
-
-    Query query3 = QueryBuilder
-      .select(SelectResult.expression(Meta.id),
-        SelectResult.property("name"),
-        SelectResult.property("public_likes"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("hotel")))
-      .limit(Expression.intValue(10));
-
-    ResultSet rs3 = query3.execute();
-    List<Result> results = rs3.allResults();
-
-    String j3 = getQueryJson(query3);
-    String clientJ3 = args.getString(3);
-    if (!areEqual(clientJ3, j3)) {
-      reject(callbackContext, "String 3 didn't match with client. Expected: " + j3 + "\nReceived: " + clientJ3);
-      return;
-    }
-
-    Query query4 = QueryBuilder
-      .select(SelectResult.expression(Meta.id),
-        SelectResult.property("name"),
-        SelectResult.property("public_likes"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("hotel"))
-        .and(ArrayFunction.contains(Expression.property("public_likes"),
-          Expression.string("Armani Langworth"))));
-
-    String j4 = getQueryJson(query4);
-    String clientJ4 = args.getString(4);
-    if (!areEqual(clientJ4, j4)) {
-      reject(callbackContext, "String 4 didn't match with client. Expected: " + j4 + "\nReceived: " + clientJ4);
-      return;
-    }
-
-    Expression[] values = new Expression[]{
-      Expression.property("first"),
-      Expression.property("last"),
-      Expression.property("username")
-    };
-
-    Query query5 = QueryBuilder.select(SelectResult.all())
-      .from(DataSource.database(database))
-      .where(Expression.string("Armani").in(values));
-
-    String j5 = getQueryJson(query5);
-    String clientJ5 = args.getString(5);
-    if (!areEqual(clientJ5, j5)) {
-      reject(callbackContext, "String 5 didn't match with client. Expected: " + j5 + "\nReceived: " + clientJ5);
-      return;
-    }
-
-    Query query6 = QueryBuilder
-      .select(SelectResult.expression(Meta.id),
-        SelectResult.property("country"),
-        SelectResult.property("name"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("landmark"))
-        .and(Expression.property("name").like(Expression.string("Royal Engineers Museum"))));
-
-    String j6 = getQueryJson(query6);
-    String clientJ6 = args.getString(6);
-    if (!areEqual(clientJ6, j6)) {
-      reject(callbackContext, "String 6 didn't match with client. Expected: " + j6 + "\nReceived: " + clientJ6);
-      return;
-    }
-
-
-    Query query7 = QueryBuilder
-      .select(SelectResult.expression(Meta.id),
-        SelectResult.property("country"),
-        SelectResult.property("name"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("landmark"))
-        .and(Expression.property("name").like(Expression.string("Eng%e%"))));
-
-    String j7 = getQueryJson(query7);
-    String clientJ7 = args.getString(7);
-    if (!areEqual(clientJ7, j7)) {
-      reject(callbackContext, "String 7 didn't match with client. Expected: " + j7 + "\nReceived: " + clientJ7);
-      return;
-    }
-
-
-    Query query8 = QueryBuilder
-      .select(SelectResult.expression(Meta.id),
-        SelectResult.property("country"),
-        SelectResult.property("name"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("landmark"))
-        .and(Expression.property("name").like(Expression.string("Eng____r"))));
-
-    String j8 = getQueryJson(query8);
-    String clientJ8 = args.getString(8);
-    if (!areEqual(clientJ8, j8)) {
-      reject(callbackContext, "String 8 didn't match with client. Expected: " + j8 + "\nReceived: " + clientJ8);
-      return;
-    }
-
-    Query query9 = QueryBuilder
-      .select(SelectResult.expression(Meta.id),
-        SelectResult.property("country"),
-        SelectResult.property("name"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("landmark"))
-        .and(Expression.property("name").regex(Expression.string("\\bEng.*r\\b"))));
-
-    String j9 = getQueryJson(query9);
-    String clientJ9 = args.getString(9);
-    if (!areEqual(clientJ9, j9)) {
-      reject(callbackContext, "String 9 didn't match with client. Expected: " + j9 + "\nReceived: " + clientJ9);
-      return;
-    }
-
-    Query query10 = QueryBuilder.select(
-      SelectResult.expression(Expression.property("name").from("airline")),
-      SelectResult.expression(Expression.property("callsign").from("airline")),
-      SelectResult.expression(Expression.property("destinationairport").from("route")),
-      SelectResult.expression(Expression.property("stops").from("route")),
-      SelectResult.expression(Expression.property("airline").from("route")))
-      .from(DataSource.database(database).as("airline"))
-      .join(Join.join(DataSource.database(database).as("route"))
-        .on(Meta.id.from("airline").equalTo(Expression.property("airlineid").from("route"))))
-      .where(Expression.property("type").from("route").equalTo(Expression.string("route"))
-        .and(Expression.property("type").from("airline").equalTo(Expression.string("airline")))
-        .and(Expression.property("sourceairport").from("route").equalTo(Expression.string("RIX"))));
-
-    String j10 = getQueryJson(query10);
-    String clientJ10 = args.getString(10);
-    if (!areEqual(clientJ10, j10)) {
-      reject(callbackContext, "String 10 didn't match with client. Expected: " + j10 + "\nReceived: " + clientJ10);
-      return;
-    }
-
-    Query query11 = QueryBuilder.select(
-      SelectResult.expression(Function.count(Expression.string("*"))),
-      SelectResult.property("country"),
-      SelectResult.property("tz"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("airport"))
-        .and(Expression.property("geo.alt").greaterThanOrEqualTo(Expression.intValue(300))))
-      .groupBy(Expression.property("country"),
-        Expression.property("tz"))
-      .orderBy(Ordering.expression(Function.count(Expression.string("*"))).descending());
-
-    String j11 = getQueryJson(query11);
-    String clientJ11 = args.getString(11);
-    if (!areEqual(clientJ11, j11)) {
-      reject(callbackContext, "String 11 didn't match with client. Expected: " + j11 + "\nReceived: " + clientJ11);
-      return;
-    }
-
-    Query query12 = QueryBuilder
-      .select(SelectResult.expression(Meta.id),
-        SelectResult.property("name"))
-      .from(DataSource.database(database))
-      .where(Expression.property("type").equalTo(Expression.string("hotel")))
-      .orderBy(Ordering.property("name").ascending())
-      .limit(Expression.intValue(10));
-
-    String j12 = getQueryJson(query12);
-    String clientJ12 = args.getString(12);
-    if (!areEqual(clientJ12, j12)) {
-      reject(callbackContext, "String 12 didn't match with client. Expected: " + j12 + "\nReceived: " + clientJ12);
-      return;
-    }
-
-  }
-
-
   public void Plugin_Configure(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     JSONObject config = config = args.getJSONObject(0);
     int chunkSize = config.optInt("allResultsChunkSize", 256);
@@ -519,7 +322,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     }
     Log.d(TAG, "Opening database: " + name);
 
-    DatabaseConfiguration c = new DatabaseConfiguration(this.cordova.getContext());
+    DatabaseConfiguration c = new DatabaseConfiguration();
 
     String directory = config.optString("directory", null);
 
@@ -624,7 +427,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     Database targetDb = null;
     JSONObject config = args.getJSONObject(3);
 
-    DatabaseConfiguration c = new DatabaseConfiguration(this.cordova.getContext());
+    DatabaseConfiguration c = new DatabaseConfiguration();
 
     String directory = config.optString("directory", null);
 
