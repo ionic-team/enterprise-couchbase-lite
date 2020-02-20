@@ -72,7 +72,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   Class<IonicCouchbaseLite> myClass;
 
   private Map<String, Database> openDatabases = new HashMap<>();
-  private Map<Number, CustomResultSet> queryResultSets = new HashMap<>();
+  private Map<Number, ResultSet> queryResultSets = new HashMap<>();
   private Map<Number, Replicator> replicators = new HashMap<>();
   private Map<Number, ListenerToken> replicatorListeners = new HashMap<>();
 
@@ -723,8 +723,8 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     String queryJson = args.getString(1);
     Database db = this.openDatabases.get(name);
 
-    CustomQuery q = new CustomQuery(db, queryJson);
-    CustomResultSet rs = q.execute();
+    Query q = JsonQueryBuilder.buildQuery(db, queryJson);
+    ResultSet rs = q.execute();
     Log.d(TAG, "Built query: " + q);
 
     int id = queryCount++;
@@ -740,14 +740,14 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   public void ResultSet_Next(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
     int id = args.getInt(1);
-    CustomResultSet r = this.queryResultSets.get(id);
+    ResultSet r = this.queryResultSets.get(id);
     if (r == null) {
       resolve(callbackContext, json(new HashMap<String, Object>() {{
       }}));
       return;
     }
     Log.d(TAG, "Moving to next result...");
-    CustomResult result = r.next();
+    Result result = r.next();
     if (result == null) {
       Log.d(TAG, "No results");
       resolve(callbackContext, (String) null);
@@ -777,7 +777,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   public void ResultSet_NextBatch(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
     int id = args.getInt(1);
-    CustomResultSet r = this.queryResultSets.get(id);
+    ResultSet r = this.queryResultSets.get(id);
     if (r == null) {
       resolve(callbackContext, json(new HashMap<String, Object>() {{
       }}));
@@ -787,7 +787,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     List<Map<String, Object>> resultsChunk = new ArrayList<>(chunkSize);
 
     Log.d(TAG, "Moving to next result...");
-    CustomResult result;
+    Result result;
     int i = 0;
     while (i++ < chunkSize && ((result = r.next()) != null)) {
       resultsChunk.add(result.toMap());
@@ -799,7 +799,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   public void ResultSet_AllResults(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
     int id = args.getInt(1);
-    CustomResultSet r = this.queryResultSets.get(id);
+    ResultSet r = this.queryResultSets.get(id);
     if (r == null) {
       resolve(callbackContext, json(new HashMap<String, Object>() {{
       }}));
@@ -808,7 +808,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
 
     int chunkSize = this.allResultsChunkSize;
     /*
-    List<CustomResult> results = r.allResults();
+    List<Result> results = r.allResults();
     if (results == null) {
       Log.d(TAG, "No results");
       return;
@@ -818,7 +818,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     List<Map<String, Object>> resultsChunk = null;
 
     int i = 0;
-    CustomResult queryResult;
+    Result queryResult;
     while ((queryResult = r.next()) != null) {
       if (i % chunkSize == 0) {
         if (resultsChunk != null) {
@@ -847,7 +847,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   public void ResultSet_Cleanup(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
     int id = args.getInt(1);
-    CustomResultSet r = this.queryResultSets.get(id);
+    ResultSet r = this.queryResultSets.get(id);
     if (r == null) {
       resolve(callbackContext, json(new HashMap<String, Object>() {{
       }}));
