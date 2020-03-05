@@ -38,6 +38,8 @@ export abstract class Query {
 
   private columnNames: { [name:string]: any } = {};
 
+  private changeListenerToken?: QueryChangeListener;
+
   // SELECT
   private _select: Select;
   // FROM
@@ -53,8 +55,27 @@ export abstract class Query {
   // LIMIT
   private _limit: Limit; // LIMIT expr
 
-  addChangeListener(listener: QueryChangeListener) {}
-  removeChangeListener(token: ListenerToken) {}
+  addChangeListener(listener: QueryChangeListener) {
+    if (this.changeListenerToken) {
+      throw new Error("Cannot add multiple change listeners due to technical limitations.");
+    }
+
+    this.changeListenerToken = listener;
+
+    const db = this._getDatabase();
+
+    db.getEngine().Query_AddChangeListener(db, this, data => {
+      this.changeListenerToken(data); // TODO: data vs QueryChange
+    }, err => {
+      console.error('Query change listener error', err);
+    });
+  }
+
+  removeChangeListener() {
+    this.changeListenerToken = undefined;
+    const db = this._getDatabase();
+    return db.getEngine().Query_RemoveChangeListener(db, this);
+  }
 
   copy(query: Query) {
     this._select = query._select;
@@ -92,7 +113,7 @@ export abstract class Query {
 
   execute(): Promise<ResultSet> {
     // console.log(this);
-    const db = this._from && this._from.getSource() as Database;
+    const db = this._getDatabase();
     return db.getEngine().Query_Execute(db, this);
   }
 
@@ -142,6 +163,11 @@ export abstract class Query {
     return this._asJSON();
   }
   // abstract asJSON(): any;
+
+  private _getDatabase(): Database {
+    const db = this._from && this._from.getSource() as Database;
+    return db;
+  }
 
   private _asJSON(): { [key:string]: any } {
     const json: { [key:string]: any } = {};

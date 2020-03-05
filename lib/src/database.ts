@@ -85,7 +85,7 @@ export class Database {
       this._engine.Database_AddChangeListener(this, (data: any) => {
         this.notifyDatabaseChangeListeners(data);
       }, (err: any) => {
-        console.log('Database change listener error', err);
+        console.error('Database change listener error', err);
       });
       this.listeningForChanges = true;
     }

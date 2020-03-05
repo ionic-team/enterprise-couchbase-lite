@@ -157,6 +157,16 @@ export class CordovaEngine extends Engine {
     return new ResultSet(query, ret.id, query.getColumnNames());
   }
 
+  Query_AddChangeListener(database: Database, query: Query, cb: (data: any) => void, err: (err: any) => void): void {
+    const args: any[] = [database.getName(), /* TODO */, null];
+    return IonicCouchbaseLite.watch(EngineActionTypes.Query_AddChangeListener, args, cb, err);
+  }
+
+  async Query_RemoveChangeListener(database: Database, query: Query): Promise<void> {
+    const args: any[] = [database.getName(), /* TODO */ null];
+    await IonicCouchbaseLite.exec(EngineActionTypes.Query_RemoveChangeListener, args) as any;
+  }
+
   async ResultSet_Next(database: Database, resultSetId: string): Promise<Result> {
     //this\.log('ResultSet_Next');
     const args: any[] = [database.getName(), resultSetId];
