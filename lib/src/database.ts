@@ -78,7 +78,7 @@ export class Database {
   /**
    * Set the given DatabaseChangeListener to the this database.
    */
-  addChangeListener(listener: DatabaseChangeListener) {
+  addChangeListener(listener: DatabaseChangeListener): ListenerToken {
     this.changeListenerTokens.push(listener);
 
     if (!this.didStartListener) {
@@ -89,6 +89,8 @@ export class Database {
       });
       this.didStartListener = true;
     }
+
+    return listener;
   }
 
   private notifyDatabaseChangeListeners(data: any) {
