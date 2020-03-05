@@ -26,6 +26,7 @@ export enum EngineActionTypes {
   Database_Compact = 'Database_Compact',
   Database_Delete = 'Database_Delete',
   Database_AddChangeListener = 'Database_AddChangeListener',
+  Database_RemoveChangeListener = 'Database_RemoveChangeListener',
   Database_GetCount = 'Database_GetCount',
   Database_GetPath = 'Database_GetPath',
   Database_Copy = 'Database_Copy',
@@ -61,6 +62,7 @@ export abstract class Engine {
   abstract async Database_Open(name: string, config: DatabaseConfiguration): Promise<void>;
   abstract async Database_Save(database: Database, document: MutableDocument, concurrencyControl: ConcurrencyControl): Promise<EngineDatabaseSaveResult>;
   abstract Database_AddChangeListener(database: Database, cb: (data: any) => void, err: (err: any) => void): void;
+  abstract async Database_RemoveChangeListener(database: Database): Promise<void>;
   abstract async Database_GetCount(database: Database): Promise<number>;
   abstract async Database_GetPath(database: Database): Promise<string>;
   abstract async Database_Copy(database: Database, path: string, name: string, config: DatabaseConfiguration): Promise<void>;

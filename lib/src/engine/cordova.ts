@@ -50,6 +50,11 @@ export class CordovaEngine extends Engine {
     return IonicCouchbaseLite.watch(EngineActionTypes.Database_AddChangeListener, args, cb, err);
   }
 
+  async Database_RemoveChangeListener(database: Database): Promise<void> {
+    const args: any[] = [database.getName()];
+    return IonicCouchbaseLite.exec(EngineActionTypes.Database_RemoveChangeListener, args) as any;
+  }
+
   async Database_GetCount(database: Database): Promise<number> {
     //this\.log('Database_GetCount');
     const args: any[] = [database.getName()];

@@ -56,7 +56,7 @@ export class Database {
 
   private _engine: Engine;
 
-  private didStartListener = false;
+  private listeningForChanges = false;
 
   public log = new DatabaseLogging(this);
 
@@ -81,13 +81,13 @@ export class Database {
   addChangeListener(listener: DatabaseChangeListener): ListenerToken {
     this.changeListenerTokens.push(listener);
 
-    if (!this.didStartListener) {
+    if (!this.listeningForChanges) {
       this._engine.Database_AddChangeListener(this, (data: any) => {
         this.notifyDatabaseChangeListeners(data);
       }, (err: any) => {
         console.log('Database change listener error', err);
       });
-      this.didStartListener = true;
+      this.listeningForChanges = true;
     }
 
     return listener;
@@ -108,8 +108,13 @@ export class Database {
   /**
    * Remove the given DatabaseChangeListener from the this database.
    */
-  removeChangeListener(listener: ListenerToken) {
+  async removeChangeListener(listener: ListenerToken): Promise<void> {
     this.changeListenerTokens = this.changeListenerTokens.filter(l => l !== listener);
+
+    if (this.changeListenerTokens.length === 0) {
+      await this._engine.Database_RemoveChangeListener(this);
+      this.listeningForChanges = false;
+    }
   }
 
   /**
