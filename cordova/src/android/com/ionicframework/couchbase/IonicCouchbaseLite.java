@@ -76,6 +76,13 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   private Map<Number, Replicator> replicators = new HashMap<>();
   private Map<Number, ListenerToken> replicatorListeners = new HashMap<>();
 
+  /**
+   * HashMap of database listeners. Key = database name.
+   *
+   * There is only ever one listener per database--multiple listeners are handled in JS.
+   */
+  private Map<String, ListenerToken> databaseListeners = new HashMap<>();
+
   private int queryCount = 0;
   private int replicatorCount = 0;
   private int allResultsChunkSize = 256;
@@ -525,7 +532,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
       return;
     }
 
-    d.addChangeListener(new DatabaseChangeListener() {
+    ListenerToken token = d.addChangeListener(new DatabaseChangeListener() {
       @Override
       public void changed(DatabaseChange change) {
         JSONObject ret = new JSONObject();
@@ -537,8 +544,27 @@ public class IonicCouchbaseLite extends CordovaPlugin {
         callbackContext.sendPluginResult(r);
       }
     });
+
+    databaseListeners.put(name, token);
   }
 
+  @SuppressWarnings("unused")
+  public void Database_RemoveChangeListener(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
+    String name = args.getString(0);
+    Database d = getDatabase(name);
+    if (d == null) {
+      reject(callbackContext, "No such database");
+      return;
+    }
+
+    ListenerToken token = databaseListeners.remove(name);
+
+    if (token != null) {
+      d.removeChangeListener(token);
+    }
+
+    resolve(callbackContext);
+  }
 
   @SuppressWarnings("unused")
   public void Database_Close(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
