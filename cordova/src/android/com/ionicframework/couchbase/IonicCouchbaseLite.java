@@ -1,5 +1,6 @@
 package com.ionicframework.couchbase;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.couchbase.lite.AbstractReplicator;
@@ -36,6 +37,8 @@ import com.couchbase.lite.OrderBy;
 import com.couchbase.lite.Ordering;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryBuilder;
+import com.couchbase.lite.QueryChange;
+import com.couchbase.lite.QueryChangeListener;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
@@ -166,6 +169,32 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     docMap.put("_id", d.getId());
     docMap.put("_sequence", d.getSequence());
     return docMap;
+  }
+
+  private Map<String, Object> resultToMap(Result result) {
+    Map<String, Object> data = result.toMap();
+
+    if (data.containsKey("_id")) {
+      data.put("id", data.get("_id"));
+      data.remove("_id");
+    }
+
+    if (data.containsKey("_sequence")) {
+      data.put("sequence", data.get("_sequence"));
+      data.remove("_sequence");
+    }
+
+    if (data.containsKey("_deleted")) {
+      data.put("deleted", data.get("_deleted"));
+      data.remove("_deleted");
+    }
+
+    if (data.containsKey("_expiration")) {
+      data.put("expiration", data.get("_expiration"));
+      data.remove("_expiration");
+    }
+
+    return data;
   }
 
   private void resolve(final CallbackContext callbackContext) {
@@ -762,6 +791,45 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     }}));
   }
 
+  @SuppressWarnings("unused")
+  public void Query_ExecuteWithListener(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
+    String name = args.getString(0);
+    String queryJson = args.getString(1);
+    Database db = this.openDatabases.get(name);
+
+    Query q = JsonQueryBuilder.buildQuery(db, queryJson);
+
+    q.addChangeListener(new QueryChangeListener() {
+      @Override
+      public void changed(@NonNull QueryChange change) {
+        JSONObject ret = new JSONObject();
+        Throwable err = change.getError();
+        PluginResult r;
+
+        List<Result> rs = change.getResults().allResults();
+        JSONArray results = new JSONArray();
+
+        for (Result result : rs) {
+          results.put(json(resultToMap(result)));
+        }
+
+        if (err == null) {
+          try {
+            ret.put("results", results);
+          } catch (JSONException ex) {}
+          r = new PluginResult(PluginResult.Status.OK, ret);
+        } else {
+          r = new PluginResult(PluginResult.Status.ERROR, err.toString());
+        }
+
+        r.setKeepCallback(true);
+        callbackContext.sendPluginResult(r);
+      }
+    });
+
+    q.execute();
+    Log.d(TAG, "Built live query: " + q);
+  }
 
   public void ResultSet_Next(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
@@ -779,23 +847,8 @@ public class IonicCouchbaseLite extends CordovaPlugin {
       resolve(callbackContext, (String) null);
       return;
     }
-    Map<String, Object> data = result.toMap();
-    if (data.containsKey("_id")) {
-      data.put("id", data.get("_id"));
-      data.remove("_id");
-    }
-    if (data.containsKey("_sequence")) {
-      data.put("sequence", data.get("_sequence"));
-      data.remove("_sequence");
-    }
-    if (data.containsKey("_deleted")) {
-      data.put("deleted", data.get("_deleted"));
-      data.remove("_deleted");
-    }
-    if (data.containsKey("_expiration")) {
-      data.put("expiration", data.get("_expiration"));
-      data.remove("_expiration");
-    }
+
+    Map<String, Object> data = resultToMap(result);
     Log.d(TAG, data.toString());
     resolve(callbackContext, json(data));
   }

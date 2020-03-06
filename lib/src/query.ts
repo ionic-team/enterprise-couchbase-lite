@@ -29,6 +29,8 @@ export class QueryChange {
 }
 
 export type QueryChangeListener = (change: QueryChange) => void;
+export type LiveQueryCleanupFn = () => void;
+
 /**
  * A database query used for querying data from the database.
  * The query statement of the Query object can be fluently constructed by calling the static select methods.
@@ -37,8 +39,6 @@ export abstract class Query {
   private parameters: Parameters;
 
   private columnNames: { [name:string]: any } = {};
-
-  private changeListenerToken?: QueryChangeListener;
 
   // SELECT
   private _select: Select;
@@ -54,28 +54,6 @@ export abstract class Query {
   private _orderBy: OrderBy; // ORDER BY ordering-term(s)
   // LIMIT
   private _limit: Limit; // LIMIT expr
-
-  addChangeListener(listener: QueryChangeListener) {
-    if (this.changeListenerToken) {
-      throw new Error("Cannot add multiple change listeners due to technical limitations.");
-    }
-
-    this.changeListenerToken = listener;
-
-    const db = this._getDatabase();
-
-    db.getEngine().Query_AddChangeListener(db, this, data => {
-      this.changeListenerToken(data); // TODO: data vs QueryChange
-    }, err => {
-      console.error('Query change listener error', err);
-    });
-  }
-
-  removeChangeListener() {
-    this.changeListenerToken = undefined;
-    const db = this._getDatabase();
-    return db.getEngine().Query_RemoveChangeListener(db, this);
-  }
 
   copy(query: Query) {
     this._select = query._select;
@@ -111,10 +89,23 @@ export abstract class Query {
     }
   }
 
-  execute(): Promise<ResultSet> {
-    // console.log(this);
+  execute(changeListener: QueryChangeListener): Promise<LiveQueryCleanupFn>;
+  execute(): Promise<ResultSet>;
+  async execute(changeListener?: QueryChangeListener): Promise<ResultSet | LiveQueryCleanupFn> {
     const db = this._getDatabase();
-    return db.getEngine().Query_Execute(db, this);
+    const engine = db.getEngine();
+
+    if (changeListener) {
+      engine.Query_ExecuteWithListener(db, this, changeListener, err => {
+        console.error('Query change listener error', err);
+      });
+
+      return () => {
+        // TODO: cleanup
+      };
+    } else {
+      return engine.Query_Execute(db, this);
+    }
   }
 
   explain(): Promise<string> {
