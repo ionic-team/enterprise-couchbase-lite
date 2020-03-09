@@ -157,9 +157,14 @@ export class CordovaEngine extends Engine {
     return new ResultSet(query, ret.id, query.getColumnNames());
   }
 
-  async LiveQuery_Execute(database: Database, query: Query, cb: (data: any) => void, err: (err: any) => void): Promise<void> {
+  LiveQuery_Execute(database: Database, query: Query, cb: (data: any) => void, err: (err: any) => void): void {
     const args: any[] = [database.getName(), JSON.stringify(query.toJson())];
     IonicCouchbaseLite.watch(EngineActionTypes.LiveQuery_Execute, args, cb, err);
+  }
+
+  async LiveQuery_End(database: Database, id: number): Promise<void> {
+    const args: any[] = [database.getName(), id];
+    return IonicCouchbaseLite.exec(EngineActionTypes.LiveQuery_End, args);
   }
 
   async ResultSet_Next(database: Database, resultSetId: string): Promise<Result> {

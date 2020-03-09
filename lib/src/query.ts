@@ -1,4 +1,5 @@
 import { ResultSet } from "./result-set";
+import { Result } from "./result";
 import { ListenerToken, Database } from "./database";
 import { Parameters } from "./parameters";
 import { DataSource } from './data-source';
@@ -13,19 +14,7 @@ import { From } from './from';
 import { Where } from './where';
 
 export class QueryChange {
-  _error: Error;
-  _query: Query;
-  _results: ResultSet;
-
-  getError(): Error {
-    return this._error;
-  }
-  getQuery(): Query {
-    return this._query;
-  }
-  getResults(): ResultSet {
-    return this._results;
-  }
+  results: Result[];
 }
 
 export type QueryChangeListener = (change: QueryChange) => void;
@@ -39,6 +28,8 @@ export abstract class Query {
   private parameters: Parameters;
 
   private columnNames: { [name:string]: any } = {};
+
+  private _liveQueryExecuted = false;
 
   // SELECT
   private _select: Select;
@@ -92,16 +83,28 @@ export abstract class Query {
   execute(changeListener: QueryChangeListener): Promise<LiveQueryCleanupFn>;
   execute(): Promise<ResultSet>;
   async execute(changeListener?: QueryChangeListener): Promise<ResultSet | LiveQueryCleanupFn> {
+    if (this._liveQueryExecuted) {
+      throw new Error('Live Query can only be executed once due to technical limitations.');
+    }
+
     const db = this._getDatabase();
     const engine = db.getEngine();
 
     if (changeListener) {
-      engine.LiveQuery_Execute(db, this, changeListener, err => {
-        console.error('Query change listener error', err);
+      const cleanupPromise = new Promise<number>(resolve => {
+        engine.LiveQuery_Execute(db, this, data => {
+          changeListener({ results: data.results });
+          resolve(data.id);
+        }, err => {
+          console.error('Query change listener error', err);
+        });
       });
 
+      this._liveQueryExecuted = true;
+
       return async () => {
-        // TODO: cleanup
+        const id = await cleanupPromise;
+        await engine.LiveQuery_End(db, id);
       };
     } else {
       return engine.Query_Execute(db, this);

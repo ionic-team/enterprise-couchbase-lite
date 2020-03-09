@@ -2,16 +2,15 @@ package com.ionicframework.couchbase;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.Pair;
 
 import com.couchbase.lite.AbstractReplicator;
-import com.couchbase.lite.ArrayFunction;
 import com.couchbase.lite.Authenticator;
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.ConcurrencyControl;
 import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
-import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseChange;
 import com.couchbase.lite.DatabaseChangeListener;
@@ -19,24 +18,17 @@ import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.EncryptionKey;
 import com.couchbase.lite.Endpoint;
-import com.couchbase.lite.Expression;
 import com.couchbase.lite.FullTextIndexItem;
-import com.couchbase.lite.Function;
 import com.couchbase.lite.Index;
 import com.couchbase.lite.IndexBuilder;
-import com.couchbase.lite.Join;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogDomain;
 import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
-import com.couchbase.lite.Meta;
 import com.couchbase.lite.MutableArray;
 import com.couchbase.lite.MutableDictionary;
 import com.couchbase.lite.MutableDocument;
-import com.couchbase.lite.OrderBy;
-import com.couchbase.lite.Ordering;
 import com.couchbase.lite.Query;
-import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.QueryChange;
 import com.couchbase.lite.QueryChangeListener;
 import com.couchbase.lite.Replicator;
@@ -45,7 +37,6 @@ import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
-import com.couchbase.lite.SelectResult;
 import com.couchbase.lite.SessionAuthenticator;
 import com.couchbase.lite.URLEndpoint;
 import com.couchbase.lite.ValueIndexItem;
@@ -76,6 +67,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
 
   private Map<String, Database> openDatabases = new HashMap<>();
   private Map<Number, ResultSet> queryResultSets = new HashMap<>();
+  private Map<Number, Pair<ListenerToken, Query>> liveQueries = new HashMap<>();
   private Map<Number, Replicator> replicators = new HashMap<>();
   private Map<Number, ListenerToken> replicatorListeners = new HashMap<>();
 
@@ -87,6 +79,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   private Map<String, ListenerToken> databaseListeners = new HashMap<>();
 
   private int queryCount = 0;
+  private int liveQueryCount = 0;
   private int replicatorCount = 0;
   private int allResultsChunkSize = 256;
 
@@ -792,14 +785,16 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   }
 
   @SuppressWarnings("unused")
-  public void Query_ExecuteWithListener(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
+  public void LiveQuery_Execute(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
     String queryJson = args.getString(1);
     Database db = this.openDatabases.get(name);
 
     Query q = JsonQueryBuilder.buildQuery(db, queryJson);
 
-    q.addChangeListener(new QueryChangeListener() {
+    int id = liveQueryCount++;
+
+    ListenerToken token = q.addChangeListener(new QueryChangeListener() {
       @Override
       public void changed(@NonNull QueryChange change) {
         JSONObject ret = new JSONObject();
@@ -815,6 +810,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
 
         if (err == null) {
           try {
+            ret.put("id", id);
             ret.put("results", results);
           } catch (JSONException ex) {}
           r = new PluginResult(PluginResult.Status.OK, ret);
@@ -827,8 +823,25 @@ public class IonicCouchbaseLite extends CordovaPlugin {
       }
     });
 
+    liveQueries.put(id, new Pair<>(token, q));
+
     q.execute();
     Log.d(TAG, "Built live query: " + q);
+  }
+
+  @SuppressWarnings("unused")
+  public void LiveQuery_End(JSONArray args, final CallbackContext callbackContext) throws JSONException {
+    String name = args.getString(0);
+    int id = args.getInt(1);
+
+    Database db = this.openDatabases.get(name);
+    Pair<ListenerToken, Query> p = this.liveQueries.get(id);
+    ListenerToken token = p.first;
+    Query q = p.second;
+
+    q.removeChangeListener(token);
+
+    resolve(callbackContext);
   }
 
   public void ResultSet_Next(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
