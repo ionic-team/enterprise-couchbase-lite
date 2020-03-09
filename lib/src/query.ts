@@ -96,7 +96,7 @@ export abstract class Query {
     const engine = db.getEngine();
 
     if (changeListener) {
-      engine.Query_ExecuteWithListener(db, this, changeListener, err => {
+      engine.LiveQuery_Execute(db, this, changeListener, err => {
         console.error('Query change listener error', err);
       });
 

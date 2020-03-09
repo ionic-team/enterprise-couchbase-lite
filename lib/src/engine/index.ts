@@ -41,7 +41,7 @@ export enum EngineActionTypes {
   Database_SetFileLoggingConfig = 'Database_SetFileLoggingConfig',
   Document_GetBlobContent = 'Document_GetBlobContent',
   Query_Execute = 'Query_Execute',
-  Query_ExecuteWithListener = 'Query_ExecuteWithListener',
+  LiveQuery_Execute = 'LiveQuery_Execute',
   ResultSet_Next = 'ResultSet_Next',
   ResultSet_NextBatch = 'ResultSet_NextBatch',
   ResultSet_AllResults = 'ResultSet_AllResults',
@@ -81,7 +81,7 @@ export abstract class Engine {
   abstract async Database_SetFileLoggingConfig(database: Database, config: DatabaseFileLoggingConfiguration): Promise<void>;
   abstract async Document_GetBlobContent(database: Database, documentId: string, key: string): Promise<ArrayBuffer>;
   abstract async Query_Execute(database: Database, query: Query): Promise<ResultSet>;
-  abstract async Query_ExecuteWithListener(database: Database, query: Query, cb: (data: any) => any, err: (err: any) => void): Promise<void>;
+  abstract async LiveQuery_Execute(database: Database, query: Query, cb: (data: any) => any, err: (err: any) => void): Promise<void>;
   abstract async ResultSet_Next(database: Database, resultSetId: string): Promise<Result>;
   // abstract ResultSet_AllResults(database: Database, resultSetId: string): Promise<Result[]>;
   abstract ResultSet_AllResults(database: Database, resultSetId: string, cb: (data: any[]) => void, err: (err: any) => void): void;
