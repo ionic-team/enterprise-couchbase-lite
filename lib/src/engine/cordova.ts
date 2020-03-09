@@ -1,4 +1,4 @@
-import { Engine, EngineDatabaseSaveResult, EngineReplicatorStartResult, EngineActionTypes } from "./index";
+import { ChangeListenerToken, Engine, EngineActionTypes, EngineDatabaseSaveResult, EngineReplicatorStartResult } from './index';
 import { MutableDocument } from '../mutable-document';
 import { ConcurrencyControl, Database } from '../database';
 import { ICouchbaseLitePlugin } from '../definitions';
@@ -24,7 +24,7 @@ export class CordovaEngine extends Engine {
   log(...args: any[]) {
     // console.log('[cordova]', args.join(' '));
   }
-  
+
   async Plugin_Configure(config: any): Promise<void> {
     const args: any[] = [config];
     return IonicCouchbaseLite.exec('Plugin_Configure', args);
@@ -45,7 +45,7 @@ export class CordovaEngine extends Engine {
   }
 
   Database_AddChangeListener(database: Database, cb: (data: any) => void, err: (err: any) => void): void {
-    //this\.log('Database_AddChangeListener', database.getName());
+    // this\.log('Database_AddChangeListener', database.getName());
     const args: any[] = [database.getName()];
     return IonicCouchbaseLite.watch(EngineActionTypes.Database_AddChangeListener, args, cb, err);
   }
@@ -56,85 +56,85 @@ export class CordovaEngine extends Engine {
   }
 
   async Database_GetCount(database: Database): Promise<number> {
-    //this\.log('Database_GetCount');
+    // this\.log('Database_GetCount');
     const args: any[] = [database.getName()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_GetCount, args) as any;
   }
 
   async Database_GetPath(database: Database): Promise<string> {
-    //this\.log('Database_GetPath');
+    // this\.log('Database_GetPath');
     const args: any[] = [database.getName()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_GetPath, args) as any;
   }
 
   async Database_Copy(database: Database, path: string, name: string, config: DatabaseConfiguration): Promise<void> {
-    //this\.log('Database_Copy');
+    // this\.log('Database_Copy');
     const args: any[] = [database.getName(), path, name, config];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_Copy, args) as any;
   }
 
   async Database_CreateIndex(database: Database, name: string, index: AbstractIndex): Promise<void> {
-    //this\.log('Database_CreateIndex');
+    // this\.log('Database_CreateIndex');
     const args: any[] = [database.getName(), name, index.toJson()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_CreateIndex, args) as any;
   }
 
   async Database_DeleteIndex(database: Database, name: string): Promise<void> {
-    //this\.log('Database_DeleteIndex');
+    // this\.log('Database_DeleteIndex');
     const args: any[] = [database.getName(), name];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_DeleteIndex, args) as any;
   }
 
   async Database_GetIndexes(database: Database): Promise<string[]> {
-    //this\.log('Database_GetIndexes');
+    // this\.log('Database_GetIndexes');
     const args: any[] = [database.getName()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_GetIndexes, args) as any;
   }
 
   async Database_Exists(database: Database, name: string, directory: string): Promise<boolean> {
-    //this\.log('Database_Exists');
+    // this\.log('Database_Exists');
     const args: any[] = [database.getName(), name, directory];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_Exists, args) as any;
   }
 
   async Database_Close(database: Database): Promise<void> {
-    //this\.log('Database_Close');
+    // this\.log('Database_Close');
     const args: any[] = [database.getName()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_Close, args) as any;
   }
 
   async Database_Compact(database: Database): Promise<void> {
-    //this\.log('Database_Compact');
+    // this\.log('Database_Compact');
     const args: any[] = [database.getName()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_Compact, args) as any;
   }
 
   async Database_Delete(database: Database): Promise<void> {
-    //this\.log('Database_Delete');
+    // this\.log('Database_Delete');
     const args: any[] = [database.getName()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_Delete, args) as any;
   }
 
   async Database_PurgeDocument(database: Database, document: Document): Promise<void> {
-    //this\.log('Database_PurgeDocument', document.getId());
+    // this\.log('Database_PurgeDocument', document.getId());
     const args: any[] = [database.getName(), document.getId(), document.toDictionary()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_PurgeDocument, args);
   }
 
   async Database_DeleteDocument(database: Database, document: Document): Promise<void> {
-    //this\.log('Database_DeleteDocument', document.getId());
+    // this\.log('Database_DeleteDocument', document.getId());
     const args: any[] = [database.getName(), document.getId(), document.toDictionary()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_DeleteDocument, args);
   }
 
   async Database_GetDocument(database: Database, documentId: string): Promise<Document> {
-    //this\.log('Database_GetDocument', documentId);
+    // this\.log('Database_GetDocument', documentId);
     const args: any[] = [database.getName(), documentId];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_GetDocument, args);
   }
 
   async Database_SetLogLevel(database: Database, domain: string, logLevel: number): Promise<void> {
-    //this\.log('Database_SetLogLevel', domain, logLevel);
+    // this\.log('Database_SetLogLevel', domain, logLevel);
     const args: any[] = [database.getName(), domain, logLevel];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_SetLogLevel, args);
   }
@@ -151,10 +151,33 @@ export class CordovaEngine extends Engine {
   }
 
   async Query_Execute(database: Database, query: Query): Promise<ResultSet> {
-    //this\.log('Query_Execute', JSON.stringify(query.toJson()));
+    // this\.log('Query_Execute', JSON.stringify(query.toJson()));
     const args: any[] = [database.getName(), JSON.stringify(query.toJson())];
     const ret = await IonicCouchbaseLite.exec(EngineActionTypes.Query_Execute, args) as any;
     return new ResultSet(query, ret.id, query.getColumnNames());
+  }
+
+  async LiveQuery_Execute(database: Database, query: Query, callback: any /* TODO */): Promise<ChangeListenerToken> {
+    // this\.log('Query_Execute', JSON.stringify(query.toJson()));
+    const args: [string, string, boolean] = [database.getName(), JSON.stringify(query.toJson()), true];
+    let resolve: any, reject;
+    const p = new Promise<ChangeListenerToken>((res, rej) => { resolve = res; reject = rej; });
+    IonicCouchbaseLite.watch(EngineActionTypes.Query_Execute, args, (data: {token?: ChangeListenerToken, id?: string }) => {
+      if (query.changeListener) {
+        if (data.token !== undefined) {
+          resolve(data.token);
+          return;
+        }
+        const rs = new ResultSet(query, data.id, query.getColumnNames());
+        query.changeListener({ query, results: rs });
+      } else {
+        query.removeChangeListener();
+      }
+    }, (error: any) => {
+      query.changeListener({ query, error });
+    });
+
+    return p;
   }
 
   Query_AddChangeListener(database: Database, query: Query, cb: (data: any) => void, err: (err: any) => void): void {
@@ -162,19 +185,18 @@ export class CordovaEngine extends Engine {
     return IonicCouchbaseLite.watch(EngineActionTypes.Query_AddChangeListener, args, cb, err);
   }
 
-  async Query_RemoveChangeListener(database: Database, query: Query): Promise<void> {
-    const args: any[] = [database.getName(), /* TODO */ null];
-    await IonicCouchbaseLite.exec(EngineActionTypes.Query_RemoveChangeListener, args) as any;
+  async Query_RemoveChangeListener(token: ChangeListenerToken): Promise<void> {
+    return IonicCouchbaseLite.exec(EngineActionTypes.Query_RemoveChangeListener, [token]);
   }
 
   async ResultSet_Next(database: Database, resultSetId: string): Promise<Result> {
-    //this\.log('ResultSet_Next');
+    // this\.log('ResultSet_Next');
     const args: any[] = [database.getName(), resultSetId];
     return IonicCouchbaseLite.exec(EngineActionTypes.ResultSet_Next, args);
   }
 
   async ResultSet_NextBatch(database: Database, resultSetId: string): Promise<Result[]> {
-    //this\.log('ResultSet_Next');
+    // this\.log('ResultSet_Next');
     const args: any[] = [database.getName(), resultSetId];
     return IonicCouchbaseLite.exec(EngineActionTypes.ResultSet_NextBatch, args);
   }
@@ -193,13 +215,13 @@ export class CordovaEngine extends Engine {
   }
 
   async ResultSet_Cleanup(database: Database, resultSetId: string): Promise<void> {
-    //this\.log('ResultSet_Cleanup');
+    // this\.log('ResultSet_Cleanup');
     const args: any[] = [database.getName(), resultSetId];
     return IonicCouchbaseLite.exec(EngineActionTypes.ResultSet_Cleanup, args);
   }
 
   async Replicator_Start(database: Database, config: ReplicatorConfiguration): Promise<EngineReplicatorStartResult> {
-    //this\.log('Replicator_Start');
+    // this\.log('Replicator_Start');
     const args: any[] = [database.getName(), config.toJson()];
     return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Start, args);
   }
@@ -210,31 +232,31 @@ export class CordovaEngine extends Engine {
   }
 
   Replicator_AddChangeListener(replicatorId: string, cb: (data: any) => void, err: (err: any) => void): void {
-    //this\.log('Replicator_AddChangeListener');
+    // this\.log('Replicator_AddChangeListener');
     const args: any[] = [replicatorId];
     return IonicCouchbaseLite.watch(EngineActionTypes.Replicator_AddChangeListener, args, cb, err);
   }
 
   async Replicator_Stop(replicatorId: string): Promise<void> {
-    //this\.log('Replicator_Stop');
+    // this\.log('Replicator_Stop');
     const args: any[] = [replicatorId];
     return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Stop, args);
   }
 
   async Replicator_ResetCheckpoint(replicatorId: string): Promise<void> {
-    //this\.log('Replicator_ResetCheckpoint');
+    // this\.log('Replicator_ResetCheckpoint');
     const args: any[] = [replicatorId];
     return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_ResetCheckpoint, args);
   }
 
   async Replicator_GetStatus(replicatorId: string): Promise<ReplicatorStatus> {
-    //this\.log('Replicator_GetStatus');
+    // this\.log('Replicator_GetStatus');
     const args: any[] = [replicatorId];
     return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_GetStatus, args);
   }
 
   async Replicator_Cleanup(replicatorId: string): Promise<void> {
-    //this\.log('Replicator_Stop');
+    // this\.log('Replicator_Stop');
     const args: any[] = [replicatorId];
     return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Cleanup, args);
   }

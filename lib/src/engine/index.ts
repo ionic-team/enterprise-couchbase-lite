@@ -3,7 +3,7 @@ import { ConcurrencyControl, Database } from '../database';
 import { DatabaseConfiguration } from '../database-configuration';
 import { ResultSet } from '../result-set';
 import { Result } from '../result';
-import { Query } from '../query';
+import { Query, QueryChangeListener } from '../query';
 import { Document } from '../document';
 import { ReplicatorConfiguration } from '../replicator-configuration';
 import { Dictionary } from '../definitions';
@@ -55,7 +55,7 @@ export enum EngineActionTypes {
   Replicator_Cleanup = 'Replicator_Cleanup',
   Replicator_Restart = 'Replicator_Restart'
 }
-
+export type ChangeListenerToken = string;
 export abstract class Engine {
   static readonly ActionType = EngineActionTypes;
 
@@ -82,8 +82,9 @@ export abstract class Engine {
   abstract async Database_SetFileLoggingConfig(database: Database, config: DatabaseFileLoggingConfiguration): Promise<void>;
   abstract async Document_GetBlobContent(database: Database, documentId: string, key: string): Promise<ArrayBuffer>;
   abstract async Query_Execute(database: Database, query: Query): Promise<ResultSet>;
+  abstract async LiveQuery_Execute(database: Database, query: Query, callback: QueryChangeListener): Promise<ChangeListenerToken>;
   abstract Query_AddChangeListener(database: Database, query: Query, cb: (data: any) => void, err: (err: any) => void): void;
-  abstract async Query_RemoveChangeListener(database: Database, query: Query): Promise<void>;
+  abstract async Query_RemoveChangeListener(token: ChangeListenerToken): Promise<void>;
   abstract async ResultSet_Next(database: Database, resultSetId: string): Promise<Result>;
   // abstract ResultSet_AllResults(database: Database, resultSetId: string): Promise<Result[]>;
   abstract ResultSet_AllResults(database: Database, resultSetId: string, cb: (data: any[]) => void, err: (err: any) => void): void;

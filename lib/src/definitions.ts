@@ -3,4 +3,4 @@ export interface ICouchbaseLitePlugin {
   watch(actionName: string, args: any[], cb: (data: any) => void, err: (err: any) => void): void;
 }
 
-export type Dictionary = { [key:string]: any };
+export interface Dictionary { [key: string]: any; }

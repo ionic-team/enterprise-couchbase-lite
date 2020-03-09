@@ -1,6 +1,6 @@
-import { ResultSet } from "./result-set";
-import { ListenerToken, Database } from "./database";
-import { Parameters } from "./parameters";
+import { ResultSet } from './result-set';
+import { Database, ListenerToken } from './database';
+import { Parameters } from './parameters';
 import { DataSource } from './data-source';
 import { Select } from './select';
 import { OrderBy } from './order-by';
@@ -12,20 +12,12 @@ import { Limit } from './limit';
 import { From } from './from';
 import { Where } from './where';
 
-export class QueryChange {
-  _error: Error;
-  _query: Query;
-  _results: ResultSet;
 
-  getError(): Error {
-    return this._error;
-  }
-  getQuery(): Query {
-    return this._query;
-  }
-  getResults(): ResultSet {
-    return this._results;
-  }
+
+export interface QueryChange {
+  error?: Error;
+  query: Query;
+  results?: ResultSet;
 }
 
 export type QueryChangeListener = (change: QueryChange) => void;
@@ -36,9 +28,10 @@ export type QueryChangeListener = (change: QueryChange) => void;
 export abstract class Query {
   private parameters: Parameters;
 
-  private columnNames: { [name:string]: any } = {};
+  private columnNames: { [name: string]: any } = {};
 
-  private changeListenerToken?: QueryChangeListener;
+  changeListener?: QueryChangeListener;
+  private changeListenerToken?: string;
 
   // SELECT
   private _select: Select;
@@ -56,25 +49,26 @@ export abstract class Query {
   private _limit: Limit; // LIMIT expr
 
   addChangeListener(listener: QueryChangeListener) {
-    if (this.changeListenerToken) {
-      throw new Error("Cannot add multiple change listeners due to technical limitations.");
+    if (this.changeListener) {
+      throw new Error('Cannot add multiple change listeners due to technical limitations.');
     }
 
-    this.changeListenerToken = listener;
+    this.changeListener = listener;
 
     const db = this._getDatabase();
 
     db.getEngine().Query_AddChangeListener(db, this, data => {
-      this.changeListenerToken(data); // TODO: data vs QueryChange
+      this.changeListener(data); // TODO: data vs QueryChange
     }, err => {
       console.error('Query change listener error', err);
     });
   }
 
-  removeChangeListener() {
-    this.changeListenerToken = undefined;
+  async removeChangeListener() {
     const db = this._getDatabase();
-    return db.getEngine().Query_RemoveChangeListener(db, this);
+    await db.getEngine().Query_RemoveChangeListener(this.changeListenerToken);
+    this.changeListener = undefined;
+    this.changeListenerToken = undefined;
   }
 
   copy(query: Query) {
@@ -99,7 +93,7 @@ export abstract class Query {
   setOrderBy(orderBy: OrderBy) { this._orderBy = orderBy; }
   setLimit(limit: Limit)       { this._limit = limit; }
 
-  getFrom() { return this._from }
+  getFrom() { return this._from; }
 
   getColumnNames() {
     return this.columnNames;
@@ -111,10 +105,19 @@ export abstract class Query {
     }
   }
 
-  execute(): Promise<ResultSet> {
-    // console.log(this);
+  async execute(): Promise<ResultSet>;
+  async execute(liveQueryCallback?: QueryChangeListener): Promise<() => void>;
+  async execute(liveQueryCallback?: QueryChangeListener): Promise<(() => void) | ResultSet> {
+    alert('test');
     const db = this._getDatabase();
-    return db.getEngine().Query_Execute(db, this);
+    if (liveQueryCallback) {
+      this.changeListener = liveQueryCallback;
+      const token = await db.getEngine().LiveQuery_Execute(db, this, this.changeListener);
+      this.changeListenerToken = token;
+      return this.removeChangeListener.bind(this);
+    } else {
+      return db.getEngine().Query_Execute(db, this);
+    }
   }
 
   explain(): Promise<string> {
@@ -124,7 +127,7 @@ export abstract class Query {
   }
 
   generateColumnNames() {
-    const map: { [name:string]: number } = {};
+    const map: { [name: string]: number } = {};
     let provisionKeyIndex = 0;
 
     this._select.getSelectResults().forEach((r, i) => {
@@ -139,7 +142,7 @@ export abstract class Query {
       }
 
       if (name in map) {
-        throw new Error("Duplicate select result named " + name);
+        throw new Error('Duplicate select result named ' + name);
       }
 
       map[name] = i;
@@ -169,8 +172,8 @@ export abstract class Query {
     return db;
   }
 
-  private _asJSON(): { [key:string]: any } {
-    const json: { [key:string]: any } = {};
+  private _asJSON(): { [key: string]: any } {
+    const json: { [key: string]: any } = {};
 
     // console.log('Rendering to json', this._select, this._select.hasSelectResults());
 
@@ -195,11 +198,11 @@ export abstract class Query {
       f.push(...this._joins.asJSON());
     }
     if (f.length > 0) {
-      json["FROM"] =  f;
+      json['FROM'] =  f;
     }
 
     if (this._where != null) {
-      json["WHERE"] = this._where.asJSON();
+      json['WHERE'] = this._where.asJSON();
     }
 
     if (this._groupBy != null) {
@@ -211,14 +214,14 @@ export abstract class Query {
     }
 
     if (this._orderBy != null) {
-      json["ORDER_BY"] = this._orderBy.asJSON();
+      json['ORDER_BY'] = this._orderBy.asJSON();
     }
 
     if (this._limit != null) {
       const list = this._limit.asJSON();
       json['LIMIT'] = list[0];
       if (list.length > 1) {
-        json["OFFSET"] = list[1];
+        json['OFFSET'] = list[1];
       }
     }
     return json;
