@@ -29,7 +29,7 @@ export class QueryChange {
 }
 
 export type QueryChangeListener = (change: QueryChange) => void;
-export type LiveQueryCleanupFn = () => void;
+export type LiveQueryCleanupFn = () => Promise<void>;
 
 /**
  * A database query used for querying data from the database.
@@ -100,7 +100,7 @@ export abstract class Query {
         console.error('Query change listener error', err);
       });
 
-      return () => {
+      return async () => {
         // TODO: cleanup
       };
     } else {
