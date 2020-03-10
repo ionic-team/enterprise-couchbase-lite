@@ -1,3 +1,4 @@
+import { ListenerToken } from './definitions';
 import { Document } from './document';
 import { MutableDocument } from './mutable-document';
 import { DatabaseConfiguration } from './database-configuration'
@@ -21,9 +22,6 @@ export interface DatabaseChange {
 
 export interface DocumentChange {
   documentID: string;
-}
-
-export interface ListenerToken {
 }
 
 export type DatabaseChangeListener = (change: DatabaseChange) => void;

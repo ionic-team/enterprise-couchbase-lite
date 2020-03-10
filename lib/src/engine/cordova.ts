@@ -152,19 +152,19 @@ export class CordovaEngine extends Engine {
 
   async Query_Execute(database: Database, query: Query): Promise<ResultSet> {
     //this\.log('Query_Execute', JSON.stringify(query.toJson()));
-    const args: any[] = [database.getName(), JSON.stringify(query.toJson())];
+    const args: any[] = [database.getName(), query._id, JSON.stringify(query.toJson())];
     const ret = await IonicCouchbaseLite.exec(EngineActionTypes.Query_Execute, args) as any;
     return new ResultSet(query, ret.id, query.getColumnNames());
   }
 
-  LiveQuery_Execute(database: Database, query: Query, cb: (data: any) => void, err: (err: any) => void): void {
-    const args: any[] = [database.getName(), JSON.stringify(query.toJson())];
-    IonicCouchbaseLite.watch(EngineActionTypes.LiveQuery_Execute, args, cb, err);
+  Query_AddChangeListener(database: Database, query: Query, cb: (data: any) => void, err: (err: any) => void): void {
+    const args: any[] = [database.getName(), query._id, JSON.stringify(query.toJson())];
+    IonicCouchbaseLite.watch(EngineActionTypes.Query_AddChangeListener, args, cb, err);
   }
 
-  async LiveQuery_End(database: Database, id: number): Promise<void> {
-    const args: any[] = [database.getName(), id];
-    return IonicCouchbaseLite.exec(EngineActionTypes.LiveQuery_End, args);
+  async Query_RemoveChangeListener(database: Database, query: Query): Promise<void> {
+    const args: any[] = [database.getName(), query._id, JSON.stringify(query.toJson())];
+    return IonicCouchbaseLite.exec(EngineActionTypes.Query_RemoveChangeListener, args);
   }
 
   async ResultSet_Next(database: Database, resultSetId: string): Promise<Result> {

@@ -4,3 +4,6 @@ export interface ICouchbaseLitePlugin {
 }
 
 export type Dictionary = { [key:string]: any };
+
+export interface ListenerToken {
+}

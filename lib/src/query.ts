@@ -1,6 +1,7 @@
 import { ResultSet } from "./result-set";
 import { Result } from "./result";
-import { ListenerToken, Database } from "./database";
+import { Database } from "./database";
+import { ListenerToken } from "./definitions";
 import { Parameters } from "./parameters";
 import { DataSource } from './data-source';
 import { Select } from './select';
@@ -12,6 +13,8 @@ import { Joins } from './joins';
 import { Limit } from './limit';
 import { From } from './from';
 import { Where } from './where';
+
+import { v4 } from './util/uuid';
 
 export class QueryChange {
   results: Result[];
@@ -25,11 +28,18 @@ export type LiveQueryCleanupFn = () => Promise<void>;
  * The query statement of the Query object can be fluently constructed by calling the static select methods.
  */
 export abstract class Query {
+  public readonly _id: string;
+
+  constructor() {
+    this._id = v4();
+  }
+
+  private changeListenerTokens: QueryChangeListener[] = [];
+  private listeningForChanges = false;
+
   private parameters: Parameters;
 
   private columnNames: { [name:string]: any } = {};
-
-  private _liveQueryExecuted = false;
 
   // SELECT
   private _select: Select;
@@ -80,34 +90,42 @@ export abstract class Query {
     }
   }
 
-  execute(changeListener: QueryChangeListener): Promise<LiveQueryCleanupFn>;
-  execute(): Promise<ResultSet>;
-  async execute(changeListener?: QueryChangeListener): Promise<ResultSet | LiveQueryCleanupFn> {
-    if (this._liveQueryExecuted) {
-      throw new Error('Live Query can only be executed once due to technical limitations.');
-    }
-
+  async execute(): Promise<ResultSet> {
     const db = this._getDatabase();
     const engine = db.getEngine();
 
-    if (changeListener) {
-      const cleanupPromise = new Promise<number>(resolve => {
-        engine.LiveQuery_Execute(db, this, data => {
-          changeListener({ results: data.results });
-          resolve(data.id);
-        }, err => {
-          console.error('Query change listener error', err);
-        });
+    return engine.Query_Execute(db, this);
+  }
+
+  async addChangeListener(listener: QueryChangeListener): Promise<ListenerToken> {
+    this.changeListenerTokens.push(listener);
+
+    if (!this.listeningForChanges) {
+      const db = this._getDatabase();
+      const engine = db.getEngine();
+      engine.Query_AddChangeListener(db, this, (data: any) => {
+        this.notifyDatabaseChangeListeners(data);
+      }, (err: any) => {
+        console.error('Query change listener error', err);
       });
+      this.listeningForChanges = true;
+    }
 
-      this._liveQueryExecuted = true;
+    return listener;
+  }
 
-      return async () => {
-        const id = await cleanupPromise;
-        await engine.LiveQuery_End(db, id);
-      };
-    } else {
-      return engine.Query_Execute(db, this);
+  private notifyDatabaseChangeListeners(data: any) {
+    this.changeListenerTokens.forEach(l => l(data));
+  }
+
+  async removeChangeListener(listener: ListenerToken): Promise<void> {
+    this.changeListenerTokens = this.changeListenerTokens.filter(l => l !== listener);
+
+    if (this.changeListenerTokens.length === 0) {
+      const db = this._getDatabase();
+      const engine = db.getEngine();
+      await engine.Query_RemoveChangeListener(db, this);
+      this.listeningForChanges = false;
     }
   }
 

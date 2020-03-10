@@ -2,7 +2,6 @@ package com.ionicframework.couchbase;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.util.Pair;
 
 import com.couchbase.lite.AbstractReplicator;
 import com.couchbase.lite.Authenticator;
@@ -65,21 +64,17 @@ public class IonicCouchbaseLite extends CordovaPlugin {
 
   Class<IonicCouchbaseLite> myClass;
 
-  private Map<String, Database> openDatabases = new HashMap<>();
-  private Map<Number, ResultSet> queryResultSets = new HashMap<>();
-  private Map<Number, Pair<ListenerToken, Query>> liveQueries = new HashMap<>();
+  private Map<String, Query> queries = new HashMap<>();
+  private Map<String, Database> databases = new HashMap<>();
   private Map<Number, Replicator> replicators = new HashMap<>();
+
+  private Map<Number, ResultSet> queryResultSets = new HashMap<>();
+
+  private Map<String, ListenerToken> queryListeners = new HashMap<>();
+  private Map<String, ListenerToken> databaseListeners = new HashMap<>();
   private Map<Number, ListenerToken> replicatorListeners = new HashMap<>();
 
-  /**
-   * HashMap of database listeners. Key = database name.
-   *
-   * There is only ever one listener per database--multiple listeners are handled in JS.
-   */
-  private Map<String, ListenerToken> databaseListeners = new HashMap<>();
-
-  private int queryCount = 0;
-  private int liveQueryCount = 0;
+  private int executeCount = 0;
   private int replicatorCount = 0;
   private int allResultsChunkSize = 256;
 
@@ -139,7 +134,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   }
 
   private Database getDatabase(String name) {
-    return this.openDatabases.get(name);
+    return this.databases.get(name);
   }
 
   private Map<String, Object> documentToMap(Document d) {
@@ -365,7 +360,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
 
     Database d = new Database(name, c);
 
-    this.openDatabases.put(name, d);
+    this.databases.put(name, d);
 
     resolve(callbackContext);
   }
@@ -600,7 +595,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     try {
       d.close();
     } finally {
-      openDatabases.remove(d);
+      databases.remove(d);
     }
 
     resolve(callbackContext);
@@ -622,7 +617,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   public void Database_DeleteDocument(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
     String id = args.getString(1);
-    Database db = this.openDatabases.get(name);
+    Database db = this.databases.get(name);
     JSONObject document = args.getJSONObject(2);
     int concurrencyControlValue = args.optInt(3, ConcurrencyControl.LAST_WRITE_WINS.getValue());
     ConcurrencyControl concurrencyControl = makeConcurrencyControl(concurrencyControlValue);
@@ -642,7 +637,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   public void Database_PurgeDocument(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
     String id = args.getString(1);
-    Database db = this.openDatabases.get(name);
+    Database db = this.databases.get(name);
     JSONObject document = args.getJSONObject(2);
     Document d = db.getDocument(id);
 
@@ -659,7 +654,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   @SuppressWarnings("unused")
   public void Database_Compact(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
-    Database db = this.openDatabases.get(name);
+    Database db = this.databases.get(name);
 
     db.compact();
 
@@ -669,7 +664,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   public void Database_GetDocument(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
 
     String name = args.getString(0);
-    Database db = this.openDatabases.get(name);
+    Database db = this.databases.get(name);
     String documentId = args.getString(1);
     Document d = db.getDocument(documentId);
 
@@ -684,7 +679,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   public void Database_SetLogLevel(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
 
     String name = args.getString(0);
-    Database db = this.openDatabases.get(name);
+    Database db = this.databases.get(name);
     String domain = args.getString(1);
     int logLevelValue = args.getInt(2);
 
@@ -709,7 +704,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
 
   public void Database_SetFileLoggingConfig(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
-    Database db = this.openDatabases.get(name);
+    Database db = this.databases.get(name);
 
     JSONObject config = args.getJSONObject(1);
 
@@ -742,7 +737,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
 
   public void Document_GetBlobContent(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
-    Database db = this.openDatabases.get(name);
+    Database db = this.databases.get(name);
     String documentId = args.getString(1);
     String key = args.getString(2);
 
@@ -765,34 +760,44 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     return data;
   }
 
+  public Query createQuery(Database db, String id, String queryJson) {
+    Query q = queries.get(id);
+
+    if (q == null) {
+      q = JsonQueryBuilder.buildQuery(db, queryJson);
+      queries.put(id, q);
+      Log.d(TAG, "Built query: " + q);
+    }
+
+    return q;
+  }
+
   @SuppressWarnings("unused")
   public void Query_Execute(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
-    String queryJson = args.getString(1);
-    Database db = this.openDatabases.get(name);
+    String id = args.getString(1);
+    String queryJson = args.getString(2);
+    Database db = this.databases.get(name);
 
-    Query q = JsonQueryBuilder.buildQuery(db, queryJson);
+    Query q = createQuery(db, id, queryJson);
     ResultSet rs = q.execute();
-    Log.d(TAG, "Built query: " + q);
 
-    int id = queryCount++;
-
-    this.queryResultSets.put(id, rs);
+    int rsId = executeCount++;
+    this.queryResultSets.put(rsId, rs);
 
     resolve(callbackContext, json(new HashMap<String, Object>() {{
-      put("id", id);
+      put("id", rsId);
     }}));
   }
 
   @SuppressWarnings("unused")
-  public void LiveQuery_Execute(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
+  public void Query_AddChangeListener(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
-    String queryJson = args.getString(1);
-    Database db = this.openDatabases.get(name);
+    String id = args.getString(1);
+    String queryJson = args.getString(2);
+    Database db = this.databases.get(name);
 
-    Query q = JsonQueryBuilder.buildQuery(db, queryJson);
-
-    int id = liveQueryCount++;
+    Query q = createQuery(db, id, queryJson);
 
     ListenerToken token = q.addChangeListener(new QueryChangeListener() {
       @Override
@@ -823,23 +828,23 @@ public class IonicCouchbaseLite extends CordovaPlugin {
       }
     });
 
-    liveQueries.put(id, new Pair<>(token, q));
-
-    q.execute();
-    Log.d(TAG, "Built live query: " + q);
+    queryListeners.put(id, token);
   }
 
   @SuppressWarnings("unused")
-  public void LiveQuery_End(JSONArray args, final CallbackContext callbackContext) throws JSONException {
+  public void Query_RemoveChangeListener(JSONArray args, final CallbackContext callbackContext) throws JSONException {
     String name = args.getString(0);
-    int id = args.getInt(1);
+    String id = args.getString(1);
+    String queryJson = args.getString(2);
+    Database db = this.databases.get(name);
 
-    Database db = this.openDatabases.get(name);
-    Pair<ListenerToken, Query> p = this.liveQueries.get(id);
-    ListenerToken token = p.first;
-    Query q = p.second;
+    Query q = createQuery(db, id, queryJson);
 
-    q.removeChangeListener(token);
+    ListenerToken token = queryListeners.get(id);
+
+    if (token != null) {
+      q.removeChangeListener(token);
+    }
 
     resolve(callbackContext);
   }
@@ -953,7 +958,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
 
   public void Replicator_Start(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
-    Database db = this.openDatabases.get(name);
+    Database db = this.databases.get(name);
     JSONObject config = args.getJSONObject(1);
     try {
       ReplicatorConfiguration replicatorConfig = replicatorConfigFromJson(db, config);

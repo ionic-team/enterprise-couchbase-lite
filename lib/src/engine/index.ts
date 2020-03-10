@@ -41,8 +41,8 @@ export enum EngineActionTypes {
   Database_SetFileLoggingConfig = 'Database_SetFileLoggingConfig',
   Document_GetBlobContent = 'Document_GetBlobContent',
   Query_Execute = 'Query_Execute',
-  LiveQuery_Execute = 'LiveQuery_Execute',
-  LiveQuery_End = 'LiveQuery_End',
+  Query_AddChangeListener = 'Query_AddChangeListener',
+  Query_RemoveChangeListener = 'Query_RemoveChangeListener',
   ResultSet_Next = 'ResultSet_Next',
   ResultSet_NextBatch = 'ResultSet_NextBatch',
   ResultSet_AllResults = 'ResultSet_AllResults',
@@ -82,8 +82,8 @@ export abstract class Engine {
   abstract async Database_SetFileLoggingConfig(database: Database, config: DatabaseFileLoggingConfiguration): Promise<void>;
   abstract async Document_GetBlobContent(database: Database, documentId: string, key: string): Promise<ArrayBuffer>;
   abstract async Query_Execute(database: Database, query: Query): Promise<ResultSet>;
-  abstract LiveQuery_Execute(database: Database, query: Query, cb: (data: any) => any, err: (err: any) => void): void;
-  abstract async LiveQuery_End(database: Database, id: number): Promise<void>;
+  abstract Query_AddChangeListener(database: Database, query: Query, cb: (data: any) => void, err: (err: any) => void): void;
+  abstract async Query_RemoveChangeListener(database: Database, query: Query): Promise<void>;
   abstract async ResultSet_Next(database: Database, resultSetId: string): Promise<Result>;
   // abstract ResultSet_AllResults(database: Database, resultSetId: string): Promise<Result[]>;
   abstract ResultSet_AllResults(database: Database, resultSetId: string, cb: (data: any[]) => void, err: (err: any) => void): void;
