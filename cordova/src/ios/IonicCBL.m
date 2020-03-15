@@ -31,7 +31,8 @@
 @implementation IonicCouchbaseLite {
   NSMutableDictionary<NSString*, CBLDatabase*> *openDatabases;
   NSMutableDictionary<NSString*, CBLQueryResultSet*> *queryResultSets;
-  NSMutableDictionary<NSString*, NSArray*> *liveQueries; // values are [token, query]
+  NSMutableDictionary<NSString*, CBLQuery*> *queries;
+  NSMutableDictionary<NSString*, id<CBLListenerToken>> *queryListeners;
   NSMutableDictionary<NSString*, CBLReplicator*> *replicators;
   NSMutableDictionary<NSString*, id> *replicatorListeners;
   NSInteger _queryResultCount;
@@ -43,7 +44,8 @@
 -(void)pluginInitialize {
   openDatabases = [NSMutableDictionary new];
   queryResultSets = [NSMutableDictionary new];
-  liveQueries = [NSMutableDictionary new];
+  queries = [NSMutableDictionary new];
+  queryListeners = [NSMutableDictionary new];
   replicators = [NSMutableDictionary new];
   replicatorListeners = [NSMutableDictionary new];
   _queryResultCount = 0;
@@ -604,70 +606,78 @@
   }];
 }
 
+-(CBLQuery*)createQuery:(CBLDatabase*)db queryId:(NSString*)queryId queryJson:(NSString*)queryJson {
+    CBLQuery* q = [queries objectForKey:queryId];
+    if (q == nil) {
+        q = [[CustomQuery alloc] initWithJson:queryJson database:db];
+        [queries setObject:q forKey:queryId];
+    }
+    return q;
+}
+
+-(void)Query_AddChangeListener:(CDVInvokedUrlCommand*)command {
+  NSString *dbName = [command argumentAtIndex:0];
+  NSString *queryId = [command argumentAtIndex:1];
+  NSString *queryJson = [command argumentAtIndex:2];
+  CBLDatabase *db = [self getDatabase:dbName];
+  CBLQuery* query =[self createQuery:db queryId:queryId queryJson:queryJson];
+
+  id<CBLListenerToken> token = [query addChangeListener:^(CBLQueryChange * _Nonnull change) {
+    long chunkSize = self->_allResultsChunkSize;
+    NSMutableArray<NSDictionary *> *resultsChunk = [[NSMutableArray alloc] initWithCapacity:chunkSize];
+
+    CBLQueryResultSet *rs = [change results];
+    CBLQueryResult *result;
+    int i = 0;
+    while(i++ < chunkSize && (result = [rs nextObject]) != NULL) {
+      [resultsChunk addObject:[self resultToMap:result dbName:dbName]];
+    };
+    CDVPluginResult *cdvResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"id": queryId, @"results": resultsChunk}];
+    [cdvResult setKeepCallbackAsBool:YES];
+
+    [self.commandDelegate sendPluginResult:cdvResult callbackId:command.callbackId];
+  }];
+
+  [queryListeners setObject:token forKey:queryId];
+}
+
 -(void)Query_RemoveChangeListener:(CDVInvokedUrlCommand*)command {
-  NSString *queryId = [command argumentAtIndex:0];
-  NSArray* result = [liveQueries objectForKey:queryId];
-  id<CBLListenerToken> token = result[0];
-  CBLQuery *query = result[1];
-  [query removeChangeListenerWithToken:token];
+  NSString *dbName = [command argumentAtIndex:0];
+  NSString *queryId = [command argumentAtIndex:1];
+  NSString *queryJson = [command argumentAtIndex:2];
+  CBLDatabase *db = [self getDatabase:dbName];
+  CBLQuery* query =[self createQuery:db queryId:queryId queryJson:queryJson];
+  id<CBLListenerToken> token = [queryListeners objectForKey:queryId];
+  if (token) {
+    [query removeChangeListenerWithToken:token];
+
+    [queryListeners removeObjectForKey:queryId];
+    [queries removeObjectForKey:queryId];
+  }
   [self resolve:command];
 }
 
 -(void)Query_Execute:(CDVInvokedUrlCommand*)command {
 
   //[self.commandDelegate runInBackground:^{
-    NSString *name = [command argumentAtIndex:0];
-    CBLDatabase *db = [self getDatabase:name];
-    if (db == NULL) {
-      [self reject:command message:@"No such open database"];
-      return;
-    }
-    NSString *queryJson = [command argumentAtIndex:1];
-    BOOL hasCallback = [command argumentAtIndex:2 withDefault:nil];
+  NSString *name = [command argumentAtIndex:0];
 
-    NSError *error;
-    CustomQuery *query = [[CustomQuery alloc] initWithJson:queryJson database:db];
+  CBLDatabase *db = [self getDatabase:name];
+  if (db == NULL) {
+    [self reject:command message:@"No such open database"];
+    return;
+  }
+  NSString *queryId = [command argumentAtIndex:1];
+  NSString *queryJson = [command argumentAtIndex:2];
+  NSError *error;
+  CBLQuery* query = [self createQuery:db queryId:queryId queryJson:queryJson];
+  CBLQueryResultSet *result = [query execute:&error];
 
-    if (hasCallback) {
-        // TODO: release captured vars from block when changeListener is removed (__weak?)
-        id<CBLListenerToken> token = [query addChangeListener:^(CBLQueryChange * _Nonnull change) {
-            CBLQueryResultSet *result = [change results];
+  [queryResultSets setObject:result forKey: [@(_queryResultCount) stringValue]];
+  NSInteger queryResultId = _queryResultCount;
+  _queryResultCount++;
 
-            [self->queryResultSets setObject:result forKey: [@(self->_queryResultCount) stringValue]];
-            NSInteger queryResultId = self->_queryResultCount;
-            self->_queryResultCount++;
-
-            // TODO: confirm that recreating cdvResult in block works, as long as command.callbackId is the same
-            CDVPluginResult *cdvResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{ @"id": [@(queryResultId) stringValue] }];
-            [cdvResult setKeepCallbackAsBool:YES];
-
-            [self.commandDelegate sendPluginResult:cdvResult callbackId:command.callbackId];
-        }];
-
-        NSInteger queryId = _queryCount;
-        [liveQueries setObject: @[token, query] forKey: [@(queryId) stringValue]];
-        _queryCount++;
-        // we need this for removeChangeListener
-        CDVPluginResult *cdvResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{ @"token": [@(queryId) stringValue] }];
-        [cdvResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:cdvResult callbackId:command.callbackId];
-
-    }
-    // TODO: handle error
-    CBLQueryResultSet *result = [query execute:&error];
-
-    if (error) {
-        // TODO: remove changeListener and send error result
-    }
-
-    if (!hasCallback) {
-        [queryResultSets setObject:result forKey: [@(_queryResultCount) stringValue]];
-        NSInteger queryResultId = _queryResultCount;
-        _queryResultCount++;
-
-        [self resolve:command data:@{ @"id": @(queryResultId) }];
-    }
-  //}];
+  [self resolve:command data:@{ @"id": @(queryResultId) }];
 }
 
 -(void)ResultSet_Next:(CDVInvokedUrlCommand*)command {
