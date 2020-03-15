@@ -13,6 +13,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
+    "watch": "tsc -w --module ES2015 --target ES5 --outDir dist/esm",
     "build": "npm run clean && npm run transpile && npm run rollup && npm run minify",
     "minify": "uglifyjs --mangle --compress --source-map \"content='dist/ionic-enterprise-couchbase-lite.js.map',url='ionic-enterprise-couchbase-lite.js.map'\" --comments '/^/*!/' --output dist/ionic-enterprise-couchbase-lite.js dist/ionic-enterprise-couchbase-lite.js",
     "prepublishOnly": "npm run build",
