@@ -53,6 +53,7 @@ export class ReplicatorConfiguration {
     this.readonly = false;
     this.replicatorType = ReplicatorType.PUSH_AND_PULL;
     this.database = database;
+    this.channels = [];
     this.target = target;
   }
 
@@ -87,7 +88,7 @@ export class ReplicatorConfiguration {
   setDocumentIDs(documentIds: string[]) {
     this.documentIds = documentIds;
   }
-  
+
   toJson() {
     return {
       replicatorType: this.replicatorType,

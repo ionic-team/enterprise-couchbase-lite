@@ -844,6 +844,7 @@
   NSDictionary *target = [data objectForKey:@"target"];
   NSString *url = [target objectForKey:@"url"];
   NSString *replicatorType = [data objectForKey:@"replicatorType"];
+  NSArray<NSString*> *channels = [data objectForKey:@"channels"];
   BOOL continuous = [data objectForKey:@"continuous"];
 
   CBLURLEndpoint *endpoint = [[CBLURLEndpoint alloc] initWithURL:[NSURL URLWithString:url]];
@@ -858,6 +859,7 @@
     [replConfig setReplicatorType:kCBLReplicatorTypePush];
   }
 
+  [replConfig setChannels:channels];
   [replConfig setContinuous:continuous];
 
   CBLAuthenticator *authenticator = [self replicatorAuthenticatorFromConfig:authenticatorData];
