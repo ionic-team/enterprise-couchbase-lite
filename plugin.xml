@@ -17,11 +17,7 @@
             </feature>
         </config-file>
         <framework src="cordova/src/android/ioniccouchbaselite.gradle" custom="true" type="gradleReference"/>
-        <source-file src="cordova/src/android/com/ionicframework/couchbase/CBLConverter.java" target-dir="src/com/ionicframework/couchbase"/>
-        <source-file src="cordova/src/android/com/ionicframework/couchbase/CustomQuery.java" target-dir="src/com/ionicframework/couchbase"/>
-        <source-file src="cordova/src/android/com/ionicframework/couchbase/CustomResultContext.java" target-dir="src/com/ionicframework/couchbase"/>
-        <source-file src="cordova/src/android/com/ionicframework/couchbase/CustomResult.java" target-dir="src/com/ionicframework/couchbase"/>
-        <source-file src="cordova/src/android/com/ionicframework/couchbase/CustomResultSet.java" target-dir="src/com/ionicframework/couchbase"/>
+        <source-file src="cordova/src/android/com/ionicframework/couchbase/JsonQueryBuilder.java" target-dir="src/com/ionicframework/couchbase"/>
         <source-file src="cordova/src/android/com/ionicframework/couchbase/IonicCouchbaseLite.java" target-dir="src/com/ionicframework/couchbase"/>
     </platform>
     <!-- ios -->
