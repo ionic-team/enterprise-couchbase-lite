@@ -2,6 +2,7 @@ import { ReplicatorConfiguration } from "./replicator-configuration";
 import { ReplicatorChange } from "./replicator-change";
 import { CouchbaseLiteException } from "./couchbase-lite-exception";
 import { EngineReplicatorStartResult } from './engine';
+import { DocumentReplication, ReplicationDirection } from './document-replication';
 
 import { v4 } from './util/uuid';
 
@@ -141,7 +142,7 @@ export class Replicator {
 }
 
 export type ReplicatorChangeListener = (change: ReplicatorChange) => void;
-export type ReplicatorDocumentListener = (doc: ReplicatedDocument) => void;
+export type ReplicatorDocumentListener = (doc: DocumentReplication) => void;
 
 export class ReplicatorProgress {
   constructor(private completed: number, private total: number) {

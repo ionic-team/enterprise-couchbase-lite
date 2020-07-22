@@ -6,7 +6,7 @@ export enum ReplicatedDocumentFlag {
 export class ReplicatedDocument {
   constructor(
     protected id: string,
-    protected flags: ReplicatedDocument[],
+    protected flags: ReplicatedDocumentFlag[],
     protected error: string = null
   ) {}
 
@@ -14,7 +14,7 @@ export class ReplicatedDocument {
     return this.id;
   }
 
-  getFlags(): ReplicatedDocument[] {
+  getFlags(): ReplicatedDocumentFlag[] {
     return this.flags;
   }
 
