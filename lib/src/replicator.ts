@@ -95,9 +95,8 @@ export class Replicator {
   }
 
   private notifyDocumentListeners(data: Dictionary) {
-    const documentList = data["documents"];
     var documents: ReplicatedDocument[] = []
-    for (const document of documentList["documents"] as [Dictionary]) {
+    for (const document of data["documents"] as [Dictionary]) {
       var flags: ReplicatedDocumentFlag[] = []
       for (const flag of document["flags"] as string[]) {
         if (flag == "DELETED") {
@@ -110,7 +109,7 @@ export class Replicator {
       documents.push(new ReplicatedDocument(document["id"], flags, document["error"]));
     }
     const event = new DocumentReplication((data["direction"] == "PUSH") ? ReplicationDirection.PUSH : ReplicationDirection.PULL, documents);
-
+    
     this.documentListenerTokens.forEach((l) => l(event));
   }
 
