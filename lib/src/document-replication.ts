@@ -8,14 +8,14 @@ export enum ReplicationDirection {
 export class DocumentReplication {
   constructor(
     protected direction: ReplicationDirection,
-    protected documents: [ReplicatedDocument]
+    protected documents: ReplicatedDocument[]
   ) {}
 
   getDirection(): ReplicationDirection {
     return this.direction;
   }
 
-  getDocuments(): [ReplicatedDocument] {
+  getDocuments(): ReplicatedDocument[] {
     return this.documents;
   }
 }
