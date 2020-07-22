@@ -22,7 +22,11 @@ export class Replicator {
 
   private changeListenerTokens: ReplicatorChangeListener[] = [];
 
-  private didStartListener = false;
+  private documentListenerTokens: ReplicatorDocumentListener[] = [];
+
+  private didStartChangeListener = false;
+
+  private didStartDocumentListener = false;
 
   /**
    * Initializes a replicator with the given configuration.
@@ -40,7 +44,11 @@ export class Replicator {
   async start(): Promise<void> {
     const db = this.config.getDatabase();
 
-    if (this.replicatorId != null && this.didStartListener) {
+    if (
+      this.replicatorId != null &&
+      this.didStartChangeListener &&
+      this.didStartDocumentListener
+    ) {
       await db.getEngine().Replicator_Restart(this.replicatorId);
       return;
     }
@@ -48,19 +56,44 @@ export class Replicator {
     const ret = await db.getEngine().Replicator_Start(db, this.config);
     this.replicatorId = ret.replicatorId;
 
-    if (!this.didStartListener) {
-      db.getEngine().Replicator_AddChangeListener(this.replicatorId, (data: any) => {
-        this.status = new ReplicatorStatus(data.activityLevel, data.progress, data.error);
-        this.notifyListeners(data);
-      }, (err: any) => {
-        console.warn('Replicator ERROR ', err);
-      });
-      this.didStartListener = true;
+    if (!this.didStartChangeListener) {
+      db.getEngine().Replicator_AddChangeListener(
+        this.replicatorId,
+        (data: any) => {
+          this.status = new ReplicatorStatus(
+            data.activityLevel,
+            data.progress,
+            data.error
+          );
+          this.notifyChangeListeners(data);
+        },
+        (err: any) => {
+          console.warn("Replicator ERROR ", err);
+        }
+      );
+      this.didStartChangeListener = true;
+    }
+
+    if (!this.didStartDocumentListener) {
+      db.getEngine().Replicator_AddDocumentListener(
+        this.replicatorId,
+        (data: any) => {
+          this.notifyDocumentListeners(data);
+        },
+        (err: any) => {
+          console.warn("Replicator ERROR ", err);
+        }
+      );
+      this.didStartDocumentListener = true;
     }
   }
 
-  private notifyListeners(data: any) {
-    this.changeListenerTokens.forEach(l => l(data));
+  private notifyChangeListeners(data: any) {
+    this.changeListenerTokens.forEach((l) => l(data));
+  }
+
+  private notifyDocumentListeners(data: any) {
+    this.documentListenerTokens.forEach((l) => l(data));
   }
 
   async cleanup() {
@@ -91,11 +124,24 @@ export class Replicator {
   }
 
   removeChangeListener(listener: ReplicatorChangeListener) {
-    this.changeListenerTokens = this.changeListenerTokens.filter(l => l !== listener);
+    this.changeListenerTokens = this.changeListenerTokens.filter(
+      (l) => l !== listener
+    );
+  }
+
+  addDocumentListener(listener: ReplicatorDocumentListener) {
+    this.documentListenerTokens.push(listener);
+  }
+
+  removeDocumentListener(listener: ReplicatorDocumentListener) {
+    this.documentListenerTokens = this.documentListenerTokens.filter(
+      (l) => l !== listener
+    );
   }
 }
 
 export type ReplicatorChangeListener = (change: ReplicatorChange) => void;
+export type ReplicatorDocumentListener = (doc: ReplicatedDocument) => void;
 
 export class ReplicatorProgress {
   constructor(private completed: number, private total: number) {
