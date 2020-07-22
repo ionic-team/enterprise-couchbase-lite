@@ -1,8 +1,9 @@
 import { ReplicatorConfiguration } from "./replicator-configuration";
 import { ReplicatorChange } from "./replicator-change";
 import { CouchbaseLiteException } from "./couchbase-lite-exception";
-import { EngineReplicatorStartResult } from './engine';
+import { ReplicatedDocument, ReplicatedDocumentFlag } from './replicated-document';
 import { DocumentReplication, ReplicationDirection } from './document-replication';
+import { Dictionary } from './definitions'
 
 import { v4 } from './util/uuid';
 
@@ -93,8 +94,24 @@ export class Replicator {
     this.changeListenerTokens.forEach((l) => l(data));
   }
 
-  private notifyDocumentListeners(data: any) {
-    this.documentListenerTokens.forEach((l) => l(data));
+  private notifyDocumentListeners(data: Dictionary) {
+    const documentList = data["documents"];
+    var documents: ReplicatedDocument[] = []
+    for (const document of documentList["documents"] as [Dictionary]) {
+      var flags: ReplicatedDocumentFlag[] = []
+      for (const flag of document["flags"] as string[]) {
+        if (flag == "DELETED") {
+          flags.push(ReplicatedDocumentFlag.DELETED)
+        }
+        else if (flag == "ACCESS_REMOVED") {
+          flags.push(ReplicatedDocumentFlag.DELETED)
+        }
+      }
+      documents.push(new ReplicatedDocument(document["id"], flags, document["error"]));
+    }
+    const event = new DocumentReplication((data["direction"] == "PUSH") ? ReplicationDirection.PUSH : ReplicationDirection.PULL, documents);
+
+    this.documentListenerTokens.forEach((l) => l(event));
   }
 
   async cleanup() {
