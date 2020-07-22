@@ -50,8 +50,8 @@ export enum EngineActionTypes {
   Replicator_AddChangeListener = 'Replicator_AddChangeListener',
   Replicator_GetStatus = 'Replicator_GetStatus',
   Replicator_Cleanup = 'Replicator_Cleanup',
-  Replicator_Restart = 'Replicator_Restart'
-  Replicator_AddDocumentListener = "Replicator_AddDocumentListener",
+  Replicator_Restart = 'Replicator_Restart',
+  Replicator_AddDocumentListener = 'Replicator_AddDocumentListener',
 }
 
 export abstract class Engine {
@@ -91,9 +91,5 @@ export abstract class Engine {
   abstract async Replicator_Cleanup(replicatorId: string): Promise<void>;
   abstract async Replicator_Restart(replicatorId: string): Promise<void>;
   abstract Replicator_AddChangeListener(replicatorId: string, cb: (data: any) => void, err: (err: any) => void): void;
-}  abstract Replicator_AddDocumentListener(
-    replicatorId: string,
-    cb: (data: any) => void,
-    err: (err: any) => void
-  ): void;
+  abstract Replicator_AddDocumentListener(replicatorId: string, cb: (data: any) => void, err: (err: any) => void): void;
 }
