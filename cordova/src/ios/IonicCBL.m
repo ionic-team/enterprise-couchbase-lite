@@ -938,6 +938,7 @@
     if (document.error != nil) {
       [documentDictionary setValue:document.error.localizedDescription forKey:@"error"];
     }
+    [docs addObject:documentDictionary];
   }
   
   return @{
