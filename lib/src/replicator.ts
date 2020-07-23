@@ -117,6 +117,7 @@ export class Replicator {
 
   async cleanup() {
     this.changeListenerTokens = [];
+    this.documentListenerTokens = [];
 
     const db = this.config.getDatabase();
     await db.getEngine().Replicator_Cleanup(this.replicatorId);
