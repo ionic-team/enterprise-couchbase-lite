@@ -65,7 +65,7 @@ export class Replicator {
             this.status = new ReplicatorStatus(
               data.activityLevel,
               new ReplicatorProgress(data.progress.completed, data.progress.total),
-              data.error == null ? null : new CouchbaseLiteException(data.error.info, data.error.domain, data.error.code)
+              data.error == null ? null : new CouchbaseLiteException(data.error.message, data.error.domain, data.error.code)
             );
             this.notifyChangeListeners(data);
           } else {
@@ -108,7 +108,8 @@ export class Replicator {
         const flags: ReplicatedDocumentFlag[] = document.flags.map(flag => {
           return (<any>ReplicatedDocumentFlag)[flag];
         });
-        return new ReplicatedDocument(document.id, flags, document.error)
+        const error = (document.error == null) ? null : new CouchbaseLiteException(document.error.message, document.error.domain, document.error.code);
+        return new ReplicatedDocument(document.id, flags, error)
       })
     );
 

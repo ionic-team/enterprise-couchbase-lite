@@ -3,10 +3,10 @@ import { ReplicatorActivityLevel } from "./replicator";
 export interface ReplicatorChange {
   activityLevel: ReplicatorActivityLevel;
   error: {
-    code: number;
+    message: string;
     domain: string;
-    info: any;
-  };
+    code: number;
+  }
   progress: {
     completed: number;
     total: number;

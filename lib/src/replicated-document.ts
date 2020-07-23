@@ -1,3 +1,5 @@
+import { CouchbaseLiteException } from "./couchbase-lite-exception";
+
 export enum ReplicatedDocumentFlag {
   DELETED = "DELETED",
   ACCESS_REMOVED = "ACCESS_REMOVED",
@@ -7,7 +9,7 @@ export class ReplicatedDocument {
   constructor(
     protected id: string,
     protected flags: ReplicatedDocumentFlag[],
-    protected error: string = null
+    protected error: CouchbaseLiteException = null
   ) {}
 
   getId(): string {
@@ -18,7 +20,7 @@ export class ReplicatedDocument {
     return this.flags;
   }
 
-  getError(): string {
+  getError(): CouchbaseLiteException {
     return this.error;
   }
 }
@@ -26,7 +28,11 @@ export class ReplicatedDocument {
 export interface ReplicatedDocumentRepresentation {
   id: string
   flags: string[]
-  error: string
+  error: {
+    message: string;
+    domain: string;
+    code: number;
+  }
 }
 
 export function isReplicatedDocumentRepresentation(obj: any): obj is ReplicatedDocumentRepresentation {
@@ -40,6 +46,11 @@ export function isReplicatedDocumentRepresentation(obj: any): obj is ReplicatedD
     });
     if (object.id == null) {
       throw "document id cannot be null";
+    }
+    if (object.error != null) {
+      if (object.error.message == null || object.error.domain == null || object.error.code == null) {
+        throw "document error is incomplete";
+      }
     }
     return true
   } catch (e) {
