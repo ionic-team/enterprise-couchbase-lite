@@ -12,3 +12,13 @@ export interface ReplicatorChange {
     total: number;
   }
 }
+
+export function isReplicatorChange(obj: any): obj is ReplicatorChange {
+  try {
+    const object: ReplicatorChange = obj
+    return (object.activityLevel != null) && (object.progress != null && object.progress.completed != null && object.progress.total != null)
+  } catch (e) {
+    console.warn("Invalid ReplicatorChange", e)
+    return false
+  }
+}
