@@ -940,11 +940,13 @@
     if ((document.flags & kCBLDocumentFlagsAccessRemoved) != 0) {
       [flags addObject:@"ACCESS_REMOVED"];
     }
-    
     NSMutableDictionary* documentDictionary = [[NSMutableDictionary alloc] initWithDictionary:@{@"id":document.id, @"flags": flags}];
-    if (document.error != nil) {
-      [documentDictionary setValue:document.error.localizedDescription forKey:@"error"];
+    
+    NSError *error = document.error;
+    if (error != nil) {
+      [documentDictionary setValue:@{@"code": @(error.code), @"domain": error.domain, @"message": error.localizedDescription} forKey:@"error"];
     }
+    
     [docs addObject:documentDictionary];
   }
   
