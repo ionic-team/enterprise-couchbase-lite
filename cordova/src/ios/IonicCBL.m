@@ -876,13 +876,13 @@
 }
 
 -(NSDictionary *)generateStatusJson:(CBLReplicatorStatus *)status {
-    NSDictionary *errorJson = @{};
+    NSDictionary *errorJson = nil;
     NSError *error = status.error;
-    if (error != NULL) {
+    if (error != nil) {
       errorJson = @{
         @"code": @(error.code),
         @"domain": error.domain,
-        @"info": @{}
+        @"message": error.localizedDescription
       };
     }
     
@@ -891,12 +891,19 @@
       @"completed": @(progress.completed),
       @"total": @(progress.total)
     };
-
-  return @{
-    @"activityLevel": @(status.activity),
-    @"error": errorJson,
-    @"progress": progressJson
-  };
+  if (errorJson != nil) {
+    return @{
+      @"activityLevel": @(status.activity),
+      @"error": errorJson,
+      @"progress": progressJson
+    };
+  }
+  else {
+    return @{
+      @"activityLevel": @(status.activity),
+      @"progress": progressJson
+    };
+  }
 }
 
 -(void)Replicator_AddChangeListener:(CDVInvokedUrlCommand*)command {
