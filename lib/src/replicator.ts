@@ -1,9 +1,8 @@
 import { ReplicatorConfiguration } from "./replicator-configuration";
-import { ReplicatorChange } from "./replicator-change";
+import { ReplicatorChange, isReplicatorChange } from "./replicator-change";
 import { CouchbaseLiteException } from "./couchbase-lite-exception";
-import { ReplicatedDocument, ReplicatedDocumentFlag } from './replicated-document';
-import { DocumentReplication, ReplicationDirection } from './document-replication';
-import { Dictionary } from './definitions'
+import { ReplicatedDocument, ReplicatedDocumentFlag, ReplicatedDocumentRepresentation } from './replicated-document';
+import { DocumentReplication, ReplicationDirection, DocumentReplicationRepresentation, isDocumentReplicationRepresentation } from './document-replication';
 
 import { v4 } from './util/uuid';
 
@@ -61,13 +60,17 @@ export class Replicator {
     if (!this.didStartChangeListener) {
       db.getEngine().Replicator_AddChangeListener(
         this.replicatorId,
-        (data: any) => {
-          this.status = new ReplicatorStatus(
-            data.activityLevel,
-            data.progress,
-            data.error
-          );
-          this.notifyChangeListeners(data);
+        (data: ReplicatorChange) => {
+          if (isReplicatorChange(data)) {
+            this.status = new ReplicatorStatus(
+              data.activityLevel,
+              new ReplicatorProgress(data.progress.completed, data.progress.total),
+              data.error == null ? null : new CouchbaseLiteException(data.error.info, data.error.domain, data.error.code)
+            );
+            this.notifyChangeListeners(data);
+          } else {
+            console.warn("Invalid Replicator Change Object!");
+          }
         },
         (err: any) => {
           console.warn("Replicator ERROR ", err);
@@ -79,8 +82,12 @@ export class Replicator {
     if (!this.didStartDocumentListener) {
       db.getEngine().Replicator_AddDocumentListener(
         this.replicatorId,
-        (data: any) => {
-          this.notifyDocumentListeners(data);
+        (data: DocumentReplicationRepresentation) => {
+          if (isDocumentReplicationRepresentation(data)) {
+            this.notifyDocumentListeners(data);
+          } else {
+            console.warn("Invalid Document Replication Object!");
+          }
         },
         (err: any) => {
           console.warn("Replicator ERROR ", err);
@@ -90,25 +97,20 @@ export class Replicator {
     }
   }
 
-  private notifyChangeListeners(data: any) {
+  private notifyChangeListeners(data: ReplicatorChange) {
     this.changeListenerTokens.forEach((l) => l(data));
   }
 
-  private notifyDocumentListeners(data: Dictionary) {
-    var documents: ReplicatedDocument[] = []
-    for (const document of data["documents"] as [Dictionary]) {
-      var flags: ReplicatedDocumentFlag[] = []
-      for (const flag of document["flags"] as string[]) {
-        if (flag == "DELETED") {
-          flags.push(ReplicatedDocumentFlag.DELETED)
-        }
-        else if (flag == "ACCESS_REMOVED") {
-          flags.push(ReplicatedDocumentFlag.DELETED)
-        }
-      }
-      documents.push(new ReplicatedDocument(document["id"], flags, document["error"]));
-    }
-    const event = new DocumentReplication((data["direction"] == "PUSH") ? ReplicationDirection.PUSH : ReplicationDirection.PULL, documents);
+  private notifyDocumentListeners(data: DocumentReplicationRepresentation) {
+    const event = new DocumentReplication(
+      (<any>ReplicationDirection)[data.direction],
+      data.documents.map(document => {
+        const flags = document.flags.map(flag => {
+          return (<any>ReplicatedDocumentFlag)[flag];
+        });
+        return new ReplicatedDocument(document.id, flags, document.error)
+      })
+    );
     
     this.documentListenerTokens.forEach((l) => l(event));
   }
