@@ -75,6 +75,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
   private Map<Number, ResultSet> queryResultSets = new HashMap<>();
   private Map<Number, Replicator> replicators = new HashMap<>();
   private Map<Number, ListenerToken> replicatorListeners = new HashMap<>();
+  private Map<Number, ListenerToken> documentListeners = new HashMap<>();
 
   private int queryCount = 0;
   private int replicatorCount = 0;
@@ -948,6 +949,50 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     }});
   }
 
+  private JSONObject generateDocumentReplicationJson(DocumentReplication replication) {
+    JSONObject replicationJson = new JSONObject();
+
+    try {
+      replicationJson.put("direction", replication.isPush() ? "PUSH" : "PULL");
+
+      JSONArray documentsJson = new JSONArray();
+      for (ReplicatedDocument replicatedDocument : replication.getDocuments()) {
+        JSONObject document = new JSONObject();
+
+        CouchbaseLiteException error = replicatedDocument.getError();
+        if (error != null) {
+          JSONObject errorJson = new JSONObject();
+
+          try {
+            errorJson.put("code", error.getCode());
+            errorJson.put("domain", error.getDomain());
+            errorJson.put("message", error.getMessage());
+          } catch (Exception ex) {}
+
+          document.put("error", errorJson);
+        }
+
+        JSONArray flags = new JSONArray();
+        if (replicatedDocument.flags().contains(DocumentFlag.DocumentFlagsDeleted)) {
+          flags.put("DELETED");
+        }
+
+        if (replicatedDocument.flags().contains(DocumentFlag.DocumentFlagsAccessRemoved)) {
+          flags.put("ACCESS_REMOVED");
+        }
+
+        document.put("flags", flags);
+        document.put("id", replicatedDocument.getID());
+
+        documentsJson.put(document);
+      }
+
+      replicationJson.put("documents", documentsJson);
+    } catch (Exception ex) {}
+
+    return replicationJson;
+  }
+
   public void Replicator_AddChangeListener(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     int replicatorId = args.getInt(0);
     Replicator r = this.replicators.get(replicatorId);
@@ -969,6 +1014,27 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     replicatorListeners.put(replicatorId, token);
   }
 
+  public void Replicator_AddDocumentListener(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
+    int replicatorId = args.getInt(0);
+    Replicator r = this.replicators.get(replicatorId);
+    if (r == null) {
+      reject(callbackContext, "No such replicator");
+      return;
+    }
+
+    ListenerToken token = r.addDocumentReplicationListener(new DocumentReplicationListener() {
+      @Override
+      public void replication(@NonNull DocumentReplication replication) {
+        JSONObject replicationJson = generateDocumentReplicationJson(replication);
+        PluginResult r = new PluginResult(PluginResult.Status.OK, replicationJson);
+        r.setKeepCallback(true);
+        callbackContext.sendPluginResult(r);
+      }
+    });
+
+    documentListeners.put(replicatorId, token);
+  }
+
   public void Replicator_Cleanup(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     int replicatorId = args.getInt(0);
     Replicator r = this.replicators.get(replicatorId);
@@ -982,6 +1048,13 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     if (token != null) {
       r.removeChangeListener(token);
       replicatorListeners.remove(replicatorId);
+    }
+
+    token = documentListeners.get(replicatorId);
+
+    if (token != null) {
+      r.removeChangeListener(token);
+      documentListeners.remove(replicatorId);
     }
 
     replicators.remove(replicatorId);
