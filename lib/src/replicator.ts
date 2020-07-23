@@ -105,18 +105,19 @@ export class Replicator {
     const event = new DocumentReplication(
       (<any>ReplicationDirection)[data.direction],
       data.documents.map(document => {
-        const flags = document.flags.map(flag => {
+        const flags: ReplicatedDocumentFlag[] = document.flags.map(flag => {
           return (<any>ReplicatedDocumentFlag)[flag];
         });
         return new ReplicatedDocument(document.id, flags, document.error)
       })
     );
-    
+
     this.documentListenerTokens.forEach((l) => l(event));
   }
 
   async cleanup() {
     this.changeListenerTokens = [];
+    this.documentListenerTokens = [];
 
     const db = this.config.getDatabase();
     await db.getEngine().Replicator_Cleanup(this.replicatorId);

@@ -30,13 +30,16 @@ export function isDocumentReplicationRepresentation(obj: any): obj is DocumentRe
     const object: DocumentReplicationRepresentation = obj;
     object.documents.forEach(document => {
       if (!isReplicatedDocumentRepresentation(document)) {
-        return false
+        throw "invalid replicated document";
       }
     });
     const direction: ReplicationDirection | undefined = (<any>ReplicationDirection)[object.direction];
-    return (direction != undefined)
+    if (direction == undefined) {
+      throw "unrecognized replication direction " + object.direction;
+    }
+    return true;
   } catch (e) {
-    console.warn("Invalid DocumentReplicationRepresentation", e)
+    console.warn("Invalid DocumentReplicationRepresentation:", e)
     return false
   }
 }

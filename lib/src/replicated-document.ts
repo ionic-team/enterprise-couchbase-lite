@@ -35,12 +35,15 @@ export function isReplicatedDocumentRepresentation(obj: any): obj is ReplicatedD
     object.flags.forEach(flag => {
       const flagTest: ReplicatedDocumentFlag | undefined = (<any>ReplicatedDocumentFlag)[flag];
       if (flagTest == undefined) {
-        return false
+        throw "unrecognized replication flag " + flag;
       }
     });
-    return (object.id != null)
+    if (object.id == null) {
+      throw "document id cannot be null";
+    }
+    return true
   } catch (e) {
-    console.warn("Invalid ReplicatedDocumentRepresentation", e)
+    console.warn("Invalid ReplicatedDocumentRepresentation:", e)
     return false
   }
 }
