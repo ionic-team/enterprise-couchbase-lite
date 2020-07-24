@@ -200,6 +200,12 @@ export class CordovaEngine extends Engine {
     return IonicCouchbaseLite.watch(EngineActionTypes.Replicator_AddChangeListener, args, cb, err);
   }
 
+  Replicator_AddDocumentListener(replicatorId: string, cb: (data: any) => void, err: (err: any) => void): void {
+    //this\.log('Replicator_AddDocumentListener');
+    const args: any[] = [replicatorId];
+    return IonicCouchbaseLite.watch(EngineActionTypes.Replicator_AddDocumentListener, args, cb, err);
+  }
+
   async Replicator_Stop(replicatorId: string): Promise<void> {
     //this\.log('Replicator_Stop');
     const args: any[] = [replicatorId];
