@@ -1,7 +1,7 @@
 ---
 title: Couchbase Lite
 template: enterprise-plugin
-version: 1.1.0
+version: 1.2.0
 minor: 1.1.X
 ---
 
@@ -1097,6 +1097,18 @@ config.setPinnedServerCertificate(cert);</code></pre>
 # Changelog
 
 
+
+### [1.2.0] (2020-07-24)
+
+
+### Features
+
+* adding replication listening API 
+
+
+### Bug Fixes
+
+* **android:** removed deleted files from cordova plugin xml 
 
 ## 1.1.0 (2020-01-08)
 
