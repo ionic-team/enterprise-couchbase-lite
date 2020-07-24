@@ -32,7 +32,8 @@
   NSMutableDictionary<NSString*, CBLDatabase*> *openDatabases;
   NSMutableDictionary<NSString*, CBLQueryResultSet*> *queryResultSets;
   NSMutableDictionary<NSString*, CBLReplicator*> *replicators;
-  NSMutableDictionary<NSString*, id> *replicatorListeners;
+  NSMutableDictionary<NSString*, id> *replicatorChangeListeners;
+  NSMutableDictionary<NSString*, id> *replicatorDocumentListeners;
   NSInteger _queryCount;
   NSInteger _replicatorCount;
   NSInteger _allResultsChunkSize;
@@ -42,7 +43,8 @@
   openDatabases = [NSMutableDictionary new];
   queryResultSets = [NSMutableDictionary new];
   replicators = [NSMutableDictionary new];
-  replicatorListeners = [NSMutableDictionary new];
+  replicatorChangeListeners = [[NSMutableDictionary alloc] init];
+  replicatorDocumentListeners = [[NSMutableDictionary alloc] init];
   _queryCount = 0;
   _replicatorCount = 0;
   _allResultsChunkSize = 256;
@@ -923,7 +925,55 @@
       [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
     
-    [self->replicatorListeners setObject:listener forKey:[@(replicatorId) stringValue]];
+    [self->replicatorChangeListeners setObject:listener forKey:[@(replicatorId) stringValue]];
+  }];
+}
+
+-(NSDictionary *)generateReplicationJson:(CBLDocumentReplication *)replication {
+  NSMutableArray* docs = [[NSMutableArray alloc] init];
+  
+  for (CBLReplicatedDocument* document in replication.documents) {
+    NSMutableArray* flags = [[NSMutableArray alloc] init];
+    if ((document.flags & kCBLDocumentFlagsDeleted) != 0) {
+      [flags addObject:@"DELETED"];
+    }
+    if ((document.flags & kCBLDocumentFlagsAccessRemoved) != 0) {
+      [flags addObject:@"ACCESS_REMOVED"];
+    }
+    NSMutableDictionary* documentDictionary = [[NSMutableDictionary alloc] initWithDictionary:@{@"id":document.id, @"flags": flags}];
+    
+    NSError *error = document.error;
+    if (error != nil) {
+      [documentDictionary setValue:@{@"code": @(error.code), @"domain": error.domain, @"message": error.localizedDescription} forKey:@"error"];
+    }
+    
+    [docs addObject:documentDictionary];
+  }
+  
+  return @{
+    @"direction": (replication.isPush) ? @"PUSH" : @"PULL",
+    @"documents": docs
+  };
+}
+
+-(void)Replicator_AddDocumentListener:(CDVInvokedUrlCommand*)command {
+  NSInteger replicatorId = [[command argumentAtIndex:0] intValue];
+  
+  [self.commandDelegate runInBackground:^{
+    CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
+    if (replicator == NULL) {
+      return [self reject:command message:@"No such replicator"];
+    }
+    
+    id listener = [replicator addDocumentReplicationListener:^(CBLDocumentReplication *replication) {
+      NSDictionary *eventJson = [self generateReplicationJson:replication];
+      CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:eventJson];
+      
+      [result setKeepCallbackAsBool:TRUE];
+      [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+    
+    [self->replicatorDocumentListeners setObject:listener forKey:[@(replicatorId) stringValue]];
   }];
 }
 
@@ -939,10 +989,16 @@
     
     [self->replicators removeObjectForKey:key];
     
-    id listener = [self->replicatorListeners objectForKey:key];
+    id listener = [self->replicatorChangeListeners objectForKey:key];
     if (listener != NULL) {
       [replicator removeChangeListenerWithToken:listener];
-      [self->replicatorListeners removeObjectForKey:key];
+      [self->replicatorChangeListeners removeObjectForKey:key];
+    }
+    
+    listener = [self->replicatorDocumentListeners objectForKey:key];
+    if (listener != NULL) {
+      [replicator removeChangeListenerWithToken:listener];
+      [self->replicatorDocumentListeners removeObjectForKey:key];
     }
     
     [self resolve:command];
