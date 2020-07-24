@@ -52,7 +52,8 @@ import {
     URLEndpoint,
     ArrayFunction,
     PropertyExpression,
-    Join
+    Join,
+    DocumentReplication
 } from '@ionic-enterprise/couchbase-lite';
 ```
 
@@ -130,6 +131,10 @@ let replicator = new Replicator(replConfig);
 
 // Listen to replicator change events.
 replicator.addChangeListener((status) => {
+});
+
+// Listen to document replication events.
+replicator.addDocumentListener((doc) => {
 });
 
 // Start replication.
