@@ -1,48 +1,43 @@
 package com.ionicframework.couchbase;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.couchbase.lite.AbstractReplicator;
-import com.couchbase.lite.ArrayFunction;
 import com.couchbase.lite.Authenticator;
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.ConcurrencyControl;
 import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
-import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseChange;
 import com.couchbase.lite.DatabaseChangeListener;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.DocumentFlag;
+import com.couchbase.lite.DocumentReplication;
+import com.couchbase.lite.DocumentReplicationListener;
 import com.couchbase.lite.EncryptionKey;
 import com.couchbase.lite.Endpoint;
-import com.couchbase.lite.Expression;
 import com.couchbase.lite.FullTextIndexItem;
-import com.couchbase.lite.Function;
 import com.couchbase.lite.Index;
 import com.couchbase.lite.IndexBuilder;
-import com.couchbase.lite.Join;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogDomain;
 import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
-import com.couchbase.lite.Meta;
 import com.couchbase.lite.MutableArray;
 import com.couchbase.lite.MutableDictionary;
 import com.couchbase.lite.MutableDocument;
-import com.couchbase.lite.OrderBy;
-import com.couchbase.lite.Ordering;
 import com.couchbase.lite.Query;
-import com.couchbase.lite.QueryBuilder;
+import com.couchbase.lite.ReplicatedDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
-import com.couchbase.lite.SelectResult;
 import com.couchbase.lite.SessionAuthenticator;
 import com.couchbase.lite.URLEndpoint;
 import com.couchbase.lite.ValueIndexItem;
@@ -596,15 +591,8 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     String name = args.getString(0);
     String id = args.getString(1);
     Database db = this.openDatabases.get(name);
-    JSONObject document = args.getJSONObject(2);
-    Document d = db.getDocument(id);
 
-    if (d == null) {
-      reject(callbackContext, "No such document");
-      return;
-    }
-
-    db.purge(d);
+    db.purge(id);
 
     resolve(callbackContext);
   }
@@ -860,7 +848,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     resolve(callbackContext);
   }
 
-  public void Replicator_Start(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
+  public void Replicator_Create(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
     String name = args.getString(0);
     Database db = this.openDatabases.get(name);
     JSONObject config = args.getJSONObject(1);
@@ -868,16 +856,25 @@ public class IonicCouchbaseLite extends CordovaPlugin {
       ReplicatorConfiguration replicatorConfig = replicatorConfigFromJson(db, config);
       Replicator r = new Replicator(replicatorConfig);
 
-      r.start();
-
       int id = replicatorCount++;
       this.replicators.put(id, r);
       resolve(callbackContext, json(new HashMap<String, Object>() {{
         put("replicatorId", id);
       }}));
     } catch (Exception ex) {
-      reject(callbackContext, "Error starting replicator: " + ex.getMessage());
+      reject(callbackContext, "Error creating replicator: " + ex.getMessage());
     }
+  }
+
+  public void Replicator_Start(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
+    int replicatorId = args.getInt(0);
+    Replicator r = this.replicators.get(replicatorId);
+    if (r == null) {
+      reject(callbackContext, "No such replicator");
+      return;
+    }
+    r.start();
+    resolve(callbackContext);
   }
 
   public void Replicator_Stop(JSONArray args, final CallbackContext callbackContext) throws JSONException, CouchbaseLiteException {
@@ -1079,6 +1076,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     String authenticatorType = authenticatorData.getString("type");
     String replicatorType = json.getString("replicatorType");
     boolean continuous = json.getBoolean("continuous");
+
     JSONObject target = json.getJSONObject("target");
     if (target == null) {
       throw new CouchbaseLiteException("No target specified for replicator");
@@ -1087,6 +1085,16 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     String url = target.getString("url");
     Endpoint endpoint = new URLEndpoint(new URI(url));
     ReplicatorConfiguration config = new ReplicatorConfiguration(db, endpoint);
+
+
+    JSONArray channelJSONArray = json.optJSONArray("channels");
+    if (channelJSONArray != null) {
+      List<String> channels = new ArrayList<String>();
+      for (int i = 0; i < channelJSONArray.length(); i++) {
+        channels.add(channelJSONArray.getString(i));
+      }
+      config.setChannels(channels);
+    }
 
     if (replicatorType.equals("PUSH_AND_PULL")) {
       config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);

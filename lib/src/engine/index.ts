@@ -46,6 +46,7 @@ export enum EngineActionTypes {
   ResultSet_NextBatch = 'ResultSet_NextBatch',
   ResultSet_AllResults = 'ResultSet_AllResults',
   ResultSet_Cleanup = 'ResultSet_Cleanup',
+  Replicator_Create = 'Replicator_Create',
   Replicator_Start = 'Replicator_Start',
   Replicator_Stop = 'Replicator_Stop',
   Replicator_ResetCheckpoint = 'Replicator_ResetCheckpoint',
@@ -74,7 +75,7 @@ export abstract class Engine {
   abstract async Database_Close(database: Database): Promise<void>;
   abstract async Database_Compact(database: Database): Promise<void>;
   abstract async Database_Delete(database: Database): Promise<void>;
-  abstract async Database_PurgeDocument(database: Database, document: Document): Promise<void>;
+  abstract async Database_PurgeDocument(database: Database, document: Document | string): Promise<void>;
   abstract async Database_DeleteDocument(database: Database, document: Document, concurrencyControl: ConcurrencyControl): Promise<void>;
   abstract async Database_GetDocument(database: Database, documentId: string): Promise<Dictionary>;
   abstract async Database_SetLogLevel(database: Database, domain: string, logLevel: number): Promise<void>;
@@ -86,7 +87,8 @@ export abstract class Engine {
   abstract ResultSet_AllResults(database: Database, resultSetId: string, cb: (data: any[]) => void, err: (err: any) => void): void;
   abstract async ResultSet_NextBatch(database: Database, resultSetId: string): Promise<Result[]>;
   abstract async ResultSet_Cleanup(database: Database, resultSetId: string): Promise<void>;
-  abstract async Replicator_Start(database: Database, replicatorConfiguration: ReplicatorConfiguration): Promise<EngineReplicatorStartResult>;
+  abstract async Replicator_Create(database: Database, replicatorConfiguration: ReplicatorConfiguration): Promise<EngineReplicatorStartResult>;
+  abstract async Replicator_Start(replicatorId: string): Promise<void>;
   abstract async Replicator_Stop(replicatorId: string): Promise<void>;
   abstract async Replicator_ResetCheckpoint(replicatorId: string): Promise<void>;
   abstract async Replicator_GetStatus(replicatorId: string): Promise<ReplicatorStatus>;

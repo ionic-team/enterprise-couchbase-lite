@@ -24,7 +24,7 @@ export class CordovaEngine extends Engine {
   log(...args: any[]) {
     // console.log('[cordova]', args.join(' '));
   }
-  
+
   async Plugin_Configure(config: any): Promise<void> {
     const args: any[] = [config];
     return IonicCouchbaseLite.exec('Plugin_Configure', args);
@@ -110,9 +110,9 @@ export class CordovaEngine extends Engine {
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_Delete, args) as any;
   }
 
-  async Database_PurgeDocument(database: Database, document: Document): Promise<void> {
-    //this\.log('Database_PurgeDocument', document.getId());
-    const args: any[] = [database.getName(), document.getId(), document.toDictionary()];
+  async Database_PurgeDocument(database: Database, document: Document | string): Promise<void> {
+    const docId = typeof document === 'string' ? document : document.getId();
+    const args: any[] = [database.getName(), docId];
     return IonicCouchbaseLite.exec(EngineActionTypes.Database_PurgeDocument, args);
   }
 
@@ -183,9 +183,14 @@ export class CordovaEngine extends Engine {
     return IonicCouchbaseLite.exec(EngineActionTypes.ResultSet_Cleanup, args);
   }
 
-  async Replicator_Start(database: Database, config: ReplicatorConfiguration): Promise<EngineReplicatorStartResult> {
-    //this\.log('Replicator_Start');
+  async Replicator_Create(database: Database, config: ReplicatorConfiguration): Promise<EngineReplicatorStartResult> {
     const args: any[] = [database.getName(), config.toJson()];
+    return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Create, args);
+  }
+
+  async Replicator_Start(replicatorId: string): Promise<void> {
+    //this\.log('Replicator_Start');
+    const args: any[] = [replicatorId];
     return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Start, args);
   }
 

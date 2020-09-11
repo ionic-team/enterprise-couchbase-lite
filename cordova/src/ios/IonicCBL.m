@@ -460,11 +460,9 @@
       [self reject:command message:@"No such open database"];
       return;
     }
-    
-    CBLDocument *doc = [db documentWithID:docId];
-    
+        
     NSError *error;
-    [db purgeDocument:doc error:&error];
+    [db purgeDocumentWithID:docId error:&error];
     
     if ([self checkError:command error:error message:@"Unable to purge document"]) {
       return;
@@ -763,7 +761,7 @@
   }];
 }
 
--(void)Replicator_Start:(CDVInvokedUrlCommand*)command {
+-(void)Replicator_Create:(CDVInvokedUrlCommand*)command {
   NSString *name = [command argumentAtIndex:0];
   NSDictionary *config = [command argumentAtIndex:1];
 
@@ -775,12 +773,25 @@
   [self.commandDelegate runInBackground:^{
     CBLReplicatorConfiguration *replicatorConfig = [self replicatorConfigFromJson:db data:config];
     CBLReplicator *replicator = [[CBLReplicator alloc] initWithConfig:replicatorConfig];
-    
-    [replicator start];
-    
+        
     NSInteger replicatorId = self->_replicatorCount++;
     [self->replicators setObject:replicator forKey:[@(replicatorId) stringValue]];
     return [self resolve:command data:@{ @"replicatorId": @(replicatorId) }];
+  }];
+}
+
+-(void)Replicator_Start:(CDVInvokedUrlCommand*)command {
+  NSInteger replicatorId = [[command argumentAtIndex:0] intValue];
+  
+  [self.commandDelegate runInBackground:^{
+    CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
+    if (replicator == NULL) {
+      return [self reject:command message:@"No such replicator"];
+    }
+    
+    [replicator start];
+    
+    [self resolve:command];
   }];
 }
 
@@ -802,7 +813,12 @@
   } else if ([replicatorType isEqualToString:@"PUSH"]) {
     [replConfig setReplicatorType:kCBLReplicatorTypePush];
   }
-  
+    
+  NSArray *channels = [data objectForKey:@"channels"];
+  if (channels != NULL) {
+    [replConfig setChannels:channels];
+  }
+    
   [replConfig setContinuous:continuous];
   
   CBLAuthenticator *authenticator = [self replicatorAuthenticatorFromConfig:authenticatorData];
