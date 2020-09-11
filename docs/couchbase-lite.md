@@ -1,7 +1,7 @@
 ---
 title: Couchbase Lite
 template: enterprise-plugin
-version: 1.2.0
+version: 1.2.1
 minor: 1.1.X
 ---
 
@@ -52,8 +52,7 @@ import {
     URLEndpoint,
     ArrayFunction,
     PropertyExpression,
-    Join,
-    DocumentReplication
+    Join
 } from '@ionic-enterprise/couchbase-lite';
 ```
 
@@ -131,10 +130,6 @@ let replicator = new Replicator(replConfig);
 
 // Listen to replicator change events.
 replicator.addChangeListener((status) => {
-});
-
-// Listen to document replication events.
-replicator.addDocumentListener((doc) => {
 });
 
 // Start replication.
@@ -1102,6 +1097,8 @@ config.setPinnedServerCertificate(cert);</code></pre>
 # Changelog
 
 
+
+### [1.2.1] (2020-09-11)
 
 ### [1.2.0] (2020-07-24)
 
