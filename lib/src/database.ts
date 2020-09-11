@@ -125,7 +125,7 @@ export class Database {
   }
 
   /**
-   * 
+   *
    */
   copy(path: string, name: string, config: DatabaseConfiguration): Promise<void> {
     path; name; config;
@@ -138,8 +138,8 @@ export class Database {
   createIndex(name: string, index: AbstractIndex): Promise<void> {
     name; index;
     return this._engine.Database_CreateIndex(this, name, index);
-  } 
- 
+  }
+
   /**
    * Deletes a document from the database.
    */
@@ -150,7 +150,7 @@ export class Database {
   /**
    * Purges the given document from the database.
    */
-  purgeDocument(document: Document) {
+  purgeDocument(document: Document | string) {
     return this._engine.Database_PurgeDocument(this, document);
   }
 

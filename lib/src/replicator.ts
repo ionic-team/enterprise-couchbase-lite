@@ -54,7 +54,7 @@ export class Replicator {
       return;
     }
 
-    const ret = await db.getEngine().Replicator_Start(db, this.config);
+    const ret = await db.getEngine().Replicator_Create(db, this.config);
     this.replicatorId = ret.replicatorId;
 
     if (!this.didStartChangeListener) {
@@ -95,6 +95,8 @@ export class Replicator {
       );
       this.didStartDocumentListener = true;
     }
+
+    await db.getEngine().Replicator_Start(this.replicatorId);
   }
 
   private notifyChangeListeners(data: ReplicatorChange) {
