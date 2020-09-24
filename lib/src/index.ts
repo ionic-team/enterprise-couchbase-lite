@@ -54,6 +54,11 @@ export class IonicCBL {
     document.addEventListener('deviceready', () => {
       this.fireOnReady();
     });
+
+    if (window.process) {
+      // Electron fire on ready
+      this.fireOnReady();
+    }
   }
   static fireOnReady() {
     console.log('FIRING ON READY', this._onReady);
