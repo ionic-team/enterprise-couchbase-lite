@@ -1,18 +1,16 @@
 import { Document } from './document';
 import { MutableDocument } from './mutable-document';
-import { DatabaseConfiguration } from './database-configuration'
+import { DatabaseConfiguration } from './database-configuration';
 import { DatabaseLogging } from './database-logging';
 
-import { CordovaEngine } from './engine/cordova';
 import { Engine } from './engine';
 import { Index, AbstractIndex } from './abstract-index';
 
-export interface File {
-}
+export interface File {}
 
 export enum ConcurrencyControl {
   LAST_WRITE_WINS = 0,
-  FAIL_ON_CONFLICT = 1
+  FAIL_ON_CONFLICT = 1,
 }
 
 export interface DatabaseChange {
@@ -23,18 +21,17 @@ export interface DocumentChange {
   documentID: string;
 }
 
-export interface ListenerToken {
-}
+export interface ListenerToken {}
 
 export type DatabaseChangeListener = (change: DatabaseChange) => void;
 export type DocumentChangeListener = (change: DocumentChange) => void;
 
 export enum LogDomain {
-  ALL = "ALL",
-  DATABASE = "DATABASE",
-  NETWORK = "NETWORK",
-  QUERY = "QUERY",
-  REPLICATOR = "REPLICATOR"
+  ALL = 'ALL',
+  DATABASE = 'DATABASE',
+  NETWORK = 'NETWORK',
+  QUERY = 'QUERY',
+  REPLICATOR = 'REPLICATOR',
 }
 
 export enum LogLevel {
@@ -43,14 +40,14 @@ export enum LogLevel {
   INFO = 2,
   WARNING = 3,
   ERROR = 4,
-  NONE = 5
+  NONE = 5,
 }
 
 /**
  * A Couchbase Lite database.
  */
 export class Database {
-  _documents: { [id:string]: Document } = {};
+  _documents: { [id: string]: Document } = {};
 
   private changeListenerTokens: DatabaseChangeListener[] = [];
 
@@ -60,8 +57,10 @@ export class Database {
 
   public log = new DatabaseLogging(this);
 
-  constructor(private name: string, private config: DatabaseConfiguration = null) {
-  }
+  constructor(
+    private name: string,
+    private config: DatabaseConfiguration = null,
+  ) {}
 
   setEngine(engine: Engine) {
     this._engine = engine;
@@ -82,11 +81,15 @@ export class Database {
     this.changeListenerTokens.push(listener);
 
     if (!this.didStartListener) {
-      this._engine.Database_AddChangeListener(this, (data: any) => {
-        this.notifyDatabaseChangeListeners(data);
-      }, (err: any) => {
-        console.log('Database change listener error', err);
-      });
+      this._engine.Database_AddChangeListener(
+        this,
+        (data: any) => {
+          this.notifyDatabaseChangeListeners(data);
+        },
+        (err: any) => {
+          console.log('Database change listener error', err);
+        },
+      );
       this.didStartListener = true;
     }
   }
@@ -98,8 +101,12 @@ export class Database {
   /**
    * Add the given DocumentChangeListener to the specified document.
    */
-  addDocumentChangeListener(id: string, listener: DocumentChangeListener): Promise<ListenerToken> {
-    id; listener;
+  addDocumentChangeListener(
+    id: string,
+    listener: DocumentChangeListener,
+  ): Promise<ListenerToken> {
+    id;
+    listener;
     return null;
   }
 
@@ -107,7 +114,9 @@ export class Database {
    * Remove the given DatabaseChangeListener from the this database.
    */
   removeChangeListener(listener: ListenerToken) {
-    this.changeListenerTokens = this.changeListenerTokens.filter(l => l !== listener);
+    this.changeListenerTokens = this.changeListenerTokens.filter(
+      l => l !== listener,
+    );
   }
 
   /**
@@ -127,8 +136,14 @@ export class Database {
   /**
    *
    */
-  copy(path: string, name: string, config: DatabaseConfiguration): Promise<void> {
-    path; name; config;
+  copy(
+    path: string,
+    name: string,
+    config: DatabaseConfiguration,
+  ): Promise<void> {
+    path;
+    name;
+    config;
     return this._engine.Database_Copy(this, path, name, config);
   }
 
@@ -136,15 +151,23 @@ export class Database {
    *
    */
   createIndex(name: string, index: AbstractIndex): Promise<void> {
-    name; index;
+    name;
+    index;
     return this._engine.Database_CreateIndex(this, name, index);
   }
 
   /**
    * Deletes a document from the database.
    */
-  deleteDocument(document: Document, concurrencyControl: ConcurrencyControl = null): Promise<void> {
-    return this._engine.Database_DeleteDocument(this, document, concurrencyControl);
+  deleteDocument(
+    document: Document,
+    concurrencyControl: ConcurrencyControl = null,
+  ): Promise<void> {
+    return this._engine.Database_DeleteDocument(
+      this,
+      document,
+      concurrencyControl,
+    );
   }
 
   /**
@@ -157,7 +180,8 @@ export class Database {
   /**
    * Deletes a database.
    */
-  deleteDatabase() {//name: string = null, directory: File = null): Promise<void> {
+  deleteDatabase() {
+    //name: string = null, directory: File = null): Promise<void> {
     return this._engine.Database_Delete(this);
   }
 
@@ -237,8 +261,15 @@ export class Database {
   /**
    * Saves a document to the database
    */
-  async save(document: MutableDocument, concurrencyControl: ConcurrencyControl = null): Promise<void> {
-    const ret = await this._engine.Database_Save(this, document, concurrencyControl);
+  async save(
+    document: MutableDocument,
+    concurrencyControl: ConcurrencyControl = null,
+  ): Promise<void> {
+    const ret = await this._engine.Database_Save(
+      this,
+      document,
+      concurrencyControl,
+    );
 
     const id = ret._id;
     document.setId(id);

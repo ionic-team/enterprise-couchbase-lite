@@ -1,15 +1,23 @@
-import { Document } from "./document";
+import { Document } from './document';
 import { Dictionary } from './definitions';
 import { Blob } from './blob';
 
 // TODO
 export class MutableDocument extends Document {
-  constructor(id: string = null, sequenceNo: number = null, data: Dictionary = {}) {
+  constructor(
+    id: string = null,
+    sequenceNo: number = null,
+    data: Dictionary = {},
+  ) {
     super(id, sequenceNo, data);
   }
 
   static fromDocument(document: Document) {
-    return new MutableDocument(document.getId(), document.getSequence(), document.getData());
+    return new MutableDocument(
+      document.getId(),
+      document.getSequence(),
+      document.getData(),
+    );
   }
 
   remove(key: string): MutableDocument {
@@ -34,12 +42,12 @@ export class MutableDocument extends Document {
   setBlob(key: string, value: Blob): MutableDocument {
     this._set(key, {
       _type: 'blob',
-      data: value.toDictionary()
+      data: value.toDictionary(),
     });
     return this;
   }
-  
-  setBoolean(key: string, value: boolean): MutableDocument {
+
+  setBoolean(key: string, value: boolean | null): MutableDocument {
     this._set(key, value);
     return this;
   }
@@ -49,42 +57,42 @@ export class MutableDocument extends Document {
     return this;
   }
 
-  setDate(key: string, value: Date): MutableDocument {
+  setDate(key: string, value: Date | null): MutableDocument {
     this._set(key, value.toISOString());
     return this;
   }
 
-  setDictionary(key: string, value: Dictionary): MutableDocument {
+  setDictionary(key: string, value: Dictionary | null): MutableDocument {
     this._set(key, value);
     return this;
   }
 
-  setDouble(key: string, value: number): MutableDocument {
+  setDouble(key: string, value: number | null): MutableDocument {
     this._set(key, value);
     return this;
   }
 
-  setFloat(key: string, value: number): MutableDocument {
+  setFloat(key: string, value: number | null): MutableDocument {
     this._set(key, value);
     return this;
   }
 
-  setInt(key: string, value: number): MutableDocument {
+  setInt(key: string, value: number | null): MutableDocument {
     this._set(key, value);
     return this;
   }
 
-  setLong(key: string, value: number): MutableDocument {
+  setLong(key: string, value: number | null): MutableDocument {
     this._set(key, value);
     return this;
   }
 
-  setNumber(key: string, value: number): MutableDocument {
+  setNumber(key: string, value: number | null): MutableDocument {
     this._set(key, value);
     return this;
   }
 
-  setString(key: string, value: string): MutableDocument {
+  setString(key: string, value: string | null): MutableDocument {
     this._set(key, value);
     return this;
   }

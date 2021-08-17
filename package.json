@@ -73,6 +73,10 @@
     },
     "android": {
       "src": "android"
+    },
+    "windows": {
+      "src": "windows",
+      "assembly": "IonicCouchbaseLite"
     }
   },
   "dependencies": {

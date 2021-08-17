@@ -10,6 +10,13 @@
         <dependency id="Capacitor" version="1.0.0" exclude="Build,Analyzers" />
         <dependency id="Couchbase.Lite.Enterprise" version="2.8.6" exclude="Build,Analyzers" />
         <dependency id="Couchbase.Lite.Support.NetDesktop" version="2.8.6" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Win32.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Diagnostics.Tracing" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.IO.FileSystem" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.IO.FileSystem.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Net.Primitives" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.InteropServices" version="4.3.0" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Encoding.Extensions" version="4.3.0" exclude="Build,Analyzers" />
       </group>
     </dependencies>
     <contentFiles>

@@ -13,7 +13,7 @@ export * from './document';
 export * from './document-replication';
 export * from './endpoint';
 export * from './engine/index';
-export * from './engine/cordova';
+// export * from './engine/cordova';
 export * from './expression';
 export * from './from';
 export * from './function';
@@ -45,23 +45,3 @@ export * from './session-authenticator';
 export * from './url-endpoint';
 export * from './value-index';
 export * from './where';
-
-declare var window: any;
-export class IonicCBL {
-  static _onReady: () => void = null;
-  static onReady(cb: () => void) {
-    this._onReady = cb;
-    document.addEventListener('deviceready', () => {
-      this.fireOnReady();
-    });
-
-    if (window.process) {
-      // Electron fire on ready
-      this.fireOnReady();
-    }
-  }
-  static fireOnReady() {
-    console.log('FIRING ON READY', this._onReady);
-    this._onReady && this._onReady();
-  }
-}
