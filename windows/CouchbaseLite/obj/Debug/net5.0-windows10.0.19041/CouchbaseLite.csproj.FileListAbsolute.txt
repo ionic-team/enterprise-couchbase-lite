@@ -1,0 +1,14 @@
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\obj\Debug\net5.0-windows10.0.19041\CouchbaseLite.csproj.AssemblyReference.cache
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\obj\Debug\net5.0-windows10.0.19041\CouchbaseLite.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\obj\Debug\net5.0-windows10.0.19041\CouchbaseLite.AssemblyInfoInputs.cache
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\obj\Debug\net5.0-windows10.0.19041\CouchbaseLite.AssemblyInfo.cs
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\obj\Debug\net5.0-windows10.0.19041\CouchbaseLite.csproj.CoreCompileInputs.cache
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\bin\Debug\net5.0-windows10.0.19041\x86\LiteCore.dll
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\bin\Debug\net5.0-windows10.0.19041\x64\LiteCore.dll
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.deps.json
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.dll
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\bin\Debug\net5.0-windows10.0.19041\ref\IonicCouchbaseLite.dll
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.pdb
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\obj\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.dll
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\obj\Debug\net5.0-windows10.0.19041\ref\IonicCouchbaseLite.dll
+C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\obj\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.pdb

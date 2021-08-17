@@ -2,9 +2,11 @@ import { registerPlugin } from '@capacitor/core';
 
 import type { IonicCouchbaseLitePlugin } from './definitions';
 
-const IonicCouchbaseLite = registerPlugin<IonicCouchbaseLitePlugin>('IonicCouchbaseLite', {
-  web: () => import('./web').then(m => new m.IonicCouchbaseLiteWeb()),
-});
+export * from './couchbase-lite/index';
+
+const IonicCouchbaseLite = registerPlugin<IonicCouchbaseLitePlugin>(
+  'IonicCouchbaseLite',
+);
 
 export * from './definitions';
 export { IonicCouchbaseLite };

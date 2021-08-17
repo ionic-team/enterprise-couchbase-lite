@@ -74,5 +74,8 @@
     "android": {
       "src": "android"
     }
+  },
+  "dependencies": {
+    "@ionic-enterprise/capacitor-windows": "file:../capacitor-windows"
   }
 }
