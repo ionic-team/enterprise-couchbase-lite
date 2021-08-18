@@ -3,8 +3,9 @@ import { MutableDocument } from './mutable-document';
 import { DatabaseConfiguration } from './database-configuration';
 import { DatabaseLogging } from './database-logging';
 
-import { Engine } from './engine';
 import { Index, AbstractIndex } from './abstract-index';
+
+import { CapacitorEngine } from './engine/capacitor';
 
 export interface File {}
 
@@ -51,7 +52,7 @@ export class Database {
 
   private changeListenerTokens: DatabaseChangeListener[] = [];
 
-  private _engine: Engine;
+  private _engine: CapacitorEngine;
 
   private didStartListener = false;
 
@@ -62,16 +63,12 @@ export class Database {
     private config: DatabaseConfiguration = null,
   ) {}
 
-  setEngine(engine: Engine) {
-    this._engine = engine;
+  open() {
+    return this._engine.Database_Open(this.name, this.config);
   }
 
   getEngine() {
     return this._engine;
-  }
-
-  open() {
-    return this._engine.Database_Open(this.name, this.config);
   }
 
   /**
@@ -81,15 +78,13 @@ export class Database {
     this.changeListenerTokens.push(listener);
 
     if (!this.didStartListener) {
-      this._engine.Database_AddChangeListener(
-        this,
-        (data: any) => {
-          this.notifyDatabaseChangeListeners(data);
-        },
-        (err: any) => {
+      this._engine.Database_AddChangeListener(this, (data: any, err: any) => {
+        if (err) {
           console.log('Database change listener error', err);
-        },
-      );
+          return;
+        }
+        this.notifyDatabaseChangeListeners(data);
+      });
       this.didStartListener = true;
     }
   }
@@ -195,8 +190,9 @@ export class Database {
   /**
    * Checks whether a database of the given name exists in the given directory or not.
    */
-  exists(name: string, directory: string): Promise<boolean> {
-    return this._engine.Database_Exists(this, name, directory);
+  async exists(name: string, directory: string): Promise<boolean> {
+    const ret = await this._engine.Database_Exists(this, name, directory);
+    return ret.exists;
   }
 
   /**
@@ -211,7 +207,7 @@ export class Database {
    */
   async getCount(): Promise<number> {
     const count = await this._engine.Database_GetCount(this);
-    return Promise.resolve(count);
+    return Promise.resolve(count.count);
   }
 
   /**
@@ -232,8 +228,8 @@ export class Database {
   /**
    * Return the indexes in the database
    */
-  getIndexes(): Promise<string[]> {
-    return this._engine.Database_GetIndexes(this);
+  async getIndexes(): Promise<string[]> {
+    return (await this._engine.Database_GetIndexes(this)).indexes;
   }
 
   /**
@@ -246,8 +242,8 @@ export class Database {
   /**
    * Return the database's path.
    */
-  getPath(): Promise<string> {
-    return this._engine.Database_GetPath(this);
+  async getPath(): Promise<string> {
+    return (await this._engine.Database_GetPath(this)).path;
   }
 
   /**

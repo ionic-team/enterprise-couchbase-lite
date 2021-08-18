@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8wswhE/SWMBhX2zeleh0P0BzU8FV6hhS422ka0PuiZedPThQbqHytPZU7VHjw8yBeLyNa3Xff0celEWZIb3QfQ==",
+  "dgSpecHash": "MwYQO9r7SjBCWyvFQLxgfSA8j2KoYDVQqGRC+izrPWV4GMOsGnzaL14H+5gN+5dSYHJC9OefLk4HBRXW+fe3sw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Max\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\CouchbaseLite.csproj",
+  "projectFilePath": "F:\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\CouchbaseLite.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Max\\.nuget\\packages\\capacitor\\1.0.0\\capacitor.1.0.0.nupkg.sha512",
     "C:\\Users\\Max\\.nuget\\packages\\couchbase.lite.enterprise\\2.8.6\\couchbase.lite.enterprise.2.8.6.nupkg.sha512",

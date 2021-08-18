@@ -1,8 +1,17 @@
-import { ReplicatorConfiguration } from "./replicator-configuration";
-import { ReplicatorChange, isReplicatorChange } from "./replicator-change";
-import { CouchbaseLiteException } from "./couchbase-lite-exception";
-import { ReplicatedDocument, ReplicatedDocumentFlag, ReplicatedDocumentRepresentation } from './replicated-document';
-import { DocumentReplication, ReplicationDirection, DocumentReplicationRepresentation, isDocumentReplicationRepresentation } from './document-replication';
+import { ReplicatorConfiguration } from './replicator-configuration';
+import { ReplicatorChange, isReplicatorChange } from './replicator-change';
+import { CouchbaseLiteException } from './couchbase-lite-exception';
+import {
+  ReplicatedDocument,
+  ReplicatedDocumentFlag,
+  ReplicatedDocumentRepresentation,
+} from './replicated-document';
+import {
+  DocumentReplication,
+  ReplicationDirection,
+  DocumentReplicationRepresentation,
+  isDocumentReplicationRepresentation,
+} from './document-replication';
 
 import { v4 } from './util/uuid';
 
@@ -11,7 +20,7 @@ export enum ReplicatorActivityLevel {
   OFFLINE = 1,
   CONNECTING = 2,
   IDLE = 3,
-  BUSY = 4
+  BUSY = 4,
 }
 
 export class Replicator {
@@ -60,21 +69,31 @@ export class Replicator {
     if (!this.didStartChangeListener) {
       db.getEngine().Replicator_AddChangeListener(
         this.replicatorId,
-        (data: ReplicatorChange) => {
+        (data: ReplicatorChange, err: any) => {
+          if (err) {
+            console.warn('Replicator ERROR ', err);
+            return;
+          }
           if (isReplicatorChange(data)) {
             this.status = new ReplicatorStatus(
               data.activityLevel,
-              new ReplicatorProgress(data.progress.completed, data.progress.total),
-              data.error == null ? null : new CouchbaseLiteException(data.error.message, data.error.domain, data.error.code)
+              new ReplicatorProgress(
+                data.progress.completed,
+                data.progress.total,
+              ),
+              data.error == null
+                ? null
+                : new CouchbaseLiteException(
+                    data.error.message,
+                    data.error.domain,
+                    data.error.code,
+                  ),
             );
             this.notifyChangeListeners(data);
           } else {
-            console.warn("Invalid Replicator Change Object!");
+            console.warn('Invalid Replicator Change Object!');
           }
         },
-        (err: any) => {
-          console.warn("Replicator ERROR ", err);
-        }
       );
       this.didStartChangeListener = true;
     }
@@ -82,16 +101,17 @@ export class Replicator {
     if (!this.didStartDocumentListener) {
       db.getEngine().Replicator_AddDocumentListener(
         this.replicatorId,
-        (data: DocumentReplicationRepresentation) => {
+        (data: DocumentReplicationRepresentation, err: any) => {
+          if (err) {
+            console.warn('Replicator ERROR ', err);
+            return;
+          }
           if (isDocumentReplicationRepresentation(data)) {
             this.notifyDocumentListeners(data);
           } else {
-            console.warn("Invalid Document Replication Object!");
+            console.warn('Invalid Document Replication Object!');
           }
         },
-        (err: any) => {
-          console.warn("Replicator ERROR ", err);
-        }
       );
       this.didStartDocumentListener = true;
     }
@@ -100,7 +120,7 @@ export class Replicator {
   }
 
   private notifyChangeListeners(data: ReplicatorChange) {
-    this.changeListenerTokens.forEach((l) => l(data));
+    this.changeListenerTokens.forEach(l => l(data));
   }
 
   private notifyDocumentListeners(data: DocumentReplicationRepresentation) {
@@ -110,12 +130,19 @@ export class Replicator {
         const flags: ReplicatedDocumentFlag[] = document.flags.map(flag => {
           return (<any>ReplicatedDocumentFlag)[flag];
         });
-        const error = (document.error == null) ? null : new CouchbaseLiteException(document.error.message, document.error.domain, document.error.code);
-        return new ReplicatedDocument(document.id, flags, error)
-      })
+        const error =
+          document.error == null
+            ? null
+            : new CouchbaseLiteException(
+                document.error.message,
+                document.error.domain,
+                document.error.code,
+              );
+        return new ReplicatedDocument(document.id, flags, error);
+      }),
     );
 
-    this.documentListenerTokens.forEach((l) => l(event));
+    this.documentListenerTokens.forEach(l => l(event));
   }
 
   async cleanup() {
@@ -148,7 +175,7 @@ export class Replicator {
 
   removeChangeListener(listener: ReplicatorChangeListener) {
     this.changeListenerTokens = this.changeListenerTokens.filter(
-      (l) => l !== listener
+      l => l !== listener,
     );
   }
 
@@ -158,7 +185,7 @@ export class Replicator {
 
   removeDocumentListener(listener: ReplicatorDocumentListener) {
     this.documentListenerTokens = this.documentListenerTokens.filter(
-      (l) => l !== listener
+      l => l !== listener,
     );
   }
 }
@@ -167,8 +194,7 @@ export type ReplicatorChangeListener = (change: ReplicatorChange) => void;
 export type ReplicatorDocumentListener = (doc: DocumentReplication) => void;
 
 export class ReplicatorProgress {
-  constructor(private completed: number, private total: number) {
-  }
+  constructor(private completed: number, private total: number) {}
 
   getCompleted() {
     return this.completed;
@@ -188,8 +214,11 @@ export class ReplicatorProgress {
 }
 
 export class ReplicatorStatus {
-  constructor(private activityLevel: ReplicatorActivityLevel, private progress: ReplicatorProgress, private error: CouchbaseLiteException) {
-  }
+  constructor(
+    private activityLevel: ReplicatorActivityLevel,
+    private progress: ReplicatorProgress,
+    private error: CouchbaseLiteException,
+  ) {}
 
   getActivityLevel() {
     return this.activityLevel;

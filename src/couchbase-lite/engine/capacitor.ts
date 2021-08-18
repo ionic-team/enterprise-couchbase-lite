@@ -1,9 +1,3 @@
-import {
-  Engine,
-  EngineDatabaseSaveResult,
-  EngineReplicatorStartResult,
-  EngineActionTypes,
-} from './index';
 import { MutableDocument } from '../mutable-document';
 import { ConcurrencyControl, Database } from '../database';
 import { ICouchbaseLitePlugin } from '../definitions';
@@ -18,24 +12,37 @@ import { ReplicatorStatus } from '../replicator';
 import { Blob } from '../blob';
 import { DatabaseFileLoggingConfiguration } from '../database-logging';
 
-declare var IonicCouchbaseLite: ICouchbaseLitePlugin;
+import { IonicCouchbaseLite } from '../../index';
+import { DatabaseSaveArgs } from '../../definitions';
+import { PluginListenerHandle } from '@capacitor/core';
 
-export class CapacitorEngine extends Engine {
+export interface EngineDatabaseSaveResult {
+  _id: string;
+}
+
+export interface EngineReplicatorStartResult {
+  replicatorId: string;
+}
+
+export class CapacitorEngine {
   constructor(config: any = {}) {
-    super();
     this.Plugin_Configure(config);
   }
 
   async Plugin_Configure(config: any): Promise<void> {
-    const args: any[] = [config];
-    return IonicCouchbaseLite.exec('Plugin_Configure', args);
+    return IonicCouchbaseLite.pluginConfigure({
+      config,
+    });
   }
 
   async Database_Open(
     name: string,
     config: DatabaseConfiguration,
   ): Promise<void> {
-    // return IonicCouchbaseLite.exec('Database_Open', args);
+    return IonicCouchbaseLite.databaseOpen({
+      name,
+      config,
+    });
   }
 
   async Database_Save(
@@ -43,47 +50,42 @@ export class CapacitorEngine extends Engine {
     document: MutableDocument,
     concurrencyControl: ConcurrencyControl,
   ): Promise<EngineDatabaseSaveResult> {
-    // //this\.log('Database_Save', document.getId());
-    const args: any[] = [
-      database.getName(),
-      document.getId(),
-      document.toDictionary(),
-    ];
-    concurrencyControl && args.push(concurrencyControl);
-    return IonicCouchbaseLite.exec('Database_Save', args);
+    var args: DatabaseSaveArgs = {
+      name: database.getName(),
+      id: document.getId(),
+      document: document.toDictionary(),
+    };
+    if (concurrencyControl) {
+      args['concurrencyControl'] = concurrencyControl;
+    }
+    return IonicCouchbaseLite.databaseSave(args);
   }
 
   Database_AddChangeListener(
     database: Database,
-    cb: (data: any) => void,
-    err: (err: any) => void,
-  ): void {
+    cb: (data: any, err: any) => void,
+  ): Promise<PluginListenerHandle> {
     //this\.log('Database_AddChangeListener', database.getName());
-    const args: any[] = [database.getName()];
-    return IonicCouchbaseLite.watch(
-      EngineActionTypes.Database_AddChangeListener,
-      args,
+    return IonicCouchbaseLite.databaseAddChangeListener(
+      {
+        name: database.getName(),
+      },
       cb,
-      err,
     );
   }
 
-  async Database_GetCount(database: Database): Promise<number> {
+  async Database_GetCount(database: Database): Promise<{ count: number }> {
     //this\.log('Database_GetCount');
-    const args: any[] = [database.getName()];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_GetCount,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseGetCount({
+      name: database.getName(),
+    });
   }
 
-  async Database_GetPath(database: Database): Promise<string> {
+  async Database_GetPath(database: Database): Promise<{ path: string }> {
     //this\.log('Database_GetPath');
-    const args: any[] = [database.getName()];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_GetPath,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseGetPath({
+      name: database.getName(),
+    });
   }
 
   async Database_Copy(
@@ -93,11 +95,12 @@ export class CapacitorEngine extends Engine {
     config: DatabaseConfiguration,
   ): Promise<void> {
     //this\.log('Database_Copy');
-    const args: any[] = [database.getName(), path, name, config];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_Copy,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseCopy({
+      name: database.getName(),
+      path,
+      newName: name,
+      config,
+    });
   }
 
   async Database_CreateIndex(
@@ -106,69 +109,62 @@ export class CapacitorEngine extends Engine {
     index: AbstractIndex,
   ): Promise<void> {
     //this\.log('Database_CreateIndex');
-    const args: any[] = [database.getName(), name, index.toJson()];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_CreateIndex,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseCreateIndex({
+      name: database.getName(),
+      indexName: name,
+      index: index.toJson(),
+    });
   }
 
   async Database_DeleteIndex(database: Database, name: string): Promise<void> {
     //this\.log('Database_DeleteIndex');
-    const args: any[] = [database.getName(), name];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_DeleteIndex,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseDeleteIndex({
+      name: database.getName(),
+      indexName: name,
+    });
   }
 
-  async Database_GetIndexes(database: Database): Promise<string[]> {
+  async Database_GetIndexes(
+    database: Database,
+  ): Promise<{ indexes: string[] }> {
     //this\.log('Database_GetIndexes');
-    const args: any[] = [database.getName()];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_GetIndexes,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseGetIndexes({
+      name: database.getName(),
+    });
   }
 
   async Database_Exists(
     database: Database,
     name: string,
     directory: string,
-  ): Promise<boolean> {
+  ): Promise<{ exists: boolean }> {
     //this\.log('Database_Exists');
-    const args: any[] = [database.getName(), name, directory];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_Exists,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseExists({
+      name: database.getName(),
+      existsName: name,
+      directory,
+    });
   }
 
   async Database_Close(database: Database): Promise<void> {
     //this\.log('Database_Close');
-    const args: any[] = [database.getName()];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_Close,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseClose({
+      name: database.getName(),
+    });
   }
 
   async Database_Compact(database: Database): Promise<void> {
     //this\.log('Database_Compact');
-    const args: any[] = [database.getName()];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_Compact,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseCompact({
+      name: database.getName(),
+    });
   }
 
   async Database_Delete(database: Database): Promise<void> {
     //this\.log('Database_Delete');
-    const args: any[] = [database.getName()];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_Delete,
-      args,
-    ) as any;
+    return IonicCouchbaseLite.databaseDelete({
+      name: database.getName(),
+    });
   }
 
   async Database_PurgeDocument(
@@ -176,39 +172,35 @@ export class CapacitorEngine extends Engine {
     document: Document | string,
   ): Promise<void> {
     const docId = typeof document === 'string' ? document : document.getId();
-    const args: any[] = [database.getName(), docId];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_PurgeDocument,
-      args,
-    );
+    return IonicCouchbaseLite.databasePurgeDocument({
+      name: database.getName(),
+      docId,
+    });
   }
 
   async Database_DeleteDocument(
     database: Database,
     document: Document,
+    concurrencyControl: ConcurrencyControl,
   ): Promise<void> {
     //this\.log('Database_DeleteDocument', document.getId());
-    const args: any[] = [
-      database.getName(),
-      document.getId(),
-      document.toDictionary(),
-    ];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_DeleteDocument,
-      args,
-    );
+    return IonicCouchbaseLite.databaseDeleteDocument({
+      name: database.getName(),
+      docId: document.getId(),
+      document: document.toDictionary(),
+      concurrencyControl,
+    });
   }
 
   async Database_GetDocument(
     database: Database,
     documentId: string,
-  ): Promise<Document> {
+  ): Promise<{ document: Document }> {
     //this\.log('Database_GetDocument', documentId);
-    const args: any[] = [database.getName(), documentId];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_GetDocument,
-      args,
-    );
+    return IonicCouchbaseLite.databaseGetDocument({
+      name: database.getName(),
+      docId: documentId,
+    });
   }
 
   async Database_SetLogLevel(
@@ -217,22 +209,21 @@ export class CapacitorEngine extends Engine {
     logLevel: number,
   ): Promise<void> {
     //this\.log('Database_SetLogLevel', domain, logLevel);
-    const args: any[] = [database.getName(), domain, logLevel];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_SetLogLevel,
-      args,
-    );
+    return IonicCouchbaseLite.databaseSetLogLevel({
+      name: database.getName(),
+      domain,
+      logLevel,
+    });
   }
 
   async Database_SetFileLoggingConfig(
     database: Database,
     config: DatabaseFileLoggingConfiguration,
   ): Promise<void> {
-    const args: any[] = [database.getName(), config];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Database_SetFileLoggingConfig,
-      args,
-    );
+    return IonicCouchbaseLite.databaseSetFileLoggingConfig({
+      name: database.getName(),
+      config,
+    });
   }
 
   async Document_GetBlobContent(
@@ -240,21 +231,20 @@ export class CapacitorEngine extends Engine {
     documentId: string,
     key: string,
   ): Promise<ArrayBuffer> {
-    const args: any[] = [database.getName(), documentId, key];
-    const data = await IonicCouchbaseLite.exec(
-      EngineActionTypes.Document_GetBlobContent,
-      args,
-    );
-    return new Uint8Array(data).buffer;
+    const data = await IonicCouchbaseLite.databaseGetBlobContent({
+      name: database.getName(),
+      documentId,
+      key,
+    });
+    return new Uint8Array(data.data).buffer;
   }
 
   async Query_Execute(database: Database, query: Query): Promise<ResultSet> {
     //this\.log('Query_Execute', JSON.stringify(query.toJson()));
-    const args: any[] = [database.getName(), JSON.stringify(query.toJson())];
-    const ret = (await IonicCouchbaseLite.exec(
-      EngineActionTypes.Query_Execute,
-      args,
-    )) as any;
+    const ret = await IonicCouchbaseLite.queryExecute({
+      name: database.getName(),
+      query: query.toJson(),
+    });
     return new ResultSet(query, ret.id, query.getColumnNames());
   }
 
@@ -263,17 +253,21 @@ export class CapacitorEngine extends Engine {
     resultSetId: string,
   ): Promise<Result> {
     //this\.log('ResultSet_Next');
-    const args: any[] = [database.getName(), resultSetId];
-    return IonicCouchbaseLite.exec(EngineActionTypes.ResultSet_Next, args);
+    return IonicCouchbaseLite.resultSetNext({
+      name: database.getName(),
+      resultSetId,
+    });
   }
 
   async ResultSet_NextBatch(
     database: Database,
     resultSetId: string,
-  ): Promise<Result[]> {
+  ): Promise<{ results: Result[] }> {
     //this\.log('ResultSet_Next');
-    const args: any[] = [database.getName(), resultSetId];
-    return IonicCouchbaseLite.exec(EngineActionTypes.ResultSet_NextBatch, args);
+    return IonicCouchbaseLite.resultSetNextBatch({
+      name: database.getName(),
+      resultSetId,
+    });
   }
 
   /*
@@ -287,15 +281,14 @@ export class CapacitorEngine extends Engine {
   ResultSet_AllResults(
     database: Database,
     resultSetId: string,
-    cb: (data: any) => void,
-    err: (err: any) => void,
-  ): void {
-    const args: any[] = [database.getName(), resultSetId];
-    return IonicCouchbaseLite.watch(
-      EngineActionTypes.ResultSet_AllResults,
-      args,
+    cb: (data: any, err: any) => void,
+  ): Promise<PluginListenerHandle> {
+    return IonicCouchbaseLite.resultSetAllResults(
+      {
+        name: database.getName(),
+        resultSetId,
+      },
       cb,
-      err,
     );
   }
 
@@ -304,86 +297,86 @@ export class CapacitorEngine extends Engine {
     resultSetId: string,
   ): Promise<void> {
     //this\.log('ResultSet_Cleanup');
-    const args: any[] = [database.getName(), resultSetId];
-    return IonicCouchbaseLite.exec(EngineActionTypes.ResultSet_Cleanup, args);
+    return IonicCouchbaseLite.resultSetCleanup({
+      name: database.getName(),
+      resultSetId,
+    });
   }
 
   async Replicator_Create(
     database: Database,
     config: ReplicatorConfiguration,
   ): Promise<EngineReplicatorStartResult> {
-    const args: any[] = [database.getName(), config.toJson()];
-    return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Create, args);
+    return IonicCouchbaseLite.replicatorCreate({
+      name: database.getName(),
+      config: config.toJson(),
+    });
   }
 
   async Replicator_Start(replicatorId: string): Promise<void> {
     //this\.log('Replicator_Start');
-    const args: any[] = [replicatorId];
-    return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Start, args);
+    return IonicCouchbaseLite.replicatorStart({
+      replicatorId,
+    });
   }
 
   async Replicator_Restart(replicatorId: string): Promise<void> {
-    const args: any[] = [replicatorId];
-    return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Restart, args);
+    return IonicCouchbaseLite.replicatorRestart({
+      replicatorId,
+    });
   }
 
   Replicator_AddChangeListener(
     replicatorId: string,
-    cb: (data: any) => void,
-    err: (err: any) => void,
-  ): void {
+    cb: (data: any, err: any) => void,
+  ): Promise<PluginListenerHandle> {
     //this\.log('Replicator_AddChangeListener');
-    const args: any[] = [replicatorId];
-    return IonicCouchbaseLite.watch(
-      EngineActionTypes.Replicator_AddChangeListener,
-      args,
+    return IonicCouchbaseLite.replicatorAddChangeListener(
+      {
+        replicatorId,
+      },
       cb,
-      err,
     );
   }
 
   Replicator_AddDocumentListener(
     replicatorId: string,
-    cb: (data: any) => void,
-    err: (err: any) => void,
-  ): void {
+    cb: (data: any, err: any) => void,
+  ): Promise<PluginListenerHandle> {
     //this\.log('Replicator_AddDocumentListener');
-    const args: any[] = [replicatorId];
-    return IonicCouchbaseLite.watch(
-      EngineActionTypes.Replicator_AddDocumentListener,
-      args,
+    return IonicCouchbaseLite.replicatorAddDocumentListener(
+      {
+        replicatorId,
+      },
       cb,
-      err,
     );
   }
 
   async Replicator_Stop(replicatorId: string): Promise<void> {
     //this\.log('Replicator_Stop');
-    const args: any[] = [replicatorId];
-    return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Stop, args);
+    return IonicCouchbaseLite.replicatorStop({
+      replicatorId,
+    });
   }
 
   async Replicator_ResetCheckpoint(replicatorId: string): Promise<void> {
     //this\.log('Replicator_ResetCheckpoint');
-    const args: any[] = [replicatorId];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Replicator_ResetCheckpoint,
-      args,
-    );
+    return IonicCouchbaseLite.replicatorResetCheckpoint({
+      replicatorId,
+    });
   }
 
-  async Replicator_GetStatus(replicatorId: string): Promise<ReplicatorStatus> {
+  async Replicator_GetStatus(replicatorId: string): Promise<void> {
     //this\.log('Replicator_GetStatus');
-    const args: any[] = [replicatorId];
-    return IonicCouchbaseLite.exec(
-      EngineActionTypes.Replicator_GetStatus,
-      args,
-    );
+    return IonicCouchbaseLite.replicatorGetStatus({
+      replicatorId,
+    });
   }
 
   async Replicator_Cleanup(replicatorId: string): Promise<void> {
     //this\.log('Replicator_Stop');
-    const args: any[] = [replicatorId];
-    return IonicCouchbaseLite.exec(EngineActionTypes.Replicator_Cleanup, args);
+    return IonicCouchbaseLite.replicatorCleanup({
+      replicatorId,
+    });
   }
 }

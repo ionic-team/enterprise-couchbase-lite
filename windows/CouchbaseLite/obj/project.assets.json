@@ -5125,17 +5125,17 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Max\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\CouchbaseLite.csproj",
+      "projectUniqueName": "F:\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\CouchbaseLite.csproj",
       "projectName": "IonicCouchbaseLite",
-      "projectPath": "C:\\Users\\Max\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\CouchbaseLite.csproj",
+      "projectPath": "F:\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\CouchbaseLite.csproj",
       "packagesPath": "C:\\Users\\Max\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Max\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\obj\\",
+      "outputPath": "F:\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Max\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\NuGet.Config",
+        "F:\\GitHub\\enterprise-couchbase-lite\\windows\\CouchbaseLite\\NuGet.Config",
         "C:\\Users\\Max\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -5145,7 +5145,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\Max\\GitHub\\enterprise-couchbase-lite\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
+        "F:\\GitHub\\enterprise-couchbase-lite\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
