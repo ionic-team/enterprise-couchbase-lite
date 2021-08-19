@@ -292,65 +292,83 @@ namespace IonicCouchbaseLite {
             */
         }
 
-        public void Database_Close(string dbName, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_Close(PluginCall call) {
+            var dbName = call.GetString("name");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
             db.Close();
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Database_Compact(string dbName, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_Compact(PluginCall call) {
+            var dbName = call.GetString("name");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
             db.Compact();
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Database_Delete(string dbName, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_Delete(PluginCall call) {
+            var dbName = call.GetString("name");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
             db.Delete();
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Database_GetPath(string dbName, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_GetPath(PluginCall call) {
+            var dbName = call.GetString("name");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
-            resolve(db.Path, false);
+            call.Resolve(new JSObject() {
+                { "path", db.Path }
+            });
         }
 
-        public void Database_GetCount(string dbName, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_GetCount(PluginCall call) {
+            var dbName = call.GetString("name");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
-            resolve(db.Count, false);
+            call.Resolve(new JSObject() {
+                { "count", db.Count }
+            });
         }
 
-        public void Database_AddChangeListener(string dbName, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_AddChangeListener(PluginCall call) {
+            var dbName = call.GetString("name");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
+
+            call.KeepAlive = true;
 
             db.AddChangeListener((object sender, DatabaseChangedEventArgs e) => {
-                resolve(new Dictionary<string, object> {
-          { "documentIDs", e.DocumentIDs }
-        }, true);
+                call.Resolve(new JSObject() {
+                  { "documentIDs", e.DocumentIDs }
+                });
             });
         }
 
@@ -358,18 +376,30 @@ namespace IonicCouchbaseLite {
         void HandleEventHandler(object sender, DatabaseChangedEventArgs e) {
         }
 
-        public void Database_Copy(string dbName, string path, string name2, Doc config, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_Copy(PluginCall call) {
+            var dbName = call.GetString("name");
+            var path = call.GetString("path");
+            var newName = call.GetString("newName");
+            var config = call.GetObject("config");
             DatabaseConfiguration dbConfig = buildDBConfig(config);
 
-            Database.Copy(path, name2, dbConfig);
+            Database.Copy(path, newName, dbConfig);
 
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Database_DeleteDocument(string dbName, string id, Doc document, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_DeleteDocument(PluginCall call) {
+            var dbName = call.GetString("name");
+            var id = call.GetString("docId");
+            var document = call.GetObject("document");
+            // TODO: Concurrency control
+            // var concurrencyControl = call.GetObject("concurrencyControl")
+
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
             Document d = db.GetDocument(id);
@@ -380,23 +410,30 @@ namespace IonicCouchbaseLite {
             }
 
             db.Delete(d);
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Database_PurgeDocument(string dbName, string id, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_PurgeDocument(PluginCall call) {
+            var dbName = call.GetString("name");
+            var docId = call.GetString("docId");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
-            db.Purge(id);
-            resolve(null, false);
+            db.Purge(docId);
+            call.Resolve();
         }
 
-        public void Database_GetDocument(string dbName, string documentId, ResolveFn resolve, RejectFn reject) {
+
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_GetDocument(PluginCall call) {
+            var dbName = call.GetString("name");
+            var documentId = call.GetString("docId");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
             Document d = db.GetDocument(documentId);
@@ -404,13 +441,13 @@ namespace IonicCouchbaseLite {
             if (d != null) {
                 string docId = d.Id;
 
-                Doc docDict = new Doc();
+                var docDict = new JSObject();
                 docDict["_sequence"] = d.Sequence;
                 docDict["_data"] = documentToJson(d);
                 docDict["_id"] = docId;
-                resolve(docDict, false);
+                call.Resolve(docDict);
             } else {
-                resolve(null, false);
+                call.Resolve();
             }
         }
 
@@ -444,7 +481,11 @@ namespace IonicCouchbaseLite {
             */
         }
 
-        public void Database_SetLogLevel(string dbName, string domainValue, Int64 logLevelValue, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_SetLogLevel(PluginCall call) {
+            var dbName = call.GetString("name");
+            var domainValue = call.GetString("domain");
+            var logLevelValue = call.GetInt("logLevel");
             LogLevel logLevel = (LogLevel)logLevelValue;
             LogDomain domain = LogDomain.All;
 
@@ -457,7 +498,7 @@ namespace IonicCouchbaseLite {
             }
 
             Database.SetLogLevel(domain, logLevel);
-            resolve(null, false);
+            call.Resolve();
         }
 
         private LogLevel GetLogLevel(int logLevelValue) {
@@ -472,12 +513,15 @@ namespace IonicCouchbaseLite {
             return LogLevel.Debug;
         }
 
-        public void Database_SetFileLoggingConfig(string dbName, Doc config, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_SetFileLoggingConfig(PluginCall call) {
+            var dbName = call.GetString("name");
+            var config = call.GetObject("config");
             Console.WriteLine($"Setting file logging config");
             Console.WriteLine(config);
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
 
@@ -507,13 +551,17 @@ namespace IonicCouchbaseLite {
             }
 
             Console.WriteLine("Set config!");
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Database_CreateIndex(string dbName, string indexName, Doc indexData, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_CreateIndex(PluginCall call) {
+            var dbName = call.GetString("name");
+            var indexName = call.GetString("indexName");
+            var indexData = call.GetObject("index");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
             string type = DictUtils.GetValue(indexData, "type") as string;
@@ -528,7 +576,7 @@ namespace IonicCouchbaseLite {
             }
 
             db.CreateIndex(indexName, index);
-            resolve(null, false);
+            call.Resolve();
         }
 
         private IValueIndexItem[] makeValueIndexItems(object[] items) {
@@ -552,53 +600,69 @@ namespace IonicCouchbaseLite {
             return valueItems.ToArray();
         }
 
-        public void Database_DeleteIndex(string dbName, string indexName, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_DeleteIndex(PluginCall call) {
+            var dbName = call.GetString("name");
+            var indexName = call.GetString("indexName");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
             db.DeleteIndex(indexName);
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Database_GetIndexes(string dbName, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_GetIndexes(PluginCall call) {
+            var dbName = call.GetString("name");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
-            resolve(db.GetIndexes(), false);
+            call.Resolve(new JSObject() {
+                { "indexes", db.GetIndexes() }
+            });
         }
 
-        public void Document_GetBlobContent(string dbName, string documentId, string key, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Database_GetBlobContent(PluginCall call) {
+            var dbName = call.GetString("name");
+            var documentId = call.GetString("documentId");
+            var key = call.GetString("key");
             Database db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
 
             Document d = db.GetDocument(documentId);
 
             if (d == null) {
-                reject(null, "No such document");
+                call.Reject("No such document");
                 return;
             }
 
             var blob = d.GetBlob(key);
             if (blob == null) {
-                reject(null, "No blob found in document");
+                call.Reject("No blob found in document");
                 return;
             }
 
             var content = blob.Content;
-            resolve(new List<Byte>(content), false);
+            call.Resolve(new JSObject() {
+                { "data", new List<Byte>(content) }
+            });
         }
 
-        public void Query_Execute(string dbName, string json, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Query_Execute(PluginCall call) {
+            var dbName = call.GetString("name");
+            var json = call.GetString("query");
             Database db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
             XQueryPatch.Json = json;
@@ -611,20 +675,23 @@ namespace IonicCouchbaseLite {
             var queryId = queryCount;
             queryCount++;
 
-            resolve(new Dictionary<string, object> {
-        { "id", queryId }
-      }, false);
+            call.Resolve(new JSObject() {
+                { "id", queryId }
+            });
         }
 
-        public void ResultSet_Next(string dbName, long resultSetId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void ResultSet_Next(PluginCall call) {
+            var dbName = call.GetString("name");
+            var resultSetId = call.GetString("resultSetId");
             Database db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
 
             IEnumerator<Result> e = null;
-            var rsId = "" + resultSetId;
+            var rsId = resultSetId;
 
             if (queryResultSets.ContainsKey(rsId)) {
                 if (queryResultSetEnumerators.ContainsKey(rsId)) {
@@ -639,24 +706,29 @@ namespace IonicCouchbaseLite {
                     var result = e.Current;
                     if (result != null) {
                         var resultDict = documentDictToJson(result.ToDictionary());
-                        resolve(resultDict, false);
+                        call.Resolve(new JSObject() {
+                            { "result", resultDict }
+                        });
                         return;
                     }
                 }
             }
 
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void ResultSet_NextBatch(string dbName, long resultSetId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void ResultSet_NextBatch(PluginCall call) {
+            var dbName = call.GetString("name");
+            var resultSetId = call.GetString("resultSetId");
             Database db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
 
             IEnumerator<Result> e = null;
-            var rsId = "" + resultSetId;
+            var rsId = resultSetId;
 
             if (queryResultSets.ContainsKey(rsId)) {
                 if (queryResultSetEnumerators.ContainsKey(rsId)) {
@@ -679,51 +751,70 @@ namespace IonicCouchbaseLite {
                         resultsChunk.Add(resultDict);
                     }
                 }
-                resolve(resultsChunk, false);
+                call.Resolve(new JSObject() {
+                    { "results", resultsChunk }
+                });
             } else {
-                resolve(new List<Doc>(), false);
+                call.Resolve(new JSObject() {
+                    { "results", new List<Doc>() }
+                });
             }
 
         }
 
-        public void ResultSet_AllResults(string dbName, long resultSetId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void ResultSet_AllResults(PluginCall call) {
+            var dbName = call.GetString("name");
+            var resultSetId = call.GetString("resultSetId");
             var db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
 
             var docs = new List<Doc>();
 
-            var rsId = "" + resultSetId;
+            var rsId = resultSetId;
 
             if (queryResultSets.ContainsKey(rsId)) {
-                var rs = queryResultSets["" + resultSetId];
+                var rs = queryResultSets[resultSetId];
                 foreach (var r in rs.AllResults()) {
                     docs.Add(documentDictToJson(r.ToDictionary()));
                 }
             }
 
-            resolve(docs.ToArray(), true);
+            call.KeepAlive = true;
+            call.Resolve(new JSObject() {
+                { "results", docs.ToArray() }
+            });
+
+            call.KeepAlive = false;
 
             // Send empty list to end the response
-            resolve(new List<Doc>(), false);
+            call.Resolve(new JSObject() {
+                { "results", new List<Doc>() }
+            });
         }
 
-        public void ResultSet_Cleanup(string dbName, long resultSetId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void ResultSet_Cleanup(PluginCall call) {
+            var resultSetId = call.GetString("resultSetId");
             var rsId = "" + resultSetId;
 
             if (queryResultSets.ContainsKey(rsId)) {
                 queryResultSets.Remove(rsId);
             }
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Replicator_Create(string dbName, Doc config, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_Create(PluginCall call) {
+            var dbName = call.GetString("name");
+            var config = call.GetObject("config");
             Console.WriteLine("Replicator Create!");
             Database db = getDatabase(dbName);
             if (db == null) {
-                reject(null, "Database not found");
+                call.Reject("Database not found");
                 return;
             }
 
@@ -733,18 +824,20 @@ namespace IonicCouchbaseLite {
             var id = replicatorCount++;
 
             replicators["" + id] = replicator;
-            resolve(new Dictionary<string, object> {
-        { "replicatorId", "" + id }
-      }, false);
+            call.Resolve(new JSObject() {
+                { "replicatorId", "" + id }
+            });
         }
 
-        public void Replicator_Start(string replicatorId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_Start(PluginCall call) {
+            var replicatorId = call.GetString("replicatorId");
             Console.WriteLine("Replicator Start!");
             if (replicators.ContainsKey(replicatorId)) {
                 Replicator r = replicators[replicatorId];
                 r.Start();
             }
-            resolve(null, false);
+            call.Resolve();
         }
 
         private ReplicatorConfiguration replicatorConfigFromJson(Database db, Doc json) {
@@ -812,90 +905,100 @@ namespace IonicCouchbaseLite {
             return null;
         }
 
-        public void Replicator_Restart(string replicatorId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_Restart(PluginCall call) {
+            var replicatorId = call.GetString("replicatorId");
             Console.WriteLine($"Restarting. {replicatorId}");
             if (replicators.ContainsKey(replicatorId)) {
                 Replicator r = replicators[replicatorId];
                 Console.WriteLine($"Restart got it {replicatorId}");
                 r.Start();
             }
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Replicator_Stop(string replicatorId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_Stop(PluginCall call) {
+            var replicatorId = call.GetString("replicatorId");
             Console.WriteLine($"Stopping replicator. {replicatorId}");
             if (replicators.ContainsKey(replicatorId)) {
                 Replicator r = replicators[replicatorId];
                 Console.WriteLine($"Stop got it {replicatorId}");
                 r.Stop();
             }
-            resolve(null, false);
+            call.Resolve();
         }
 
-
-        public void Replicator_ResetCheckpoint(string replicatorId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_ResetCheckpoint(PluginCall call) {
+            var replicatorId = call.GetString("replicatorId");
             Console.WriteLine($"Resetting replicator checkpoint. {replicatorId}");
             if (replicators.ContainsKey(replicatorId)) {
                 Replicator r = replicators[replicatorId];
                 Console.WriteLine($"Got it here");
                 r.ResetCheckpoint();
             }
-            resolve(null, false);
+            call.Resolve();
         }
 
-        public void Replicator_GetStatus(string replicatorId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_GetStatus(PluginCall call) {
+            var replicatorId = call.GetString("replicatorId");
             if (replicators.ContainsKey(replicatorId)) {
                 Replicator r = replicators[replicatorId];
                 var status = r.Status;
                 var statusJson = generateStatusJson(status);
-                resolve(statusJson, false);
+                call.Resolve(statusJson);
             } else {
-                resolve(null, false);
+                call.Resolve();
             }
         }
 
-        private Doc generateStatusJson(ReplicatorStatus status) {
+        private JSObject generateStatusJson(ReplicatorStatus status) {
             var error = status.Error;
             var errorJson = new Dictionary<string, dynamic>();
             if (error != null) {
                 CouchbaseException ex = (CouchbaseException)error;
-                errorJson = new Dictionary<string, dynamic> {
-          { "code", ex.Error },
-          { "domain", ex.Domain},
-          { "info", ex.Data }
-        };
+                errorJson = new JSObject() {
+                  { "code", ex.Error },
+                  { "domain", ex.Domain},
+                  { "info", ex.Data }
+                };
             }
 
-            return new Dictionary<string, dynamic> {
-        { "activityLevel", status.Activity },
-        { "error", errorJson },
-        {
-          "progress", new Dictionary<string, object> {
-            { "completed", status.Progress.Completed },
-            { "total", status.Progress.Total }
-          }
-        }
-      };
+            return new JSObject() {
+                { "activityLevel", status.Activity },
+                { "error", errorJson },
+                {
+                  "progress", new JSObject() {
+                    { "completed", status.Progress.Completed },
+                    { "total", status.Progress.Total }
+                  }
+                }
+            };
         }
 
-        public void Replicator_AddChangeListener(string replicatorId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_AddChangeListener(PluginCall call) {
+            var replicatorId = call.GetString("replicatorId");
             Replicator r;
             if (replicators.ContainsKey(replicatorId)) {
                 r = replicators[replicatorId];
             } else {
-                reject(null, "No such replicator");
+                call.Reject("No such replicator");
                 return;
             }
 
+            call.KeepAlive = true;
             var listener = r.AddChangeListener((object sender, ReplicatorStatusChangedEventArgs e) => {
-                resolve(generateStatusJson(e.Status), true);
+                call.Resolve(generateStatusJson(e.Status));
             });
 
             replicatorChangeListeners.Add(replicatorId, listener);
         }
 
-        private Doc generateReplicationJson(DocumentReplicationEventArgs replication) {
-            var docs = new List<Doc>();
+        private JSObject generateReplicationJson(DocumentReplicationEventArgs replication) {
+            var docs = new List<JSObject>();
 
             foreach (var doc in replication.Documents) {
                 var flags = new List<string>();
@@ -907,51 +1010,57 @@ namespace IonicCouchbaseLite {
                     flags.Add("ACCESS_REMOVED");
                 }
 
-                var documentDictionary = new Doc();
+                var documentDictionary = new JSObject();
                 documentDictionary["id"] = doc.Id;
                 documentDictionary["flags"] = flags;
 
                 if (doc.Error != null) {
                     var ex = doc.Error;
-                    documentDictionary["error"] = new Dictionary<string, dynamic> {
-            { "code", ex.Error },
-            { "domain", ex.Domain},
-            { "message", ex.Data }
-          };
+                    documentDictionary["error"] = new JSObject() {
+                        { "code", ex.Error },
+                        { "domain", ex.Domain},
+                        { "message", ex.Data }
+                    };
                 }
 
                 docs.Add(documentDictionary);
             }
 
             var direction = replication.IsPush ? "PUSH" : "PULL";
-            return new Dictionary<string, dynamic> {
-        { "direction", direction },
-        { "documents", docs }
-      };
+            return new JSObject() {
+                { "direction", direction },
+                { "documents", docs }
+            };
         }
 
-        public void Replicator_AddDocumentListener(string replicatorId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_AddDocumentListener(PluginCall call) {
+            var replicatorId = call.GetString("replicatorId");
             Replicator r;
             if (replicators.ContainsKey(replicatorId)) {
                 r = replicators[replicatorId];
             } else {
-                reject(null, "No such replicator");
+                call.Reject("No such replicator");
                 return;
             }
 
+            call.KeepAlive = true;
+
             var listener = r.AddDocumentReplicationListener((object sender, DocumentReplicationEventArgs e) => {
-                resolve(generateReplicationJson(e), true);
+                call.Resolve(generateReplicationJson(e));
             });
 
             replicatorDocumentListeners.Add(replicatorId, listener);
         }
 
-        public void Replicator_Cleanup(string replicatorId, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Replicator_Cleanup(PluginCall call) {
+            var replicatorId = call.GetString("replicatorId");
             Replicator r;
             if (replicators.ContainsKey(replicatorId)) {
                 r = replicators[replicatorId];
             } else {
-                reject(null, "No such replicator");
+                call.Reject("No such replicator");
                 return;
             }
 
@@ -968,7 +1077,7 @@ namespace IonicCouchbaseLite {
             }
 
             replicators.Remove(replicatorId);
-            resolve(null, false);
+            call.Resolve();
         }
 
     }

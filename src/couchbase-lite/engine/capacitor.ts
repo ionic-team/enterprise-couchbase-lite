@@ -30,7 +30,7 @@ export class CapacitorEngine {
   }
 
   async Plugin_Configure(config: any): Promise<void> {
-    return IonicCouchbaseLite.pluginConfigure({
+    return IonicCouchbaseLite.Plugin_Configure({
       config,
     });
   }
@@ -39,7 +39,7 @@ export class CapacitorEngine {
     name: string,
     config: DatabaseConfiguration,
   ): Promise<void> {
-    return IonicCouchbaseLite.databaseOpen({
+    return IonicCouchbaseLite.Database_Open({
       name,
       config,
     });
@@ -58,7 +58,7 @@ export class CapacitorEngine {
     if (concurrencyControl) {
       args['concurrencyControl'] = concurrencyControl;
     }
-    return IonicCouchbaseLite.databaseSave(args);
+    return IonicCouchbaseLite.Database_Save(args);
   }
 
   Database_AddChangeListener(
@@ -66,7 +66,7 @@ export class CapacitorEngine {
     cb: (data: any, err: any) => void,
   ): Promise<PluginListenerHandle> {
     //this\.log('Database_AddChangeListener', database.getName());
-    return IonicCouchbaseLite.databaseAddChangeListener(
+    return IonicCouchbaseLite.Database_AddChangeListener(
       {
         name: database.getName(),
       },
@@ -76,14 +76,14 @@ export class CapacitorEngine {
 
   async Database_GetCount(database: Database): Promise<{ count: number }> {
     //this\.log('Database_GetCount');
-    return IonicCouchbaseLite.databaseGetCount({
+    return IonicCouchbaseLite.Database_GetCount({
       name: database.getName(),
     });
   }
 
   async Database_GetPath(database: Database): Promise<{ path: string }> {
     //this\.log('Database_GetPath');
-    return IonicCouchbaseLite.databaseGetPath({
+    return IonicCouchbaseLite.Database_GetPath({
       name: database.getName(),
     });
   }
@@ -95,7 +95,7 @@ export class CapacitorEngine {
     config: DatabaseConfiguration,
   ): Promise<void> {
     //this\.log('Database_Copy');
-    return IonicCouchbaseLite.databaseCopy({
+    return IonicCouchbaseLite.Database_Copy({
       name: database.getName(),
       path,
       newName: name,
@@ -109,7 +109,7 @@ export class CapacitorEngine {
     index: AbstractIndex,
   ): Promise<void> {
     //this\.log('Database_CreateIndex');
-    return IonicCouchbaseLite.databaseCreateIndex({
+    return IonicCouchbaseLite.Database_CreateIndex({
       name: database.getName(),
       indexName: name,
       index: index.toJson(),
@@ -118,7 +118,7 @@ export class CapacitorEngine {
 
   async Database_DeleteIndex(database: Database, name: string): Promise<void> {
     //this\.log('Database_DeleteIndex');
-    return IonicCouchbaseLite.databaseDeleteIndex({
+    return IonicCouchbaseLite.Database_DeleteIndex({
       name: database.getName(),
       indexName: name,
     });
@@ -128,7 +128,7 @@ export class CapacitorEngine {
     database: Database,
   ): Promise<{ indexes: string[] }> {
     //this\.log('Database_GetIndexes');
-    return IonicCouchbaseLite.databaseGetIndexes({
+    return IonicCouchbaseLite.Database_GetIndexes({
       name: database.getName(),
     });
   }
@@ -139,7 +139,7 @@ export class CapacitorEngine {
     directory: string,
   ): Promise<{ exists: boolean }> {
     //this\.log('Database_Exists');
-    return IonicCouchbaseLite.databaseExists({
+    return IonicCouchbaseLite.Database_Exists({
       name: database.getName(),
       existsName: name,
       directory,
@@ -148,21 +148,21 @@ export class CapacitorEngine {
 
   async Database_Close(database: Database): Promise<void> {
     //this\.log('Database_Close');
-    return IonicCouchbaseLite.databaseClose({
+    return IonicCouchbaseLite.Database_Close({
       name: database.getName(),
     });
   }
 
   async Database_Compact(database: Database): Promise<void> {
     //this\.log('Database_Compact');
-    return IonicCouchbaseLite.databaseCompact({
+    return IonicCouchbaseLite.Database_Compact({
       name: database.getName(),
     });
   }
 
   async Database_Delete(database: Database): Promise<void> {
     //this\.log('Database_Delete');
-    return IonicCouchbaseLite.databaseDelete({
+    return IonicCouchbaseLite.Database_Delete({
       name: database.getName(),
     });
   }
@@ -172,7 +172,7 @@ export class CapacitorEngine {
     document: Document | string,
   ): Promise<void> {
     const docId = typeof document === 'string' ? document : document.getId();
-    return IonicCouchbaseLite.databasePurgeDocument({
+    return IonicCouchbaseLite.Database_PurgeDocument({
       name: database.getName(),
       docId,
     });
@@ -184,7 +184,7 @@ export class CapacitorEngine {
     concurrencyControl: ConcurrencyControl,
   ): Promise<void> {
     //this\.log('Database_DeleteDocument', document.getId());
-    return IonicCouchbaseLite.databaseDeleteDocument({
+    return IonicCouchbaseLite.Database_DeleteDocument({
       name: database.getName(),
       docId: document.getId(),
       document: document.toDictionary(),
@@ -197,7 +197,7 @@ export class CapacitorEngine {
     documentId: string,
   ): Promise<{ document: Document }> {
     //this\.log('Database_GetDocument', documentId);
-    return IonicCouchbaseLite.databaseGetDocument({
+    return IonicCouchbaseLite.Database_GetDocument({
       name: database.getName(),
       docId: documentId,
     });
@@ -209,7 +209,7 @@ export class CapacitorEngine {
     logLevel: number,
   ): Promise<void> {
     //this\.log('Database_SetLogLevel', domain, logLevel);
-    return IonicCouchbaseLite.databaseSetLogLevel({
+    return IonicCouchbaseLite.Database_SetLogLevel({
       name: database.getName(),
       domain,
       logLevel,
@@ -220,7 +220,7 @@ export class CapacitorEngine {
     database: Database,
     config: DatabaseFileLoggingConfiguration,
   ): Promise<void> {
-    return IonicCouchbaseLite.databaseSetFileLoggingConfig({
+    return IonicCouchbaseLite.Database_SetFileLoggingConfig({
       name: database.getName(),
       config,
     });
@@ -231,7 +231,7 @@ export class CapacitorEngine {
     documentId: string,
     key: string,
   ): Promise<ArrayBuffer> {
-    const data = await IonicCouchbaseLite.databaseGetBlobContent({
+    const data = await IonicCouchbaseLite.Database_GetBlobContent({
       name: database.getName(),
       documentId,
       key,
@@ -241,7 +241,7 @@ export class CapacitorEngine {
 
   async Query_Execute(database: Database, query: Query): Promise<ResultSet> {
     //this\.log('Query_Execute', JSON.stringify(query.toJson()));
-    const ret = await IonicCouchbaseLite.queryExecute({
+    const ret = await IonicCouchbaseLite.Query_Execute({
       name: database.getName(),
       query: query.toJson(),
     });
@@ -253,7 +253,7 @@ export class CapacitorEngine {
     resultSetId: string,
   ): Promise<Result> {
     //this\.log('ResultSet_Next');
-    return IonicCouchbaseLite.resultSetNext({
+    return IonicCouchbaseLite.ResultSet_Next({
       name: database.getName(),
       resultSetId,
     });
@@ -264,7 +264,7 @@ export class CapacitorEngine {
     resultSetId: string,
   ): Promise<{ results: Result[] }> {
     //this\.log('ResultSet_Next');
-    return IonicCouchbaseLite.resultSetNextBatch({
+    return IonicCouchbaseLite.ResultSet_NextBatch({
       name: database.getName(),
       resultSetId,
     });
@@ -283,7 +283,7 @@ export class CapacitorEngine {
     resultSetId: string,
     cb: (data: any, err: any) => void,
   ): Promise<PluginListenerHandle> {
-    return IonicCouchbaseLite.resultSetAllResults(
+    return IonicCouchbaseLite.ResultSet_AllResults(
       {
         name: database.getName(),
         resultSetId,
@@ -297,7 +297,7 @@ export class CapacitorEngine {
     resultSetId: string,
   ): Promise<void> {
     //this\.log('ResultSet_Cleanup');
-    return IonicCouchbaseLite.resultSetCleanup({
+    return IonicCouchbaseLite.ResultSet_Cleanup({
       name: database.getName(),
       resultSetId,
     });
@@ -307,7 +307,7 @@ export class CapacitorEngine {
     database: Database,
     config: ReplicatorConfiguration,
   ): Promise<EngineReplicatorStartResult> {
-    return IonicCouchbaseLite.replicatorCreate({
+    return IonicCouchbaseLite.Replicator_Create({
       name: database.getName(),
       config: config.toJson(),
     });
@@ -315,13 +315,13 @@ export class CapacitorEngine {
 
   async Replicator_Start(replicatorId: string): Promise<void> {
     //this\.log('Replicator_Start');
-    return IonicCouchbaseLite.replicatorStart({
+    return IonicCouchbaseLite.Replicator_Start({
       replicatorId,
     });
   }
 
   async Replicator_Restart(replicatorId: string): Promise<void> {
-    return IonicCouchbaseLite.replicatorRestart({
+    return IonicCouchbaseLite.Replicator_Restart({
       replicatorId,
     });
   }
@@ -331,7 +331,7 @@ export class CapacitorEngine {
     cb: (data: any, err: any) => void,
   ): Promise<PluginListenerHandle> {
     //this\.log('Replicator_AddChangeListener');
-    return IonicCouchbaseLite.replicatorAddChangeListener(
+    return IonicCouchbaseLite.Replicator_AddChangeListener(
       {
         replicatorId,
       },
@@ -344,7 +344,7 @@ export class CapacitorEngine {
     cb: (data: any, err: any) => void,
   ): Promise<PluginListenerHandle> {
     //this\.log('Replicator_AddDocumentListener');
-    return IonicCouchbaseLite.replicatorAddDocumentListener(
+    return IonicCouchbaseLite.Replicator_AddDocumentListener(
       {
         replicatorId,
       },
@@ -354,28 +354,28 @@ export class CapacitorEngine {
 
   async Replicator_Stop(replicatorId: string): Promise<void> {
     //this\.log('Replicator_Stop');
-    return IonicCouchbaseLite.replicatorStop({
+    return IonicCouchbaseLite.Replicator_Stop({
       replicatorId,
     });
   }
 
   async Replicator_ResetCheckpoint(replicatorId: string): Promise<void> {
     //this\.log('Replicator_ResetCheckpoint');
-    return IonicCouchbaseLite.replicatorResetCheckpoint({
+    return IonicCouchbaseLite.Replicator_ResetCheckpoint({
       replicatorId,
     });
   }
 
   async Replicator_GetStatus(replicatorId: string): Promise<void> {
     //this\.log('Replicator_GetStatus');
-    return IonicCouchbaseLite.replicatorGetStatus({
+    return IonicCouchbaseLite.Replicator_GetStatus({
       replicatorId,
     });
   }
 
   async Replicator_Cleanup(replicatorId: string): Promise<void> {
     //this\.log('Replicator_Stop');
-    return IonicCouchbaseLite.replicatorCleanup({
+    return IonicCouchbaseLite.Replicator_Cleanup({
       replicatorId,
     });
   }

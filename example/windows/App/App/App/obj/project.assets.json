@@ -6267,7 +6267,7 @@
   },
   "libraries": {
     "Capacitor/1.0.0": {
-      "sha512": "gD6Hi2P5og1BVMON7BfqiaLe+VwBjAxP6uxO0+ufIRxSy5iKyv7dX30A23UPV5S+ggd794kOCMJEnldt0oy3Yg==",
+      "sha512": "O0wJ9UA2TnfS2cuiO98/hRfswZtK/kscWiG+Lg2uutBeNsTB8mf6mm9rBW+wOAKQhMDZhA2XzciYYu7GRgSY/A==",
       "type": "package",
       "path": "capacitor/1.0.0",
       "files": [

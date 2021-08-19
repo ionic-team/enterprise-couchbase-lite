@@ -13,40 +13,40 @@ npx cap sync
 
 <docgen-index>
 
-* [`pluginConfigure(...)`](#pluginconfigure)
-* [`databaseOpen(...)`](#databaseopen)
-* [`databaseSave(...)`](#databasesave)
-* [`databaseGetCount(...)`](#databasegetcount)
-* [`databaseGetPath(...)`](#databasegetpath)
-* [`databaseCopy(...)`](#databasecopy)
-* [`databaseCreateIndex(...)`](#databasecreateindex)
-* [`databaseDeleteIndex(...)`](#databasedeleteindex)
-* [`databaseGetIndexes(...)`](#databasegetindexes)
-* [`databaseExists(...)`](#databaseexists)
-* [`databaseClose(...)`](#databaseclose)
-* [`databaseCompact(...)`](#databasecompact)
-* [`databaseDelete(...)`](#databasedelete)
-* [`databasePurgeDocument(...)`](#databasepurgedocument)
-* [`databaseDeleteDocument(...)`](#databasedeletedocument)
-* [`databaseGetDocument(...)`](#databasegetdocument)
-* [`databaseAddChangeListener(...)`](#databaseaddchangelistener)
-* [`databaseSetLogLevel(...)`](#databasesetloglevel)
-* [`databaseSetFileLoggingConfig(...)`](#databasesetfileloggingconfig)
-* [`databaseGetBlobContent(...)`](#databasegetblobcontent)
-* [`queryExecute(...)`](#queryexecute)
-* [`resultSetNext(...)`](#resultsetnext)
-* [`resultSetNextBatch(...)`](#resultsetnextbatch)
-* [`resultSetAllResults(...)`](#resultsetallresults)
-* [`resultSetCleanup(...)`](#resultsetcleanup)
-* [`replicatorCreate(...)`](#replicatorcreate)
-* [`replicatorStart(...)`](#replicatorstart)
-* [`replicatorRestart(...)`](#replicatorrestart)
-* [`replicatorAddChangeListener(...)`](#replicatoraddchangelistener)
-* [`replicatorAddDocumentListener(...)`](#replicatoradddocumentlistener)
-* [`replicatorStop(...)`](#replicatorstop)
-* [`replicatorResetCheckpoint(...)`](#replicatorresetcheckpoint)
-* [`replicatorGetStatus(...)`](#replicatorgetstatus)
-* [`replicatorCleanup(...)`](#replicatorcleanup)
+* [`Plugin_Configure(...)`](#plugin_configure)
+* [`Database_Open(...)`](#database_open)
+* [`Database_Save(...)`](#database_save)
+* [`Database_GetCount(...)`](#database_getcount)
+* [`Database_GetPath(...)`](#database_getpath)
+* [`Database_Copy(...)`](#database_copy)
+* [`Database_CreateIndex(...)`](#database_createindex)
+* [`Database_DeleteIndex(...)`](#database_deleteindex)
+* [`Database_GetIndexes(...)`](#database_getindexes)
+* [`Database_Exists(...)`](#database_exists)
+* [`Database_Close(...)`](#database_close)
+* [`Database_Compact(...)`](#database_compact)
+* [`Database_Delete(...)`](#database_delete)
+* [`Database_PurgeDocument(...)`](#database_purgedocument)
+* [`Database_DeleteDocument(...)`](#database_deletedocument)
+* [`Database_GetDocument(...)`](#database_getdocument)
+* [`Database_AddChangeListener(...)`](#database_addchangelistener)
+* [`Database_SetLogLevel(...)`](#database_setloglevel)
+* [`Database_SetFileLoggingConfig(...)`](#database_setfileloggingconfig)
+* [`Database_GetBlobContent(...)`](#database_getblobcontent)
+* [`Query_Execute(...)`](#query_execute)
+* [`ResultSet_Next(...)`](#resultset_next)
+* [`ResultSet_NextBatch(...)`](#resultset_nextbatch)
+* [`ResultSet_AllResults(...)`](#resultset_allresults)
+* [`ResultSet_Cleanup(...)`](#resultset_cleanup)
+* [`Replicator_Create(...)`](#replicator_create)
+* [`Replicator_Start(...)`](#replicator_start)
+* [`Replicator_Restart(...)`](#replicator_restart)
+* [`Replicator_AddChangeListener(...)`](#replicator_addchangelistener)
+* [`Replicator_AddDocumentListener(...)`](#replicator_adddocumentlistener)
+* [`Replicator_Stop(...)`](#replicator_stop)
+* [`Replicator_ResetCheckpoint(...)`](#replicator_resetcheckpoint)
+* [`Replicator_GetStatus(...)`](#replicator_getstatus)
+* [`Replicator_Cleanup(...)`](#replicator_cleanup)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
 
@@ -55,10 +55,10 @@ npx cap sync
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### pluginConfigure(...)
+### Plugin_Configure(...)
 
 ```typescript
-pluginConfigure(args: PluginConfigureArgs) => any
+Plugin_Configure(args: PluginConfigureArgs) => any
 ```
 
 | Param      | Type                                                                |
@@ -70,10 +70,10 @@ pluginConfigure(args: PluginConfigureArgs) => any
 --------------------
 
 
-### databaseOpen(...)
+### Database_Open(...)
 
 ```typescript
-databaseOpen(args: DatabaseOpenArgs) => any
+Database_Open(args: DatabaseOpenArgs) => any
 ```
 
 | Param      | Type                                                          |
@@ -85,10 +85,10 @@ databaseOpen(args: DatabaseOpenArgs) => any
 --------------------
 
 
-### databaseSave(...)
+### Database_Save(...)
 
 ```typescript
-databaseSave(args: DatabaseSaveArgs) => any
+Database_Save(args: DatabaseSaveArgs) => any
 ```
 
 | Param      | Type                                                          |
@@ -100,10 +100,10 @@ databaseSave(args: DatabaseSaveArgs) => any
 --------------------
 
 
-### databaseGetCount(...)
+### Database_GetCount(...)
 
 ```typescript
-databaseGetCount(args: DatabaseArgs) => any
+Database_GetCount(args: DatabaseArgs) => any
 ```
 
 | Param      | Type                                                  |
@@ -115,10 +115,10 @@ databaseGetCount(args: DatabaseArgs) => any
 --------------------
 
 
-### databaseGetPath(...)
+### Database_GetPath(...)
 
 ```typescript
-databaseGetPath(args: DatabaseArgs) => any
+Database_GetPath(args: DatabaseArgs) => any
 ```
 
 | Param      | Type                                                  |
@@ -130,10 +130,10 @@ databaseGetPath(args: DatabaseArgs) => any
 --------------------
 
 
-### databaseCopy(...)
+### Database_Copy(...)
 
 ```typescript
-databaseCopy(args: DatabaseCopyArgs) => any
+Database_Copy(args: DatabaseCopyArgs) => any
 ```
 
 | Param      | Type                                                          |
@@ -145,10 +145,10 @@ databaseCopy(args: DatabaseCopyArgs) => any
 --------------------
 
 
-### databaseCreateIndex(...)
+### Database_CreateIndex(...)
 
 ```typescript
-databaseCreateIndex(args: DatabaseCreateIndexArgs) => any
+Database_CreateIndex(args: DatabaseCreateIndexArgs) => any
 ```
 
 | Param      | Type                                                                        |
@@ -160,10 +160,10 @@ databaseCreateIndex(args: DatabaseCreateIndexArgs) => any
 --------------------
 
 
-### databaseDeleteIndex(...)
+### Database_DeleteIndex(...)
 
 ```typescript
-databaseDeleteIndex(args: DatabaseDeleteIndexArgs) => any
+Database_DeleteIndex(args: DatabaseDeleteIndexArgs) => any
 ```
 
 | Param      | Type                                                                        |
@@ -175,10 +175,10 @@ databaseDeleteIndex(args: DatabaseDeleteIndexArgs) => any
 --------------------
 
 
-### databaseGetIndexes(...)
+### Database_GetIndexes(...)
 
 ```typescript
-databaseGetIndexes(args: DatabaseArgs) => any
+Database_GetIndexes(args: DatabaseArgs) => any
 ```
 
 | Param      | Type                                                  |
@@ -190,10 +190,10 @@ databaseGetIndexes(args: DatabaseArgs) => any
 --------------------
 
 
-### databaseExists(...)
+### Database_Exists(...)
 
 ```typescript
-databaseExists(args: DatabaseExistsArgs) => any
+Database_Exists(args: DatabaseExistsArgs) => any
 ```
 
 | Param      | Type                                                              |
@@ -205,10 +205,10 @@ databaseExists(args: DatabaseExistsArgs) => any
 --------------------
 
 
-### databaseClose(...)
+### Database_Close(...)
 
 ```typescript
-databaseClose(args: DatabaseArgs) => any
+Database_Close(args: DatabaseArgs) => any
 ```
 
 | Param      | Type                                                  |
@@ -220,10 +220,10 @@ databaseClose(args: DatabaseArgs) => any
 --------------------
 
 
-### databaseCompact(...)
+### Database_Compact(...)
 
 ```typescript
-databaseCompact(args: DatabaseArgs) => any
+Database_Compact(args: DatabaseArgs) => any
 ```
 
 | Param      | Type                                                  |
@@ -235,10 +235,10 @@ databaseCompact(args: DatabaseArgs) => any
 --------------------
 
 
-### databaseDelete(...)
+### Database_Delete(...)
 
 ```typescript
-databaseDelete(args: DatabaseArgs) => any
+Database_Delete(args: DatabaseArgs) => any
 ```
 
 | Param      | Type                                                  |
@@ -250,10 +250,10 @@ databaseDelete(args: DatabaseArgs) => any
 --------------------
 
 
-### databasePurgeDocument(...)
+### Database_PurgeDocument(...)
 
 ```typescript
-databasePurgeDocument(args: DatabasePurgeDocumentArgs) => any
+Database_PurgeDocument(args: DatabasePurgeDocumentArgs) => any
 ```
 
 | Param      | Type                                                                            |
@@ -265,10 +265,10 @@ databasePurgeDocument(args: DatabasePurgeDocumentArgs) => any
 --------------------
 
 
-### databaseDeleteDocument(...)
+### Database_DeleteDocument(...)
 
 ```typescript
-databaseDeleteDocument(args: DatabaseDeleteDocumentArgs) => any
+Database_DeleteDocument(args: DatabaseDeleteDocumentArgs) => any
 ```
 
 | Param      | Type                                                                              |
@@ -280,10 +280,10 @@ databaseDeleteDocument(args: DatabaseDeleteDocumentArgs) => any
 --------------------
 
 
-### databaseGetDocument(...)
+### Database_GetDocument(...)
 
 ```typescript
-databaseGetDocument(args: DatabaseGetDocumentArgs) => any
+Database_GetDocument(args: DatabaseGetDocumentArgs) => any
 ```
 
 | Param      | Type                                                                        |
@@ -295,10 +295,10 @@ databaseGetDocument(args: DatabaseGetDocumentArgs) => any
 --------------------
 
 
-### databaseAddChangeListener(...)
+### Database_AddChangeListener(...)
 
 ```typescript
-databaseAddChangeListener(args: DatabaseArgs, cb: PluginCallback) => any
+Database_AddChangeListener(args: DatabaseArgs, cb: PluginCallback) => any
 ```
 
 | Param      | Type                                                                        |
@@ -311,10 +311,10 @@ databaseAddChangeListener(args: DatabaseArgs, cb: PluginCallback) => any
 --------------------
 
 
-### databaseSetLogLevel(...)
+### Database_SetLogLevel(...)
 
 ```typescript
-databaseSetLogLevel(args: DatabaseSetLogLevelArgs) => any
+Database_SetLogLevel(args: DatabaseSetLogLevelArgs) => any
 ```
 
 | Param      | Type                                                                        |
@@ -326,10 +326,10 @@ databaseSetLogLevel(args: DatabaseSetLogLevelArgs) => any
 --------------------
 
 
-### databaseSetFileLoggingConfig(...)
+### Database_SetFileLoggingConfig(...)
 
 ```typescript
-databaseSetFileLoggingConfig(args: DatabaseSetFileLoggingConfigArgs) => any
+Database_SetFileLoggingConfig(args: DatabaseSetFileLoggingConfigArgs) => any
 ```
 
 | Param      | Type                                                                                          |
@@ -341,10 +341,10 @@ databaseSetFileLoggingConfig(args: DatabaseSetFileLoggingConfigArgs) => any
 --------------------
 
 
-### databaseGetBlobContent(...)
+### Database_GetBlobContent(...)
 
 ```typescript
-databaseGetBlobContent(args: DatabaseGetBlobContentArgs) => any
+Database_GetBlobContent(args: DatabaseGetBlobContentArgs) => any
 ```
 
 | Param      | Type                                                                              |
@@ -356,10 +356,10 @@ databaseGetBlobContent(args: DatabaseGetBlobContentArgs) => any
 --------------------
 
 
-### queryExecute(...)
+### Query_Execute(...)
 
 ```typescript
-queryExecute(args: QueryExecuteArgs) => any
+Query_Execute(args: QueryExecuteArgs) => any
 ```
 
 | Param      | Type                                                          |
@@ -371,10 +371,10 @@ queryExecute(args: QueryExecuteArgs) => any
 --------------------
 
 
-### resultSetNext(...)
+### ResultSet_Next(...)
 
 ```typescript
-resultSetNext(args: ResultSetNextArgs) => any
+ResultSet_Next(args: ResultSetNextArgs) => any
 ```
 
 | Param      | Type                                                            |
@@ -386,10 +386,10 @@ resultSetNext(args: ResultSetNextArgs) => any
 --------------------
 
 
-### resultSetNextBatch(...)
+### ResultSet_NextBatch(...)
 
 ```typescript
-resultSetNextBatch(args: ResultSetNextBatchArgs) => any
+ResultSet_NextBatch(args: ResultSetNextBatchArgs) => any
 ```
 
 | Param      | Type                                                                      |
@@ -401,10 +401,10 @@ resultSetNextBatch(args: ResultSetNextBatchArgs) => any
 --------------------
 
 
-### resultSetAllResults(...)
+### ResultSet_AllResults(...)
 
 ```typescript
-resultSetAllResults(args: ResultSetAllResultsArgs, callback: PluginCallback) => any
+ResultSet_AllResults(args: ResultSetAllResultsArgs, callback: PluginCallback) => any
 ```
 
 | Param          | Type                                                                        |
@@ -417,10 +417,10 @@ resultSetAllResults(args: ResultSetAllResultsArgs, callback: PluginCallback) => 
 --------------------
 
 
-### resultSetCleanup(...)
+### ResultSet_Cleanup(...)
 
 ```typescript
-resultSetCleanup(args: ResultSetCleanupArgs) => any
+ResultSet_Cleanup(args: ResultSetCleanupArgs) => any
 ```
 
 | Param      | Type                                                                  |
@@ -432,10 +432,10 @@ resultSetCleanup(args: ResultSetCleanupArgs) => any
 --------------------
 
 
-### replicatorCreate(...)
+### Replicator_Create(...)
 
 ```typescript
-replicatorCreate(args: ReplicatorCreateArgs) => any
+Replicator_Create(args: ReplicatorCreateArgs) => any
 ```
 
 | Param      | Type                                                                  |
@@ -447,10 +447,10 @@ replicatorCreate(args: ReplicatorCreateArgs) => any
 --------------------
 
 
-### replicatorStart(...)
+### Replicator_Start(...)
 
 ```typescript
-replicatorStart(args: ReplicatorArgs) => any
+Replicator_Start(args: ReplicatorArgs) => any
 ```
 
 | Param      | Type                                                      |
@@ -462,10 +462,10 @@ replicatorStart(args: ReplicatorArgs) => any
 --------------------
 
 
-### replicatorRestart(...)
+### Replicator_Restart(...)
 
 ```typescript
-replicatorRestart(args: ReplicatorArgs) => any
+Replicator_Restart(args: ReplicatorArgs) => any
 ```
 
 | Param      | Type                                                      |
@@ -477,10 +477,10 @@ replicatorRestart(args: ReplicatorArgs) => any
 --------------------
 
 
-### replicatorAddChangeListener(...)
+### Replicator_AddChangeListener(...)
 
 ```typescript
-replicatorAddChangeListener(args: ReplicatorArgs, cb: PluginCallback) => any
+Replicator_AddChangeListener(args: ReplicatorArgs, cb: PluginCallback) => any
 ```
 
 | Param      | Type                                                                        |
@@ -493,10 +493,10 @@ replicatorAddChangeListener(args: ReplicatorArgs, cb: PluginCallback) => any
 --------------------
 
 
-### replicatorAddDocumentListener(...)
+### Replicator_AddDocumentListener(...)
 
 ```typescript
-replicatorAddDocumentListener(args: ReplicatorArgs, cb: PluginCallback) => any
+Replicator_AddDocumentListener(args: ReplicatorArgs, cb: PluginCallback) => any
 ```
 
 | Param      | Type                                                                        |
@@ -509,10 +509,10 @@ replicatorAddDocumentListener(args: ReplicatorArgs, cb: PluginCallback) => any
 --------------------
 
 
-### replicatorStop(...)
+### Replicator_Stop(...)
 
 ```typescript
-replicatorStop(args: ReplicatorArgs) => any
+Replicator_Stop(args: ReplicatorArgs) => any
 ```
 
 | Param      | Type                                                      |
@@ -524,10 +524,10 @@ replicatorStop(args: ReplicatorArgs) => any
 --------------------
 
 
-### replicatorResetCheckpoint(...)
+### Replicator_ResetCheckpoint(...)
 
 ```typescript
-replicatorResetCheckpoint(args: ReplicatorArgs) => any
+Replicator_ResetCheckpoint(args: ReplicatorArgs) => any
 ```
 
 | Param      | Type                                                      |
@@ -539,10 +539,10 @@ replicatorResetCheckpoint(args: ReplicatorArgs) => any
 --------------------
 
 
-### replicatorGetStatus(...)
+### Replicator_GetStatus(...)
 
 ```typescript
-replicatorGetStatus(args: ReplicatorArgs) => any
+Replicator_GetStatus(args: ReplicatorArgs) => any
 ```
 
 | Param      | Type                                                      |
@@ -554,10 +554,10 @@ replicatorGetStatus(args: ReplicatorArgs) => any
 --------------------
 
 
-### replicatorCleanup(...)
+### Replicator_Cleanup(...)
 
 ```typescript
-replicatorCleanup(args: ReplicatorArgs) => any
+Replicator_Cleanup(args: ReplicatorArgs) => any
 ```
 
 | Param      | Type                                                      |

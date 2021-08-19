@@ -71,7 +71,7 @@ F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\7.71340d30.chunk.js
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\8.61d03a0d.chunk.js
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\9.3e5f9e39.chunk.js
-F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\main.b646dfe6.chunk.js
+F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\main.8b06ce61.chunk.js
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\polyfills-dom.27591f7b.chunk.js
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\runtime-main.14282759.js
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\service-worker.js.map
@@ -133,7 +133,7 @@ F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\7.71340d30.chunk.js.map
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\8.61d03a0d.chunk.js.map
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\9.3e5f9e39.chunk.js.map
-F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\main.b646dfe6.chunk.js.map
+F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\main.8b06ce61.chunk.js.map
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\polyfills-dom.27591f7b.chunk.js.map
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\js\runtime-main.14282759.js.map
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\Public\static\css\4.532f36fa.chunk.css

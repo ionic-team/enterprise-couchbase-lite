@@ -121,82 +121,82 @@ export interface ReplicatorArgs {
 }
 
 export interface IonicCouchbaseLitePlugin {
-  pluginConfigure(args: PluginConfigureArgs): Promise<void>;
-  databaseOpen(args: DatabaseOpenArgs): Promise<void>;
-  databaseSave(args: DatabaseSaveArgs): Promise<{ _id: string }>;
-  databaseGetCount(
+  Plugin_Configure(args: PluginConfigureArgs): Promise<void>;
+  Database_Open(args: DatabaseOpenArgs): Promise<void>;
+  Database_Save(args: DatabaseSaveArgs): Promise<{ _id: string }>;
+  Database_GetCount(
     args: DatabaseArgs,
   ): Promise<{
     count: number;
   }>;
-  databaseGetPath(args: DatabaseArgs): Promise<{ path: string }>;
-  databaseCopy(args: DatabaseCopyArgs): Promise<void>;
-  databaseCreateIndex(args: DatabaseCreateIndexArgs): Promise<void>;
-  databaseDeleteIndex(args: DatabaseDeleteIndexArgs): Promise<void>;
-  databaseGetIndexes(
+  Database_GetPath(args: DatabaseArgs): Promise<{ path: string }>;
+  Database_Copy(args: DatabaseCopyArgs): Promise<void>;
+  Database_CreateIndex(args: DatabaseCreateIndexArgs): Promise<void>;
+  Database_DeleteIndex(args: DatabaseDeleteIndexArgs): Promise<void>;
+  Database_GetIndexes(
     args: DatabaseArgs,
   ): Promise<{
     indexes: string[];
   }>;
-  databaseExists(args: DatabaseExistsArgs): Promise<{ exists: boolean }>;
-  databaseClose(args: DatabaseArgs): Promise<void>;
-  databaseCompact(args: DatabaseArgs): Promise<void>;
-  databaseDelete(args: DatabaseArgs): Promise<void>;
-  databasePurgeDocument(args: DatabasePurgeDocumentArgs): Promise<void>;
-  databaseDeleteDocument(args: DatabaseDeleteDocumentArgs): Promise<void>;
-  databaseGetDocument(
+  Database_Exists(args: DatabaseExistsArgs): Promise<{ exists: boolean }>;
+  Database_Close(args: DatabaseArgs): Promise<void>;
+  Database_Compact(args: DatabaseArgs): Promise<void>;
+  Database_Delete(args: DatabaseArgs): Promise<void>;
+  Database_PurgeDocument(args: DatabasePurgeDocumentArgs): Promise<void>;
+  Database_DeleteDocument(args: DatabaseDeleteDocumentArgs): Promise<void>;
+  Database_GetDocument(
     args: DatabaseGetDocumentArgs,
   ): Promise<{
     document: Document;
   }>;
-  databaseAddChangeListener(
+  Database_AddChangeListener(
     args: DatabaseArgs,
     cb: PluginCallback,
   ): Promise<PluginListenerHandle>;
-  databaseSetLogLevel(args: DatabaseSetLogLevelArgs): Promise<void>;
-  databaseSetFileLoggingConfig(
+  Database_SetLogLevel(args: DatabaseSetLogLevelArgs): Promise<void>;
+  Database_SetFileLoggingConfig(
     args: DatabaseSetFileLoggingConfigArgs,
   ): Promise<void>;
-  databaseGetBlobContent(
+  Database_GetBlobContent(
     args: DatabaseGetBlobContentArgs,
   ): Promise<{
     data: any;
   }>;
-  queryExecute(
+  Query_Execute(
     args: QueryExecuteArgs,
   ): Promise<{
     id: string;
   }>;
-  resultSetNext(
+  ResultSet_Next(
     args: ResultSetNextArgs,
   ): Promise<{
     result: Result;
   }>;
-  resultSetNextBatch(
+  ResultSet_NextBatch(
     args: ResultSetNextBatchArgs,
   ): Promise<{
     results: Result[];
   }>;
-  resultSetAllResults(
+  ResultSet_AllResults(
     args: ResultSetAllResultsArgs,
     callback: PluginCallback,
   ): Promise<PluginListenerHandle>;
-  resultSetCleanup(args: ResultSetCleanupArgs): Promise<void>;
-  replicatorCreate(
+  ResultSet_Cleanup(args: ResultSetCleanupArgs): Promise<void>;
+  Replicator_Create(
     args: ReplicatorCreateArgs,
   ): Promise<{ replicatorId: string }>;
-  replicatorStart(args: ReplicatorArgs): Promise<void>;
-  replicatorRestart(args: ReplicatorArgs): Promise<void>;
-  replicatorAddChangeListener(
+  Replicator_Start(args: ReplicatorArgs): Promise<void>;
+  Replicator_Restart(args: ReplicatorArgs): Promise<void>;
+  Replicator_AddChangeListener(
     args: ReplicatorArgs,
     cb: PluginCallback,
   ): Promise<PluginListenerHandle>;
-  replicatorAddDocumentListener(
+  Replicator_AddDocumentListener(
     args: ReplicatorArgs,
     cb: PluginCallback,
   ): Promise<PluginListenerHandle>;
-  replicatorStop(args: ReplicatorArgs): Promise<void>;
-  replicatorResetCheckpoint(args: ReplicatorArgs): Promise<void>;
-  replicatorGetStatus(args: ReplicatorArgs): Promise<void>;
-  replicatorCleanup(args: ReplicatorArgs): Promise<void>;
+  Replicator_Stop(args: ReplicatorArgs): Promise<void>;
+  Replicator_ResetCheckpoint(args: ReplicatorArgs): Promise<void>;
+  Replicator_GetStatus(args: ReplicatorArgs): Promise<void>;
+  Replicator_Cleanup(args: ReplicatorArgs): Promise<void>;
 }
