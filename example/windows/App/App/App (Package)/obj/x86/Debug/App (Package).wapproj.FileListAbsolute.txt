@@ -232,5 +232,5 @@ F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\obj\x8
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\4.85c25d9e.chunk.js
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\4.85c25d9e.chunk.js.LICENSE.txt
 F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\4.85c25d9e.chunk.js.map
-F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\main.8b06ce61.chunk.js
-F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\main.8b06ce61.chunk.js.map
+F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\main.b41734b8.chunk.js
+F:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\main.b41734b8.chunk.js.map

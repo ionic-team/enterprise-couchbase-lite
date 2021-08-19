@@ -172,10 +172,12 @@ namespace IonicCouchbaseLite {
             DynamicMojo.SwapMethodBodies(methodToReplace2, methodToInject2);
         }
 
-        public void Plugin_Configure(Doc config, ResolveFn resolve, RejectFn reject) {
+        [PluginMethod(PluginMethodReturnType.Promise)]
+        public void Plugin_Configure(PluginCall call) {
+            var config = call.GetObject("config");
             var chunkSizeVal = (long)config.GetValueOrDefault("allResultsChunkSize", 256L);
             allResultsChunkSize = Convert.ToInt32(chunkSizeVal);
-            resolve.Invoke(null, false);
+            call.Resolve();
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]

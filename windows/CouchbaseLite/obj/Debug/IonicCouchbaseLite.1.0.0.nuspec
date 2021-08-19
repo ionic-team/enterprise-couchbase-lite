@@ -24,7 +24,7 @@
     </contentFiles>
   </metadata>
   <files>
-    <file src="C:\Users\Max\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" target="lib\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" />
+    <file src="F:\GitHub\enterprise-couchbase-lite\windows\CouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" target="lib\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" />
     <file src="C:\Users\Max\.nuget\packages\couchbase.lite.enterprise.support.netdesktop\2.8.6\runtimes\win7-x86\native\LiteCore.dll" target="content\LiteCore.dll" />
     <file src="C:\Users\Max\.nuget\packages\couchbase.lite.enterprise.support.netdesktop\2.8.6\runtimes\win7-x86\native\LiteCore.dll" target="contentFiles\any\net5.0-windows10.0.19041\LiteCore.dll" />
   </files>

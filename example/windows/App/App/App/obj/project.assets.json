@@ -6370,7 +6370,7 @@
       ]
     },
     "IonicCouchbaseLite/1.0.0": {
-      "sha512": "Cj87KneB/rS3/b4UZXWhLwVs4tiwXwFv9ZtN4wpsq8UCT6Ew7xarnQOCFa6jVSmqBvLvllKN2OsMDTl77DtNDw==",
+      "sha512": "ClBkyW7bGF4gtWWCN4+3MTaAebuXxPaTHakw5ODto91WKNCVKEoVkMb+Pu3FQ4KOdFV8m+C0IL1t1KR1CI0b4A==",
       "type": "package",
       "path": "ioniccouchbaselite/1.0.0",
       "files": [
