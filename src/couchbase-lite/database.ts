@@ -52,7 +52,7 @@ export class Database {
 
   private changeListenerTokens: DatabaseChangeListener[] = [];
 
-  private _engine: CapacitorEngine;
+  private _engine: CapacitorEngine = new CapacitorEngine();
 
   private didStartListener = false;
 
