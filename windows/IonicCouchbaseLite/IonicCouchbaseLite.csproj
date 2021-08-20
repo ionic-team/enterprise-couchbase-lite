@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net5.0-windows10.0.19041</TargetFramework>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	  <AssemblyName>IonicCouchbaseLite</AssemblyName>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <RootNamespace>IonicCouchbaseLite</RootNamespace>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Capacitor" Version="1.0.0" />
+		<PackageReference Include="Couchbase.Lite.Enterprise" Version="2.8.6" />
+		<PackageReference Include="Couchbase.Lite.Support.NetDesktop" Version="2.8.6" />
+		<PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+		<PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+		<PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
+		<PackageReference Include="Microsoft.Win32.Primitives" Version="4.3.0" />
+		<PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
+		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+		<PackageReference Include="System.Net.Primitives" Version="4.3.0" />
+	</ItemGroup>
+</Project>

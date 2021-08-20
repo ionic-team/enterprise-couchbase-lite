@@ -6,7 +6,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './Home.css';
 
 import {
@@ -77,8 +77,10 @@ class CBLTester {
     // this.router.navigateByUrl('/document');
   }
 
+  outputChanged(value: string) {}
   out(value: string) {
     this.output = value;
+    this.outputChanged(value);
   }
 
   async preInit() {
@@ -987,8 +989,17 @@ const tester = new CBLTester();
 
 const Home: React.FC = () => {
   const outputRef = useRef<HTMLDivElement | null>(null);
+  const [output, setOutput] = useState('');
 
   const testerRef = useRef<CBLTester>(tester);
+
+  const doChange = useCallback(() => {
+    console.log('OUTPUT CHANGED', tester.output);
+    setOutput(tester.output);
+  }, []);
+  useEffect(() => {
+    tester.outputChanged = doChange;
+  }, [tester.output]);
 
   return (
     <IonPage>
@@ -1003,7 +1014,7 @@ const Home: React.FC = () => {
             <IonTitle size="large">Blank</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <div id="output" ref={outputRef} />
+        <div id="output" dangerouslySetInnerHTML={{ __html: output }} />
         <IonButton onClick={() => testerRef.current.toggleLogLevel()}>
           Toggle Log Level
         </IonButton>
