@@ -6267,7 +6267,7 @@
   },
   "libraries": {
     "Capacitor/1.0.0": {
-      "sha512": "E7ZQpfw9LOzaa1ncViefxChEJfM15nKrIh/2C3Qat/qLUJW6mIWricVy+frdGCb09hnV0wfo+eOdjDku646/NQ==",
+      "sha512": "HuACssfo9j5hf2f8p6TNvu71gGUd1mHouy3D3aJ2ZQZrfslXYPGSOijwVF60DxZWhGj1SA0U5llgZIAfUuvCMQ==",
       "type": "package",
       "path": "capacitor/1.0.0",
       "files": [
@@ -6370,7 +6370,7 @@
       ]
     },
     "IonicCouchbaseLite/1.0.0": {
-      "sha512": "IwtvYony7FJn+JztOA3GaZwb36iwElhxEooqj1Kz8ad0X0UGW722gWfpKC5YSoVfSw+W37PzsuAEarH/yupQSg==",
+      "sha512": "V9cCOgJRvnBDzzO/8oDZ/qKZamjURYBJvnhflVAyYPB3BjB+5s8Yp3xveDw/hjYubyhaZDVBefVGZIkCY/ADWg==",
       "type": "package",
       "path": "ioniccouchbaselite/1.0.0",
       "files": [

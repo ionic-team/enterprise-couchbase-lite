@@ -18,14 +18,13 @@ using LiteCore;
 using LiteCore.Util;
 using LiteCore.Interop;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Capacitor;
 
 namespace IonicCouchbaseLite {
     using Doc = Dictionary<string, object>;
-    using ResolveFn = Func<object, bool, Task>;
-    using RejectFn = Func<Exception, string, Task>;
 
     public class XQueryPatch {
         public static string Json { get; set; }
@@ -242,6 +241,8 @@ namespace IonicCouchbaseLite {
             var id = call.GetString("id");
             var document = call.GetObject("document");
             var db = getDatabase(dbName);
+
+            Logger.debug($"Saving document: {JsonConvert.SerializeObject(document)}");
             if (db == null) {
                 call.Reject("Database not found");
                 return;
@@ -261,17 +262,23 @@ namespace IonicCouchbaseLite {
             });
         }
 
-        private Doc jsonWithCBLObjects(Doc document) {
-            return document;
-            /*
-            var items  = new Doc();
-            foreach(var item in document) {
-              var key = item.Key;
-              var value = item.Value;
+        private JSObject jsonWithCBLObjects(Doc document) {
+            var items = new JSObject();
+            foreach (var item in document) {
+                var key = item.Key;
+                var value = item.Value;
 
 
-              // var t = value.GetType();
-              if (value is JObject) {
+                // var t = value.GetType();
+                if (value is DateTime) {
+                    items[key] = new DateTimeOffset((DateTime)value);
+                    continue;
+                } else if (value is Newtonsoft.Json.Linq.JObject) {
+                    items[key] = jsonWithCBLObjects(((Newtonsoft.Json.Linq.JObject)value).ToObject<JSObject>());
+                    continue;
+                }
+
+                    /*
                 var subValue = (JObject) value;
                 var typeToken = subValue["_type"];
 
@@ -287,14 +294,13 @@ namespace IonicCouchbaseLite {
                     continue;
                   }
                 }
-              }
+                    */
 
-              items[key] = value;
+                items[key] = value;
             }
 
 
             return items;
-            */
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]
