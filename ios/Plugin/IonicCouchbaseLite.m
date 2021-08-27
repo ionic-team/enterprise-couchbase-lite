@@ -56,46 +56,11 @@
   }
 }
 
--(void)resolve:(CAPPluginCall*)call {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
--(void)resolve:(CAPPluginCall*)call data:(NSDictionary *)data {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
--(void)resolve:(CAPPluginCall*)call array:(NSArray *)data {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:data];
-  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
--(void)resolve:(CAPPluginCall*)call integer:(NSInteger)integer {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsNSInteger:integer];
-  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
--(void)resolve:(CAPPluginCall*)call boolean:(BOOL)boolean {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:boolean];
-  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
--(void)resolve:(CAPPluginCall*)call string:(NSString *)string {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:string];
-  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
--(void)reject:(CAPPluginCall*)call message:(NSString *)message {
-  CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:message];
-  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
 -(BOOL)checkError:(CAPPluginCall*)call error:(NSError *)error message:(NSString *)message {
   if (error != NULL) {
     NSString *msg = [message stringByAppendingString:@": "];
     msg = [msg stringByAppendingString:error.localizedDescription];
-    [self reject:command message:msg];
+    [call reject:msg];
     return TRUE;
   }
   return FALSE;
@@ -155,13 +120,13 @@
   NSError *error;
   CBLDatabase *database = [[CBLDatabase alloc] initWithName:name config:config error:&error];
   
-  if ([self checkError:command error:error message:@"Unable to open database"]) {
+  if ([self checkError:call error:error message:@"Unable to open database"]) {
     return;
   }
   
   [openDatabases setObject:database forKey:name];
     
-  [self resolve:command];
+  [self resolve];
 }
 
 -(CBLDatabaseConfiguration *)buildDBConfig:(NSDictionary *)config {
@@ -181,8 +146,11 @@
 -(void)Database_Exists:(CAPPluginCall*)call {
   NSString *existsName = [call getString:@"existsName"];
   NSString *directory = [call getString:@"directory"];
-  [self.commandDelegate runInBackground:^{
-    return [self resolve:command boolean:[CBLDatabase databaseExists:existsName inDirectory:directory]];
+  dispatch_async(dispatch_get_main_queue(), ^{
+
+    [call resolve:@{
+      "exists": [CBLDatabase databaseExists:existsName inDirectory:directory]
+    }];
   }];
 }
 
@@ -192,10 +160,10 @@
   NSDictionary *document = [call getObject:@"document"];
   int concurrencyControlValue = [call getInt:@"concurrencyControl"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     CBLMutableDocument *m = nil;
@@ -209,11 +177,13 @@
     NSError *error;
     [db saveDocument:m concurrencyControl:concurrencyControlValue error:&error];
     
-    if ([self checkError:command error:error message:@"Unable to save document"]) {
+    if ([self checkError:call error:error message:@"Unable to save document"]) {
       return;
     }
     
-    [self resolve:command data:@{ @"_id": m.id }];
+    [call resolve:@{
+      "_id": m.id
+    }];
   }];
 }
 
@@ -249,31 +219,35 @@
 
 -(void)Database_GetCount:(CAPPluginCall*)call {
   NSString *name = [call getString:@"name"];
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [call reject:@"No such open database"];
       return;
     }
-    [self resolve: command integer:[db count]];
+    [call resolve:@{
+      @"count": [db count]
+    }];
   }];
 }
 
 -(void)Database_GetPath:(CAPPluginCall*)call {
   NSString *name = [call getString:@"name"];
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
-    [self resolve:command string:[db path]];
+    [call resolve:@{
+      @"path": [db path]
+    }];
   }];
 }
 
 -(void)Database_Copy:(CAPPluginCall*)call {
 
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *path = [call getString:@"path"];
     NSString *name2 = [call getString:@"newName"]
     NSDictionary *configValue = [call getObject:@"config"];
@@ -283,18 +257,18 @@
     NSError *error;
     [CBLDatabase copyFromPath:path toDatabase:name2 withConfig:config error:&error];
     
-    [self resolve: command];
+    [call resolve];
   }];
 }
 
 -(void)Database_CreateIndex:(CAPPluginCall*)call {
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     NSString *indexName = [call getString:@"indexName"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     NSDictionary *indexData = [call getObject:@"index"];
@@ -313,7 +287,7 @@
     NSError *error;
     [db createIndex:index withName:indexName error:&error];
     
-    [self resolve: command];
+    [call resolve];
   }];
 }
 
@@ -340,18 +314,18 @@
 }
 
 -(void)Database_DeleteIndex:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     NSString *indexName = [call getString:@"indexName"];
     
     NSError *error;
     [db deleteIndexForName:indexName error:&error];
-    [self resolve:command string:[db path]];
+    [call resolve];
   }];
 }
 
@@ -359,41 +333,43 @@
   NSString *name = [call getString:@"name"];
   CBLDatabase *db = [self getDatabase:name];
   if (db == NULL) {
-    [self reject:command message:@"No such open database"];
+    [self reject:call message:@"No such open database"];
     return;
   }
-  [self.commandDelegate runInBackground:^{
-    [self resolve:command array:[db indexes]];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [call resolve:@{
+      "indexes": [db indexes];
+    }];
   }];
 }
 
 -(void)Database_AddChangeListener:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
+
+    [call setKeepAlive:YES];
     
     [db addChangeListener:^(CBLDatabaseChange *change) {
       NSArray<NSString *> *docIds = [change documentIDs];
       NSDictionary *data = @{
         @"documentIDs": docIds
       };
-      CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-      [result setKeepCallbackAsBool:TRUE];
-      [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+      [call resolve:data];
     }];
   }];
 }
 
 -(void)Database_Close:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     
@@ -402,11 +378,11 @@
     
     [self->openDatabases removeObjectForKey:name];
     
-    if ([self checkError:command error:error message:@"Unable to close database"]) {
+    if ([self checkError:call error:error message:@"Unable to close database"]) {
       return;
     }
     
-    [self resolve:command];
+    [self resolve];
   }];
 }
 
@@ -414,27 +390,27 @@
   NSString *name = [call getString:@"name"];
   CBLDatabase *db = [self getDatabase:name];
   if (db == NULL) {
-    [self reject:command message:@"No such open database"];
+    [self reject:call message:@"No such open database"];
     return;
   }
   NSError *error;
   [db delete:&error];
   
-  if ([self checkError:command error:error message:@"Unable to delete database"]) {
+  if ([self checkError:call error:error message:@"Unable to delete database"]) {
     return;
   }
   
-  [self resolve:command];
+  [call resolve];
 }
 
 -(void)Database_DeleteDocument:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     NSString *docId = [call getString:@"docId"];
     int concurrencyControlValue = [call getInt:@"concurrencyControl"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     
@@ -442,62 +418,62 @@
     
     NSError *error;
     [db deleteDocument:doc concurrencyControl:concurrencyControlValue error:&error];
-    if ([self checkError:command error:error message:@"Unable to delete document"]) {
+    if ([self checkError:call error:error message:@"Unable to delete document"]) {
       return;
     }
     
-    [self resolve:command];
+    [call resolve];
   }];
 }
 
 -(void)Database_PurgeDocument:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     NSString *docId = [call getString:@"docId"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
         
     NSError *error;
     [db purgeDocumentWithID:docId error:&error];
     
-    if ([self checkError:command error:error message:@"Unable to purge document"]) {
+    if ([self checkError:call error:error message:@"Unable to purge document"]) {
       return;
     }
     
-    [self resolve:command];
+    [call resolve];
   }];
 }
 
 -(void)Database_Compact:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     
     NSError *error;
     [db compact:&error];
     
-    if ([self checkError:command error:error message:@"Unable to compact database"]) {
+    if ([self checkError:call error:error message:@"Unable to compact database"]) {
       return;
     }
     
-    [self resolve:command];
+    [call resolve];
   }];
 }
 
 -(void)Database_GetDocument:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     NSString *docId = [call getString:@"docId"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     
@@ -509,16 +485,16 @@
       [data setObject:documentMap forKey:@"_data"];
       [data setObject:docId forKey:@"_id"];
       [data setObject:@([doc sequence]) forKey:@"_sequence"];
-      [self resolve:command data:data];
+      [call resolve:data];
       return;
     }
     
-    [self resolve:command data:@{}];
+    [call resolve:@{}];
   }];
 }
 
 -(void)Database_SetLogLevel:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *domainValue = [call getString:@"domain"];
     int logLevelValue = [call getInt:@"logLevel"];
     CBLLogDomain domain = kCBLLogDomainAll;
@@ -531,16 +507,16 @@
     
     [CBLDatabase setLogLevel:logLevelValue domain:domain];
     
-    return [self resolve:command];
+    return [call resolve];
   }];
 }
 
 -(void)Database_SetFileLoggingConfig:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     JSObject *configObject = [call getObject:@"config"]
@@ -567,18 +543,18 @@
     if (logLevelValue != NULL) {
       [CBLDatabase.log.file setLevel:(NSInteger) logLevelValue];
     }
-    return [self resolve:command];
+    return [call resolve];
   }];
 }
 
 -(void)Document_GetBlobContent:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     NSString *documentId = [call getString:@"docId"];
     NSString *key = [call getString:@"key"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     
@@ -592,20 +568,24 @@
       for (int i = 0; i < [data length]; i++) {
         [content addObject:@(bytes[i])];
       }
-      [self resolve:command array:content];
+      [call resolve:@{
+        "data": content
+      }];
     } else {
-      [self resolve:command data:@{}];
+      [call resolve:@{
+        "data": []
+      }];
     }
   }];
 }
 
 -(void)Query_Execute:(CAPPluginCall*)call {
 
-  //[self.commandDelegate runInBackground:^{
+  //dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
-      [self reject:command message:@"No such open database"];
+      [self reject:call message:@"No such open database"];
       return;
     }
     NSString *queryJson = [call getString:@"query"];
@@ -618,38 +598,40 @@
     NSInteger queryId = _queryCount;
     _queryCount++;
     
-    [self resolve:command data:@{ @"id": @(queryId) }];
+    [call resolve:@{ @"id": @(queryId) }];
   //}];
 }
 
 -(void)ResultSet_Next:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     int queryId = [call getInt:@"resultSetId"];
     
     CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
     if (rs == NULL) {
-      [self reject:command message:@"No such result set"];
+      [self reject:call message:@"No such result set"];
       return;
     }
     CBLQueryResult *result = [rs nextObject];
     
     if (result == NULL) {
-      return [self resolve:command];
+      return [call resolve];
     }
     
-    return [self resolve:command data:[self resultToMap:result dbName:name]];
+    return [call resolve:@{
+      "results": [self resultToMap:result dbName:name]
+    }];
   }];
 }
 
 -(void)ResultSet_NextBatch:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     int queryId = [call getInt:@"resultSetId"];
     
     CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
     if (rs == NULL) {
-      [self reject:command message:@"No such result set"];
+      [self reject:call message:@"No such result set"];
       return;
     }
     long chunkSize = self->_allResultsChunkSize;
@@ -662,33 +644,36 @@
       [resultsChunk addObject:[self resultToMap:result dbName:name]];
     };
     
-    return [self resolve:command array:resultsChunk];
+    return [call array:@{
+      "results": resultsChunk
+    }];
   }];
 }
 
 -(void)ResultSet_AllResults:(CAPPluginCall*)call {
   __weak IonicCouchbaseLite *weakSelf = self;
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     int queryId = [call getInt:@"resultSetId"];
     long chunkSize = self->_allResultsChunkSize;
     CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
     
     if (rs == NULL) {
-      [weakSelf reject:command message:@"No such result set"];
+      [weakSelf reject:call message:@"No such result set"];
       return;
     }
     NSMutableArray *resultsChunk = NULL;
+
+    [call setKeepAlive:YES];
     
     int i = 0;
     CBLQueryResult *queryResult;
     while ((queryResult = [rs nextObject]) != NULL) {
       if (i % chunkSize == 0) {
         if (resultsChunk != NULL) {
-          CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:resultsChunk];
-          
-          [result setKeepCallbackAsBool:TRUE];
-          [weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+          [call resolve:@{
+            @"results": resultsChunk
+          }];
           [resultsChunk removeAllObjects];
         } else {
           resultsChunk = [[NSMutableArray alloc] initWithCapacity:chunkSize];
@@ -699,28 +684,31 @@
     }
     
     if (resultsChunk != NULL && [resultsChunk count] > 0) {
-      CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:resultsChunk];
-      [result setKeepCallbackAsBool:TRUE];
-      [weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+      [call resolve:@{
+        @"results": resultsChunk
+      }];
     }
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:[NSMutableArray new]];
-    [weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    [call resolve:@{
+      @"results": []
+    }];
   }];
 }
 
 -(void)ResultSet_AllResults2:(CAPPluginCall*)call {
   //__weak IonicCouchbaseLite *weakSelf = self;
   IonicCouchbaseLite *weakSelf = self;
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name"];
     int queryId = [call getInt:@"resultSetId"];
     int chunkSize = (int) self->_allResultsChunkSize;
     CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
     
     if (rs == NULL) {
-      [weakSelf reject:command message:@"No such result set"];
+      [weakSelf reject:call message:@"No such result set"];
       return;
     }
+
+    [call setKeepAlive:YES];
     
     NSArray<CBLQueryResult *> *results = [rs allResults];
     //NSMutableArray *resultsMapped = [NSMutableArray new];
@@ -728,10 +716,9 @@
     for (int i = 0; i < [results count]; i++) {
       if (i % chunkSize == 0) {
         if (resultsChunk != NULL) {
-          CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:resultsChunk];
-          
-          [result setKeepCallbackAsBool:TRUE];
-          [weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+          [call resolve:@{
+            @"results": resultsChunk
+          }];
         }
         resultsChunk = [NSMutableArray new];
       }
@@ -740,17 +727,18 @@
     }
     
     if (resultsChunk != NULL && [resultsChunk count] > 0) {
-      CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:resultsChunk];
-      [result setKeepCallbackAsBool:TRUE];
-      [weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+      [call resolve:@{
+        @"results": resultsChunk
+      }];
     }
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:[NSMutableArray new]];
-    [weakSelf.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    [call resolve:@{
+      @"results": []
+    }];
   }];
 }
 
 -(void)ResultSet_Cleanup:(CAPPluginCall*)call {
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     int queryId = [call getInt:@"resultSetId"];
     CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
 
@@ -766,31 +754,31 @@
 
   CBLDatabase *db = [self getDatabase:name];
   if (db == NULL) {
-    [self reject:command message:@"No such open database"];
+    [self reject:call message:@"No such open database"];
     return;
   }
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLReplicatorConfiguration *replicatorConfig = [self replicatorConfigFromJson:db data:config];
     CBLReplicator *replicator = [[CBLReplicator alloc] initWithConfig:replicatorConfig];
         
     NSInteger replicatorId = self->_replicatorCount++;
     [self->replicators setObject:replicator forKey:[@(replicatorId) stringValue]];
-    return [self resolve:command data:@{ @"replicatorId": @(replicatorId) }];
+    return [call resolve:@{ @"replicatorId": @(replicatorId) }];
   }];
 }
 
 -(void)Replicator_Start:(CAPPluginCall*)call {
   NSInteger replicatorId = [call getInt:@"replicatorId"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
     if (replicator == NULL) {
-      return [self reject:command message:@"No such replicator"];
+      return [self reject:call message:@"No such replicator"];
     }
     
     [replicator start];
     
-    [self resolve:command];
+    [call resolve];
   }];
 }
 
@@ -849,46 +837,46 @@
 -(void)Replicator_Stop:(CAPPluginCall*)call {
   NSInteger replicatorId = [call getInt:@"replicatorId"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
     if (replicator == NULL) {
-      return [self reject:command message:@"No such replicator"];
+      return [self reject:call message:@"No such replicator"];
     }
     
     [replicator stop];
     
-    [self resolve:command];
+    [call resolve];
   }];
 }
 -(void)Replicator_ResetCheckpoint:(CAPPluginCall*)call {
   NSInteger replicatorId = [call getInt:@"replicatorId"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
     if (replicator == NULL) {
-      return [self reject:command message:@"No such replicator"];
+      return [self reject:call message:@"No such replicator"];
     }
     
     [replicator resetCheckpoint];
     
-    [self resolve:command];
+    [call resolve];
   }];
 }
 
 -(void)Replicator_GetStatus:(CAPPluginCall*)call {
   NSInteger replicatorId = [call getInt:@"replicatorId"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
     if (replicator == NULL) {
-      return [self reject:command message:@"No such replicator"];
+      return [self reject:call message:@"No such replicator"];
     }
     
     CBLReplicatorStatus *status = [replicator status];
 
     NSDictionary *statusJson = [self generateStatusJson:status];
     
-    [self resolve:command data:statusJson];
+    [call resolve:statusJson];
   }];
 }
 
@@ -926,18 +914,17 @@
 -(void)Replicator_AddChangeListener:(CAPPluginCall*)call {
   NSInteger replicatorId = [call getInt:@"replicatorId"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
     if (replicator == NULL) {
-      return [self reject:command message:@"No such replicator"];
+      return [self reject:call message:@"No such replicator"];
     }
+
+    [call setKeepAlive:YES];
     
     id listener = [replicator addChangeListener:^(CBLReplicatorChange *change) {
       NSDictionary *statusJson = [self generateStatusJson:change.status];
-      CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:statusJson];
-      
-      [result setKeepCallbackAsBool:TRUE];
-      [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+      [call resolve:statusJson];
     }];
     
     [self->replicatorChangeListeners setObject:listener forKey:[@(replicatorId) stringValue]];
@@ -974,18 +961,17 @@
 -(void)Replicator_AddDocumentListener:(CAPPluginCall*)call {
   NSInteger replicatorId = [call getInt:@"replicatorId"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
     if (replicator == NULL) {
-      return [self reject:command message:@"No such replicator"];
+      return [self reject:call message:@"No such replicator"];
     }
+
+    [call setKeepAlive:YES];
     
     id listener = [replicator addDocumentReplicationListener:^(CBLDocumentReplication *replication) {
       NSDictionary *eventJson = [self generateReplicationJson:replication];
-      CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:eventJson];
-      
-      [result setKeepCallbackAsBool:TRUE];
-      [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+      [call resolve:eventJson];
     }];
     
     [self->replicatorDocumentListeners setObject:listener forKey:[@(replicatorId) stringValue]];
@@ -995,11 +981,11 @@
 -(void)Replicator_Cleanup:(CAPPluginCall*)call {
   NSInteger replicatorId = [call getInt:@"replicatorId"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *key = [@(replicatorId) stringValue];
     CBLReplicator *replicator = [self->replicators objectForKey:key];
     if (replicator == NULL) {
-      return [self reject:command message:@"No such replicator"];
+      return [self reject:call message:@"No such replicator"];
     }
     
     [self->replicators removeObjectForKey:key];
@@ -1016,20 +1002,20 @@
       [self->replicatorDocumentListeners removeObjectForKey:key];
     }
     
-    [self resolve:command];
+    [call resolve];
   }];
 }
 
 -(void)Replicator_Restart:(CAPPluginCall*)call {
   NSInteger replicatorId = [call getInt:@"replicatorId"];
   
-  [self.commandDelegate runInBackground:^{
+  dispatch_async(dispatch_get_main_queue(), ^{
     NSString *key = [@(replicatorId) stringValue];
     CBLReplicator *replicator = [self->replicators objectForKey:key];
     if (replicator != NULL) {
       [replicator start];
     }
-    [self resolve:command];
+    [call resolve];
   }];
 }
 
