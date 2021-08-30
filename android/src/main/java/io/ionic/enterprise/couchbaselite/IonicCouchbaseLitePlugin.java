@@ -365,6 +365,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     }
 
     @SuppressWarnings("unused")
+    @PluginMethod
     public void Database_Save(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         String id = call.getString("id");
@@ -379,15 +380,13 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         ConcurrencyControl concurrencyControl = makeConcurrencyControl(concurrencyControlValue);
 
         MutableDocument m;
-        if (!id.equals("null")) {
+        if (id != null) {
             m = new MutableDocument(id, toMap(document));
         } else {
             m = new MutableDocument(toMap(document));
         }
 
         d.save(m, concurrencyControl);
-
-        Log.d(TAG, "Saved document, new id: " + m.getId());
 
         call.resolve(new JSObject() {{
             put("_id", m.getId());
@@ -405,6 +404,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     }
 
     @SuppressWarnings("unused")
+    @PluginMethod
     public void Database_GetCount(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -417,6 +417,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }});
     }
 
+    @PluginMethod
     public void Database_GetPath(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -429,6 +430,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }});
     }
 
+    @PluginMethod
     public void Database_Copy(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -458,6 +460,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Database_CreateIndex(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -508,6 +511,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         return valueItems.toArray(new FullTextIndexItem[0]);
     }
 
+    @PluginMethod
     public void Database_DeleteIndex(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -520,6 +524,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Database_GetIndexes(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -533,6 +538,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     }
 
     @SuppressWarnings("unused")
+    @PluginMethod
     public void Database_AddChangeListener(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -555,6 +561,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
 
     @SuppressWarnings("unused")
+    @PluginMethod
     public void Database_Close(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -572,6 +579,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Database_Delete(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -585,6 +593,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Database_DeleteDocument(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         String id = call.getString("docId");
@@ -605,6 +614,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Database_PurgeDocument(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         String id = call.getString("docId");
@@ -616,6 +626,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     }
 
     @SuppressWarnings("unused")
+    @PluginMethod
     public void Database_Compact(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database db = this.openDatabases.get(name);
@@ -625,6 +636,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Database_GetDocument(PluginCall call) throws JSONException, CouchbaseLiteException {
 
         String name = call.getString("name");
@@ -640,6 +652,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
     }
 
+    @PluginMethod
     public void Database_SetLogLevel(PluginCall call) throws JSONException, CouchbaseLiteException {
 
         String name = call.getString("name");
@@ -666,6 +679,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         return LogLevel.DEBUG;
     }
 
+    @PluginMethod
     public void Database_SetFileLoggingConfig(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database db = this.openDatabases.get(name);
@@ -699,6 +713,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     }
 
 
+    @PluginMethod
     public void Document_GetBlobContent(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database db = this.openDatabases.get(name);
@@ -727,9 +742,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     }
 
     @SuppressWarnings("unused")
+    @PluginMethod
     public void Query_Execute(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
-        String queryJson = call.getString("query");
+        JSObject query = call.getObject("query");
+        String queryJson = query.toString();
         Database db = this.openDatabases.get(name);
 
         Query q = JsonQueryBuilder.buildQuery(db, queryJson);
@@ -746,6 +763,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     }
 
 
+    @PluginMethod
     public void ResultSet_Next(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         int id = call.getInt("resultSetId");
@@ -784,6 +802,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve(ret);
     }
 
+    @PluginMethod
     public void ResultSet_NextBatch(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         int id = call.getInt("resultSetId");
@@ -807,6 +826,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }});
     }
 
+    @PluginMethod
     public void ResultSet_AllResults(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         int id = call.getInt("resultSetId");
@@ -859,6 +879,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }});
     }
 
+    @PluginMethod
     public void ResultSet_Cleanup(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         int id = call.getInt("resultSetId");
@@ -873,6 +894,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Replicator_Create(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database db = this.openDatabases.get(name);
@@ -891,6 +913,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
     }
 
+    @PluginMethod
     public void Replicator_Start(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);
@@ -902,6 +925,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Replicator_Stop(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);
@@ -913,6 +937,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Replicator_ResetCheckpoint(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);
@@ -924,6 +949,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Replicator_GetStatus(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);
@@ -1015,6 +1041,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         return replicationJson;
     }
 
+    @PluginMethod
     public void Replicator_AddChangeListener(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);
@@ -1036,6 +1063,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         replicatorListeners.put(replicatorId, token);
     }
 
+    @PluginMethod
     public void Replicator_AddDocumentListener(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);
@@ -1057,6 +1085,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         documentListeners.put(replicatorId, token);
     }
 
+    @PluginMethod
     public void Replicator_Cleanup(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);
@@ -1084,6 +1113,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
     public void Replicator_Restart(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);

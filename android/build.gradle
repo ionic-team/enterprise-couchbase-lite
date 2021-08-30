@@ -41,12 +41,13 @@ android {
     }
 }
 
+
 repositories {
     google()
     jcenter()
     mavenCentral()
-    maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
 }
+
 
 
 dependencies {
