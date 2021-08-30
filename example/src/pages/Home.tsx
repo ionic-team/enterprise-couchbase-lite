@@ -70,7 +70,6 @@ class CBLTester {
     // database2.setEngine(new CordovaEngine());
     this.database = database;
     //this.database2 = database2;
-    this.preInit();
   }
 
   openDocRepl() {
@@ -83,22 +82,11 @@ class CBLTester {
     this.outputChanged(value);
   }
 
-  async preInit() {
-    await this.database.open();
-    //await this.database2.open();
-    console.log('Databases opened!');
+  async init() {
+    await this.openDbs();
     this.database.addChangeListener((change: DatabaseChange) => {
       console.log('DATABASE CHANGE', change, change.documentIDs);
     });
-    /*
-    await this.database.deleteDatabase();
-    await this.database2.deleteDatabase();
-    console.log('Databases deleted!');
-    */
-  }
-
-  async init() {
-    await this.openDbs();
     this.out(`Opened db`);
   }
 

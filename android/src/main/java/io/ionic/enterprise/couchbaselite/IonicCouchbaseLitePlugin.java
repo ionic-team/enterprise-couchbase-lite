@@ -1,5 +1,7 @@
 package io.ionic.enterprise.couchbaselite;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -90,57 +92,6 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         CouchbaseLite.init(bridge.getContext());
     }
 
-    /*
-    public boolean execute(final String action, final PluginCall call) throws JSONException {
-        Log.d(TAG, "IonicCouchbaseLite execute - " + action);
-        final IonicCouchbaseLite cbl = this;
-
-        if (action.equals("Database_Open")) {
-            // Run these on the main thread
-            try {
-                Database_Open(args, callbackContext);
-                return true;
-            } catch (Exception ex) {
-                // Handle
-                Log.e(TAG, "Unable to open database", ex);
-                // TODO: Perhaps some more nuance
-                callbackContext.error(ex.getMessage());
-                return true;
-            }
-        }
-
-        if (action.equals("Database_Delete")) {
-            // Run these on the main thread
-            try {
-                Database_Delete(args, callbackContext);
-                return true;
-            } catch (Exception ex) {
-                // Handle
-                Log.e(TAG, "Unable to delete database", ex);
-                // TODO: Perhaps some more nuance
-                callbackContext.error(ex.getMessage());
-                return true;
-            }
-        }
-
-        this.cordova.getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Method actionHandle = myClass.getMethod(action, JSONArray.class, CallbackContext.class);
-                    actionHandle.invoke(cbl, args, callbackContext);
-                } catch (Exception ex) {
-                    // Handle
-                    Log.e(TAG, "Unable to execute action", ex);
-                    // TODO: Perhaps some more nuance
-                    callbackContext.error(ex.getMessage());
-                }
-            }
-        });
-        return true;
-    }
-    */
-
     private Database getDatabase(String name) {
         return this.openDatabases.get(name);
     }
@@ -167,53 +118,6 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         docMap.put("_sequence", d.getSequence());
         return docMap;
     }
-
-    /*
-    private void resolve(final CallbackContext callbackContext) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK);
-        callbackContext.sendPluginResult(result);
-    }
-
-    private void resolve(final CallbackContext callbackContext, JSONObject data) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, data);
-        callbackContext.sendPluginResult(result);
-    }
-
-    private void resolve(final CallbackContext callbackContext, JSONArray data) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, data);
-        callbackContext.sendPluginResult(result);
-    }
-
-    private void resolve(final CallbackContext callbackContext, String message) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, message);
-        callbackContext.sendPluginResult(result);
-    }
-
-    private void resolve(final CallbackContext callbackContext, int number) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, number);
-        callbackContext.sendPluginResult(result);
-    }
-
-    private void resolve(final CallbackContext callbackContext, long number) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, number);
-        callbackContext.sendPluginResult(result);
-    }
-
-    private void reject(final CallbackContext callbackContext, JSONObject data) {
-        PluginResult result = new PluginResult(PluginResult.Status.ERROR, data);
-        callbackContext.sendPluginResult(result);
-    }
-
-    private void reject(final CallbackContext callbackContext, String message) {
-        PluginResult result = new PluginResult(PluginResult.Status.ERROR, message);
-        callbackContext.sendPluginResult(result);
-    }
-
-    private void resolve(final CallbackContext callbackContext, boolean value) {
-        PluginResult result = new PluginResult(PluginResult.Status.ERROR, value);
-        callbackContext.sendPluginResult(result);
-    }
-     */
 
     private JSONObject json(Map<String, Object> data) {
         return new JSONObject(data);
@@ -341,11 +245,17 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             c.setEncryptionKey(new EncryptionKey(encKey));
         }
 
-        Database d = new Database(name, c);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try {
+                Database d = new Database(name, c);
 
-        this.openDatabases.put(name, d);
+                this.openDatabases.put(name, d);
 
-        call.resolve();
+                call.resolve();
+            } catch (Exception ex) {
+                call.reject("Unable to open database", ex);
+            }
+        });
     }
 
     @PluginMethod
@@ -588,9 +498,14 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             return;
         }
 
-        d.delete();
-
-        call.resolve();
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try {
+                d.delete();
+                call.resolve();
+            } catch (Exception ex) {
+                call.reject("Unable to delete database", ex);
+            }
+        });
     }
 
     @PluginMethod
@@ -609,9 +524,12 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             return;
         }
 
-        db.delete(d, concurrencyControl);
-
-        call.resolve();
+        try {
+            db.delete(d, concurrencyControl);
+            call.resolve();
+        } catch (Exception ex) {
+            call.reject("Unable to delete document", ex);
+        }
     }
 
     @PluginMethod
