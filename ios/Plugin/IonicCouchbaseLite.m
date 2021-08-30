@@ -8,7 +8,7 @@
 #import <objc/runtime.h>
 #import <Foundation/Foundation.h>
 
-#import "IonicCBL.h"
+#import "IonicCouchbaseLite.h"
 
 @implementation CustomQuery
 
