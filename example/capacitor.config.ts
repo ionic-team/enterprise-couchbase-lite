@@ -5,7 +5,6 @@ const config: CapacitorConfig = {
   appName: 'example',
   webDir: 'build',
   bundledWebRuntime: false,
-  hideLogs: true,
 };
 
 export default config;

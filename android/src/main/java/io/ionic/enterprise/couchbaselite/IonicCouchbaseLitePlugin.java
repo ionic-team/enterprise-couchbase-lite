@@ -102,12 +102,15 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
         Map<String, Object> documentAsMap = d.toMap();
 
-        Map<String, Object> finalDocumentMap = new HashMap<>();
+        // Map<String, Object> finalDocumentMap = new HashMap<>();
+        JSObject finalDocumentMap = new JSObject();
 
         for (String key : documentAsMap.keySet()) {
             Object value = documentAsMap.get(key);
             if (value instanceof Blob) {
-                finalDocumentMap.put(key, ((Blob) value).getProperties());
+                JSONObject blobProps = new JSONObject(((Blob) value).getProperties());
+                // JSObject blobProperties = JSObject.fromJSONObject(blobProps);
+                finalDocumentMap.put(key, blobProps);
             } else {
                 finalDocumentMap.put(key, value);
             }
@@ -266,12 +269,16 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             call.reject("No such database");
             return;
         }
-        String existsName = call.getString("existsName");
-        String directory = call.getString("directory");
-        boolean exists = d.exists(existsName, new File(directory));
-        call.resolve(new JSObject() {{
-            put("exists", exists);
-        }});
+        try {
+            String existsName = call.getString("existsName");
+            String directory = call.getString("directory");
+            boolean exists = d.exists(existsName, new File(directory));
+            call.resolve(new JSObject() {{
+                put("exists", exists);
+            }});
+        } catch (Exception ex) {
+            call.reject("Unable to check if database exists", ex);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -287,20 +294,24 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             return;
         }
 
-        ConcurrencyControl concurrencyControl = makeConcurrencyControl(concurrencyControlValue);
+        try {
+            ConcurrencyControl concurrencyControl = makeConcurrencyControl(concurrencyControlValue);
 
-        MutableDocument m;
-        if (id != null) {
-            m = new MutableDocument(id, toMap(document));
-        } else {
-            m = new MutableDocument(toMap(document));
+            MutableDocument m;
+            if (id != null) {
+                m = new MutableDocument(id, toMap(document));
+            } else {
+                m = new MutableDocument(toMap(document));
+            }
+
+            d.save(m, concurrencyControl);
+
+            call.resolve(new JSObject() {{
+                put("_id", m.getId());
+            }});
+        } catch (Exception ex) {
+            call.reject("Unable to save document", ex);
         }
-
-        d.save(m, concurrencyControl);
-
-        call.resolve(new JSObject() {{
-            put("_id", m.getId());
-        }});
     }
 
     private ConcurrencyControl makeConcurrencyControl(int concurrencyControlValue) {
@@ -322,9 +333,13 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             call.reject("No such database");
             return;
         }
-        call.resolve(new JSObject() {{
-            put("count", d.getCount());
-        }});
+        try {
+            call.resolve(new JSObject() {{
+                put("count", d.getCount());
+            }});
+        } catch (Exception ex) {
+            call.reject("Error getting count", ex);
+        }
     }
 
     @PluginMethod
@@ -335,9 +350,13 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             call.reject("No such database");
             return;
         }
-        call.resolve(new JSObject() {{
-            put("path", d.getPath());
-        }});
+        try {
+            call.resolve(new JSObject() {{
+                put("path", d.getPath());
+            }});
+        } catch (Exception ex) {
+            call.reject("Error getting path", ex);
+        }
     }
 
     @PluginMethod
@@ -365,9 +384,12 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             c.setEncryptionKey(new EncryptionKey(encKey));
         }
 
-        Database.copy(new File(path), name2, c);
-
-        call.resolve();
+        try {
+            Database.copy(new File(path), name2, c);
+            call.resolve();
+        } catch (Exception ex) {
+            call.reject("Error copying database", ex);
+        }
     }
 
     @PluginMethod
@@ -392,9 +414,13 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             index = IndexBuilder.fullTextIndex(makeFullTextIndexItems(items));
         }
 
-        d.createIndex(indexName, index);
+        try {
+            d.createIndex(indexName, index);
 
-        call.resolve();
+            call.resolve();
+        } catch (Exception ex) {
+            call.reject("Error creating index", ex);
+        }
     }
 
     ValueIndexItem[] makeValueIndexItems(JSONArray items) throws JSONException {
@@ -429,9 +455,13 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             call.reject("No such database");
             return;
         }
-        String indexName = call.getString("indexName");
-        d.deleteIndex(indexName);
-        call.resolve();
+        try {
+            String indexName = call.getString("indexName");
+            d.deleteIndex(indexName);
+            call.resolve();
+        } catch (Exception ex) {
+            call.reject("Error deleting index", ex);
+        }
     }
 
     @PluginMethod
@@ -442,13 +472,17 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             call.reject("No such database");
             return;
         }
-        call.resolve(new JSObject() {{
-            put("indexes", new JSArray(d.getIndexes()));
-        }});
+        try {
+            call.resolve(new JSObject() {{
+                put("indexes", new JSArray(d.getIndexes()));
+            }});
+        } catch (Exception ex) {
+            call.reject("Error getting indexes", ex);
+        }
     }
 
     @SuppressWarnings("unused")
-    @PluginMethod
+    @PluginMethod(returnType=PluginMethod.RETURN_CALLBACK)
     public void Database_AddChangeListener(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         Database d = getDatabase(name);
@@ -459,14 +493,18 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
         call.setKeepAlive(true);
 
-        d.addChangeListener(new DatabaseChangeListener() {
-            @Override
-            public void changed(DatabaseChange change) {
-                JSObject ret = new JSObject();
-                ret.put("documentIDs", new JSONArray(change.getDocumentIDs()));
-                call.resolve(ret);
-            }
-        });
+        try {
+            d.addChangeListener(new DatabaseChangeListener() {
+                @Override
+                public void changed(DatabaseChange change) {
+                    JSObject ret = new JSObject();
+                    ret.put("documentIDs", new JSONArray(change.getDocumentIDs()));
+                    call.resolve(ret);
+                }
+            });
+        } catch (Exception ex) {
+            call.reject("Unable to add listener", ex);
+        }
     }
 
 
@@ -538,7 +576,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         String id = call.getString("docId");
         Database db = this.openDatabases.get(name);
 
-        db.purge(id);
+        try {
+            db.purge(id);
+        } catch (Exception ex) {
+            call.reject("Unable to purge document", ex);
+        }
 
         call.resolve();
     }
@@ -549,24 +591,30 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         String name = call.getString("name");
         Database db = this.openDatabases.get(name);
 
-        db.compact();
+        try {
+            db.compact();
+        } catch (Exception ex) {
+            call.reject("Unable to compact", ex);
+        }
 
         call.resolve();
     }
 
     @PluginMethod
     public void Database_GetDocument(PluginCall call) throws JSONException, CouchbaseLiteException {
-
         String name = call.getString("name");
         Database db = this.openDatabases.get(name);
         String documentId = call.getString("docId");
-        Document d = db.getDocument(documentId);
-
-        if (d != null) {
-            JSObject doc = documentToMap(d);
-            call.resolve(doc);
-        } else {
-            call.resolve(null);
+        try {
+            Document d = db.getDocument(documentId);
+            if (d != null) {
+                JSObject doc = documentToMap(d);
+                call.resolve(doc);
+            } else {
+                call.resolve(null);
+            }
+        } catch (Exception ex) {
+            call.reject("Unable to get document", ex);
         }
     }
 
@@ -580,9 +628,12 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
         LogLevel logLevel = getLogLevel(logLevelValue);
 
-        db.setLogLevel(LogDomain.valueOf(domain), logLevel);
-
-        call.resolve(null);
+        try {
+            db.setLogLevel(LogDomain.valueOf(domain), logLevel);
+            call.resolve(null);
+        } catch (Exception ex) {
+            call.reject("Unable to get document", ex);
+        }
     }
 
     private LogLevel getLogLevel(int logLevelValue) {
@@ -638,16 +689,20 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         String documentId = call.getString("documentId");
         String key = call.getString("key");
 
-        Document d = db.getDocument(documentId);
+        try {
+            Document d = db.getDocument(documentId);
 
-        if (d != null) {
-            Blob b = d.getBlob(key);
-            byte[] content = b.getContent();
-            JSObject ret = new JSObject();
-            ret.put("data", new JSONArray(content));
-            call.resolve(ret);
-        } else {
-            call.resolve(null);
+            if (d != null) {
+                Blob b = d.getBlob(key);
+                byte[] content = b.getContent();
+                JSObject ret = new JSObject();
+                ret.put("data", new JSONArray(content));
+                call.resolve(ret);
+            } else {
+                call.resolve(null);
+            }
+        } catch (Exception ex) {
+            call.reject("Unable to get blob content", ex);
         }
     }
 
@@ -667,17 +722,21 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         String queryJson = query.toString();
         Database db = this.openDatabases.get(name);
 
-        Query q = JsonQueryBuilder.buildQuery(db, queryJson);
-        ResultSet rs = q.execute();
-        Log.d(TAG, "Built query: " + q);
+        try {
+            Query q = JsonQueryBuilder.buildQuery(db, queryJson);
+            ResultSet rs = q.execute();
+            Log.d(TAG, "Built query: " + q);
 
-        int id = queryCount++;
+            int id = queryCount++;
 
-        this.queryResultSets.put(id, rs);
+            this.queryResultSets.put(id, rs);
 
-        call.resolve(new JSObject() {{
-            put("id", id);
-        }});
+            call.resolve(new JSObject() {{
+                put("id", id);
+            }});
+        } catch (Exception ex) {
+            call.reject("Unable to execute query", ex);
+        }
     }
 
 
@@ -685,39 +744,44 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     public void ResultSet_Next(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         int id = call.getInt("resultSetId");
-        ResultSet r = this.queryResultSets.get(id);
-        if (r == null) {
-            call.resolve(new JSObject());
-            return;
-        }
-        Log.d(TAG, "Moving to next result...");
-        Result result = r.next();
-        if (result == null) {
-            Log.d(TAG, "No results");
-            call.resolve(null);
-            return;
-        }
 
-        Map<String, Object> data = result.toMap();
-        if (data.containsKey("_id")) {
-            data.put("id", data.get("_id"));
-            data.remove("_id");
-        }
-        if (data.containsKey("_sequence")) {
-            data.put("sequence", data.get("_sequence"));
-            data.remove("_sequence");
-        }
-        if (data.containsKey("_deleted")) {
-            data.put("deleted", data.get("_deleted"));
-            data.remove("_deleted");
-        }
-        if (data.containsKey("_expiration")) {
-            data.put("expiration", data.get("_expiration"));
-            data.remove("_expiration");
-        }
+        try {
+            ResultSet r = this.queryResultSets.get(id);
+            if (r == null) {
+                call.resolve(new JSObject());
+                return;
+            }
+            Log.d(TAG, "Moving to next result...");
+            Result result = r.next();
+            if (result == null) {
+                Log.d(TAG, "No results");
+                call.resolve(null);
+                return;
+            }
 
-        JSObject ret = JSObject.fromJSONObject(new JSONObject(result.toMap()));
-        call.resolve(ret);
+            Map<String, Object> data = result.toMap();
+            if (data.containsKey("_id")) {
+                data.put("id", data.get("_id"));
+                data.remove("_id");
+            }
+            if (data.containsKey("_sequence")) {
+                data.put("sequence", data.get("_sequence"));
+                data.remove("_sequence");
+            }
+            if (data.containsKey("_deleted")) {
+                data.put("deleted", data.get("_deleted"));
+                data.remove("_deleted");
+            }
+            if (data.containsKey("_expiration")) {
+                data.put("expiration", data.get("_expiration"));
+                data.remove("_expiration");
+            }
+
+            JSObject ret = JSObject.fromJSONObject(new JSONObject(result.toMap()));
+            call.resolve(ret);
+        } catch (Exception ex) {
+            call.reject("Unable to move result set next", ex);
+        }
     }
 
     @PluginMethod
@@ -729,22 +793,26 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             call.resolve(new JSObject());
             return;
         }
-        int chunkSize = allResultsChunkSize;
-        List<Map<String, Object>> resultsChunk = new ArrayList<>(chunkSize);
+        try {
+            int chunkSize = allResultsChunkSize;
+            List<Map<String, Object>> resultsChunk = new ArrayList<>(chunkSize);
 
-        Log.d(TAG, "Moving to next result...");
-        Result result;
-        int i = 0;
-        while (i++ < chunkSize && ((result = r.next()) != null)) {
-            resultsChunk.add(result.toMap());
+            Log.d(TAG, "Moving to next result...");
+            Result result;
+            int i = 0;
+            while (i++ < chunkSize && ((result = r.next()) != null)) {
+                resultsChunk.add(result.toMap());
+            }
+
+            call.resolve(new JSObject() {{
+                put("results", new JSArray(resultsChunk));
+            }});
+        } catch (Exception ex) {
+            call.reject("Unable to move result set next", ex);
         }
-
-        call.resolve(new JSObject() {{
-            put("results", new JSArray(resultsChunk));
-        }});
     }
 
-    @PluginMethod
+    @PluginMethod(returnType=PluginMethod.RETURN_CALLBACK)
     public void ResultSet_AllResults(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
         int id = call.getInt("resultSetId");
@@ -959,7 +1027,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         return replicationJson;
     }
 
-    @PluginMethod
+    @PluginMethod(returnType=PluginMethod.RETURN_CALLBACK)
     public void Replicator_AddChangeListener(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);
@@ -981,7 +1049,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         replicatorListeners.put(replicatorId, token);
     }
 
-    @PluginMethod
+    @PluginMethod(returnType=PluginMethod.RETURN_CALLBACK)
     public void Replicator_AddDocumentListener(PluginCall call) throws JSONException, CouchbaseLiteException {
         int replicatorId = call.getInt("replicatorId");
         Replicator r = this.replicators.get(replicatorId);

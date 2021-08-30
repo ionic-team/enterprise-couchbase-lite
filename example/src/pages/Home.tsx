@@ -953,6 +953,7 @@ class CBLTester {
     const allDocs = await rs.allResults();
     console.log('Got all results', allDocs);
     const newDoc = await this.database.getDocument(doc.getId());
+    console.log('Got new doc', newDoc);
     const blob = doc.getBlob('profile');
     const blobContent = await doc.getBlobContent('profile', this.database);
     console.log('Got blob', blob);

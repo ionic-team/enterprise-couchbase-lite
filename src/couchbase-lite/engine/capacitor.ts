@@ -231,7 +231,7 @@ export class CapacitorEngine {
     documentId: string,
     key: string,
   ): Promise<ArrayBuffer> {
-    const data = await IonicCouchbaseLite.Database_GetBlobContent({
+    const data = await IonicCouchbaseLite.Document_GetBlobContent({
       name: database.getName(),
       documentId,
       key,

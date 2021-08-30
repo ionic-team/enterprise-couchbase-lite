@@ -16,7 +16,8 @@ export class ResultSet {
       db.getEngine().ResultSet_AllResults(
         db,
         this.resultSetId,
-        (data: any[], err: any) => {
+        (ret: any, err: any) => {
+          const data = ret.results;
           if (err) {
             reject(err);
             return;

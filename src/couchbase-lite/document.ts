@@ -6,7 +6,11 @@ import { Database } from './database';
 export class Document {
   protected doc: Dictionary = {};
 
-  constructor(protected id: string = null, protected sequenceNo: number = null, data: Dictionary = {}) {
+  constructor(
+    protected id: string = null,
+    protected sequenceNo: number = null,
+    data: Dictionary = {},
+  ) {
     this.doc = data;
   }
 
@@ -28,6 +32,7 @@ export class Document {
 
   getBlob(key: string): Blob {
     const data = this._get(key);
+    console.log('Got blob data', key, data, this.doc);
     if (data.content_type) {
       const b = new Blob(data.content_type, null);
       b.digest = data.digest;
@@ -38,7 +43,9 @@ export class Document {
   }
 
   getBlobContent(key: string, database: Database): Promise<ArrayBuffer> {
-    return database.getEngine().Document_GetBlobContent(database, this.getId(), key);
+    return database
+      .getEngine()
+      .Document_GetBlobContent(database, this.getId(), key);
   }
 
   getBoolean(key: string) {

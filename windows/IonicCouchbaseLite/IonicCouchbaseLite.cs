@@ -638,7 +638,7 @@ namespace IonicCouchbaseLite {
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]
-        public void Database_GetBlobContent(PluginCall call) {
+        public void Document_GetBlobContent(PluginCall call) {
             var dbName = call.GetString("name");
             var documentId = call.GetString("documentId");
             var key = call.GetString("key");

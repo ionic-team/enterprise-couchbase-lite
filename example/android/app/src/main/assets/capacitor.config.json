@@ -2,6 +2,5 @@
 	"appId": "io.ionic.starter",
 	"appName": "example",
 	"webDir": "build",
-	"bundledWebRuntime": false,
-	"hideLogs": true
+	"bundledWebRuntime": false
 }

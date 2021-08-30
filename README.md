@@ -32,7 +32,7 @@ npx cap sync
 * [`Database_AddChangeListener(...)`](#database_addchangelistener)
 * [`Database_SetLogLevel(...)`](#database_setloglevel)
 * [`Database_SetFileLoggingConfig(...)`](#database_setfileloggingconfig)
-* [`Database_GetBlobContent(...)`](#database_getblobcontent)
+* [`Document_GetBlobContent(...)`](#document_getblobcontent)
 * [`Query_Execute(...)`](#query_execute)
 * [`ResultSet_Next(...)`](#resultset_next)
 * [`ResultSet_NextBatch(...)`](#resultset_nextbatch)
@@ -341,15 +341,15 @@ Database_SetFileLoggingConfig(args: DatabaseSetFileLoggingConfigArgs) => any
 --------------------
 
 
-### Database_GetBlobContent(...)
+### Document_GetBlobContent(...)
 
 ```typescript
-Database_GetBlobContent(args: DatabaseGetBlobContentArgs) => any
+Document_GetBlobContent(args: DocumentGetBlobContentArgs) => any
 ```
 
 | Param      | Type                                                                              |
 | ---------- | --------------------------------------------------------------------------------- |
-| **`args`** | <code><a href="#databasegetblobcontentargs">DatabaseGetBlobContentArgs</a></code> |
+| **`args`** | <code><a href="#documentgetblobcontentargs">DocumentGetBlobContentArgs</a></code> |
 
 **Returns:** <code>any</code>
 
@@ -689,7 +689,7 @@ Replicator_Cleanup(args: ReplicatorArgs) => any
 | **`usePlaintext`**   | <code>boolean</code> |
 
 
-#### DatabaseGetBlobContentArgs
+#### DocumentGetBlobContentArgs
 
 | Prop             | Type                |
 | ---------------- | ------------------- |

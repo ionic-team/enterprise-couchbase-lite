@@ -79,7 +79,7 @@ export interface DatabaseSetFileLoggingConfigArgs extends DatabaseArgs {
   config: DatabaseFileLoggingConfiguration;
 }
 
-export interface DatabaseGetBlobContentArgs extends DatabaseArgs {
+export interface DocumentGetBlobContentArgs extends DatabaseArgs {
   documentId: string;
   key: string;
 }
@@ -157,8 +157,8 @@ export interface IonicCouchbaseLitePlugin {
   Database_SetFileLoggingConfig(
     args: DatabaseSetFileLoggingConfigArgs,
   ): Promise<void>;
-  Database_GetBlobContent(
-    args: DatabaseGetBlobContentArgs,
+  Document_GetBlobContent(
+    args: DocumentGetBlobContentArgs,
   ): Promise<{
     data: any;
   }>;
