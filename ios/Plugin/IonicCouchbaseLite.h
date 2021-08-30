@@ -11,4 +11,4 @@
 
 @interface CustomQuery : CBLQuery {
 }
-
+@end
