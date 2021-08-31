@@ -933,7 +933,7 @@ Couchbase Mobile 2.0 uses a new replication protocol based on WebSockets.
 ### Compatibility
 
 The new protocol is <strong>incompatible</strong> with CouchDB-based databases.
-And since Couchbase Lite 2 only supports the new protocol, you will need to run a version of Sync Gateway that <a href="compatibility-matrix.html" class="page">supports it</a>.
+And since Couchbase Lite 2 only supports the new protocol, you will need to run a version of Sync Gateway that supports it.
 
 To use this protocol with Couchbase Lite 2.0, the replication URL should specify WebSockets as the URL scheme (see the "Starting a Replication" section below).
 Mobile clients using Couchbase Lite 1.x can continue to use <strong>http</strong> as the URL scheme.
@@ -1019,8 +1019,8 @@ The following table lists the different activity levels in the API and the meani
 
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
-<col style="width: 50%;" />
-<col style="width: 50%;" />
+<col style={{width: '50%'}} />
+<col style={{width: '50%'}} />
 </colgroup>
 <thead>
 <tr>
