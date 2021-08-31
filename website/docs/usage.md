@@ -474,7 +474,7 @@ for (let result of rs) {
 
 #### Collection Operators
 
-<a href="http://docs.couchbase.com/mobile/2.0/couchbase-lite-java/db022/com/couchbase/lite/ArrayFunction.html">Collection operators</a> are useful to check if a given value is present in an array.</p>
+<a href="http://docs.couchbase.com/mobile/2.0/couchbase-lite-java/db022/com/couchbase/lite/ArrayFunction.html">Collection operators</a> are useful to check if a given value is present in an array.
 
 ##### CONTAINS Operator
 
@@ -989,7 +989,7 @@ Some load balancers are not configured for WebSocket connections by default (NGI
 so it might be necessary to explicitly enable them in the load balancer’s configuration (see <a href="https://developer.couchbase.com/documentation/mobile/current/guides/sync-gateway/nginx/index.html">Load Balancers</a>).
 
 By default, the WebSocket protocol uses compression to optimize for speed and bandwidth utilization.
-The level of compression is set on Sync Gateway and can be tuned in the configuration file (<code>replicator_compression</code></a>).
+The level of compression is set on Sync Gateway and can be tuned in the configuration file (<code>replicator_compression</code>).
 
 #### Replication Ordering
 
@@ -1019,8 +1019,8 @@ The following table lists the different activity levels in the API and the meani
 
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
 </colgroup>
 <thead>
 <tr>
@@ -1122,7 +1122,7 @@ Similarly to the save operation, the delete operation also has two method signat
 
 - <code>delete(document: Document)</code>: The last write will win if there is a conflict.
 - <code>delete(document: Document, concurrencyControl: ConcurrencyControl)</code>: attemps to delete the document with a concurrency control.
-  The concurrency control parameter has two possible values: - <code>lastWriteWins</code>: The last operation wins if there is a conflict.</p> - <code>failOnConflict</code>: The operation will fail if there is a conflict.</p>
+  The concurrency control parameter has two possible values: - <code>lastWriteWins</code>: The last operation wins if there is a conflict. - <code>failOnConflict</code>: The operation will fail if there is a conflict.
 
 ## Database Replicas
 
