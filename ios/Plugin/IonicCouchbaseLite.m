@@ -16,8 +16,8 @@
 
 @implementation CustomQuery
 
--(instancetype) initWithJson:(NSString *)json database:(CBLDatabase*)database {
-  NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
+-(instancetype) initWithJson:(NSData *)jsonData database:(CBLDatabase*)database {
+  // NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
   SEL sel = NSSelectorFromString(@"initWithDatabase:JSONRepresentation:");
   id queryInstance = [CBLQuery alloc];
 
@@ -43,7 +43,7 @@
   NSInteger _allResultsChunkSize;
 }
 
--(void)pluginInitialize {
+-(void)load {
   openDatabases = [NSMutableDictionary new];
   queryResultSets = [NSMutableDictionary new];
   replicators = [NSMutableDictionary new];
@@ -607,10 +607,12 @@
       [call reject:@"No such open database" :NULL :NULL :@{}];
       return;
     }
-    NSString *queryJson = [call getString:@"query" defaultValue:NULL];
+    NSDictionary *queryJson = [call getObject:@"query" defaultValue:NULL];
+    NSError *jsonError;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:queryJson options:0 error:&jsonError];
     
+    CustomQuery *query = [[CustomQuery alloc] initWithJson:jsonData database:db];
     NSError *error;
-    CustomQuery *query = [[CustomQuery alloc] initWithJson:queryJson database:db];
     CBLQueryResultSet *result = [query execute:&error];
 
     [queryResultSets setObject:result forKey: [@(_queryCount) stringValue]];
