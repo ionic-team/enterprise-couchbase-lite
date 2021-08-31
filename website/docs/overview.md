@@ -8,7 +8,7 @@ import WistiaVideo from '@site/src/components/WistiaVideo';
 
 Ionic's [Couchbase Lite](https://www.couchbase.com/products/lite) integration makes it easy to build secure, high-performance, offline-enabled apps using the industry-leading Couchbase Lite storage solution.
 
-This integration supports apps built for iOS, Android, and native Windows when using the new [Windows](/docs/windows) platform support from Ionic.
+This integration supports apps built for iOS, Android, and native Windows when using the new <a href="/docs/windows" data-noBrokenLinkCheck="true">Windows</a> platform support from Ionic.
 
 **Interested in Couchbase Lite support?** [Get in touch](https://ionic.io/contact/sales).
 
