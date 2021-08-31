@@ -7,6 +7,8 @@ To installing Ionic's Couchbase Lite integration into your app, first check the 
 
 ## Prerequisites
 
+**Important:** Ionic's Couchbase Lite integration uses Couchbase Lite Enterprise, and requires an existing Couchbase subscription with access to enterprise mobile functionality.
+
 Ionic's Couchbase Lite integration requires Capacitor 3.0 or above, and is _not_ compatible with Cordova-based Ionic apps. We _strongly_ recommend migrating to Capacitor and we offer [official migration support](https://ionic.io/advisory) to help your team navigate the transition.
 
 ## Installation
