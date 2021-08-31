@@ -569,7 +569,7 @@
 -(void)Document_GetBlobContent:(CAPPluginCall*)call {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name" defaultValue:NULL];
-    NSString *documentId = [call getString:@"docId" defaultValue:NULL];
+    NSString *documentId = [call getString:@"documentId" defaultValue:NULL];
     NSString *key = [call getString:@"key" defaultValue:NULL];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
@@ -614,6 +614,11 @@
     CustomQuery *query = [[CustomQuery alloc] initWithJson:jsonData database:db];
     NSError *error;
     CBLQueryResultSet *result = [query execute:&error];
+    
+    if (error != NULL) {
+      [call reject:@"Unable to execute query" :NULL :error :@{}];
+      return;
+    }
 
     [queryResultSets setObject:result forKey: [@(_queryCount) stringValue]];
     NSInteger queryId = _queryCount;
