@@ -417,7 +417,7 @@
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name" defaultValue:NULL];
     NSString *docId = [call getString:@"docId" defaultValue:NULL];
-    int concurrencyControlValue = [call getNumber:@"concurrencyControl" defaultValue:NULL];
+    NSNumber *concurrencyControlValue = [call getNumber:@"concurrencyControl" defaultValue:NULL];
     CBLDatabase *db = [self getDatabase:name];
     if (db == NULL) {
       [call reject:@"No such open database" :NULL :NULL :@{}];
@@ -427,7 +427,12 @@
     CBLDocument *doc = [db documentWithID:docId];
     
     NSError *error;
-    [db deleteDocument:doc concurrencyControl:concurrencyControlValue error:&error];
+    
+    if (concurrencyControlValue != NULL) {
+        [db deleteDocument:doc concurrencyControl:[concurrencyControlValue intValue] error:&error];
+    } else {
+        [db deleteDocument:doc error:&error];
+    }
     if ([self checkError:call error:error message:@"Unable to delete document"]) {
       return;
     }
@@ -506,7 +511,11 @@
 -(void)Database_SetLogLevel:(CAPPluginCall*)call {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *domainValue = [call getString:@"domain" defaultValue:NULL];
-    int logLevelValue = [call getNumber:@"logLevel" defaultValue:NULL];
+    NSNumber *logLevelValue = [call getNumber:@"logLevel" defaultValue:NULL];
+    if (logLevelValue != NULL) {
+      [call reject:@"No log level supplied" :NULL :NULL :@{}];
+      return;
+    }
     CBLLogDomain domain = kCBLLogDomainAll;
     
     if ([domainValue isEqualToString:@"ALL"]) domain = kCBLLogDomainAll;
@@ -515,7 +524,7 @@
     else if ([domainValue isEqualToString:@"QUERY"]) domain = kCBLLogDomainQuery;
     else if ([domainValue isEqualToString:@"REPLICATOR"]) domain = kCBLLogDomainReplicator;
     
-    [CBLDatabase setLogLevel:logLevelValue domain:domain];
+    [CBLDatabase setLogLevel:[logLevelValue intValue] domain:domain];
     
     return [call resolve];
   });
@@ -615,9 +624,12 @@
 -(void)ResultSet_Next:(CAPPluginCall*)call {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name" defaultValue:NULL];
-    int queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
-    
-    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
+    NSNumber *queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
+    if (queryId == NULL) {
+      [call reject:@"No resultSetId supplied" :NULL :NULL :@{}];
+      return;
+    }
+    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[queryId stringValue]];
     if (rs == NULL) {
       [call reject:@"No such result set" :NULL :NULL :@{}];
       return;
@@ -637,9 +649,12 @@
 -(void)ResultSet_NextBatch:(CAPPluginCall*)call {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name" defaultValue:NULL];
-    int queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
-    
-    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
+    NSNumber *queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
+    if (queryId == NULL) {
+      [call reject:@"No resultSetId supplied" :NULL :NULL :@{}];
+      return;
+    }
+    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[queryId stringValue]];
     if (rs == NULL) {
       [call reject:@"No such result set" :NULL :NULL :@{}];
       return;
@@ -661,12 +676,15 @@
 }
 
 -(void)ResultSet_AllResults:(CAPPluginCall*)call {
-  __weak IonicCouchbaseLite *weakSelf = self;
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name" defaultValue:NULL];
-    int queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
+    NSNumber *queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
+    if (queryId == NULL) {
+      [call reject:@"No resultSetId supplied" :NULL :NULL :@{}];
+      return;
+    }
     long chunkSize = self->_allResultsChunkSize;
-    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
+    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[queryId stringValue]];
     
     if (rs == NULL) {
       [call reject:@"No such result set" :NULL :NULL :@{}];
@@ -705,13 +723,15 @@
 }
 
 -(void)ResultSet_AllResults2:(CAPPluginCall*)call {
-  //__weak IonicCouchbaseLite *weakSelf = self;
-  IonicCouchbaseLite *weakSelf = self;
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name" defaultValue:NULL];
-    int queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
+    NSNumber *queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
+    if (queryId == NULL) {
+      [call reject:@"No resultSetId supplied" :NULL :NULL :@{}];
+      return;
+    }
     int chunkSize = (int) self->_allResultsChunkSize;
-    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
+    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[queryId stringValue]];
     
     if (rs == NULL) {
       [call reject:@"No such result set" :NULL :NULL :@{}];
@@ -749,11 +769,15 @@
 
 -(void)ResultSet_Cleanup:(CAPPluginCall*)call {
   dispatch_async(dispatch_get_main_queue(), ^{
-    int queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
-    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[@(queryId) stringValue]];
+    NSNumber *queryId = [call getNumber:@"resultSetId" defaultValue:NULL];
+    if (queryId == NULL) {
+      [call reject:@"No resultSetId supplied" :NULL :NULL :@{}];
+      return;
+    }
+    CBLQueryResultSet *rs = [self->queryResultSets objectForKey:[queryId stringValue]];
 
     if (rs != NULL) {
-      [self->queryResultSets removeObjectForKey:[@(queryId) stringValue]];
+      [self->queryResultSets removeObjectForKey:[queryId stringValue]];
     }
   });
 }
@@ -778,10 +802,13 @@
 }
 
 -(void)Replicator_Start:(CAPPluginCall*)call {
-  NSInteger replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
-  
+    NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
   dispatch_async(dispatch_get_main_queue(), ^{
-    CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
+    CBLReplicator *replicator = [self->replicators objectForKey:[replicatorId stringValue]];
     if (replicator == NULL) {
       return [call reject:@"No such replicator" :NULL :NULL :@{}];
     }
@@ -845,10 +872,13 @@
 }
 
 -(void)Replicator_Stop:(CAPPluginCall*)call {
-  NSInteger replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
-  
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
   dispatch_async(dispatch_get_main_queue(), ^{
-    CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
+    CBLReplicator *replicator = [self->replicators objectForKey:[replicatorId stringValue]];
     if (replicator == NULL) {
       return [call reject:@"No such replicator" :NULL :NULL :@{}];
     }
@@ -859,10 +889,13 @@
   });
 }
 -(void)Replicator_ResetCheckpoint:(CAPPluginCall*)call {
-  NSInteger replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
-  
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
   dispatch_async(dispatch_get_main_queue(), ^{
-    CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
+    CBLReplicator *replicator = [self->replicators objectForKey:[replicatorId stringValue]];
     if (replicator == NULL) {
       return [call reject:@"No such replicator" :NULL :NULL :@{}];
     }
@@ -874,10 +907,13 @@
 }
 
 -(void)Replicator_GetStatus:(CAPPluginCall*)call {
-  NSInteger replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
-  
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
   dispatch_async(dispatch_get_main_queue(), ^{
-    CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
+    CBLReplicator *replicator = [self->replicators objectForKey:[replicatorId stringValue]];
     if (replicator == NULL) {
       return [call reject:@"No such replicator" :NULL :NULL :@{}];
     }
@@ -922,10 +958,13 @@
 }
 
 -(void)Replicator_AddChangeListener:(CAPPluginCall*)call {
-  NSInteger replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
-  
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
   dispatch_async(dispatch_get_main_queue(), ^{
-    CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
+    CBLReplicator *replicator = [self->replicators objectForKey:[replicatorId stringValue]];
     if (replicator == NULL) {
       return [call reject:@"No such replicator" :NULL :NULL :@{}];
     }
@@ -937,7 +976,7 @@
       [call resolve:statusJson];
     }];
     
-    [self->replicatorChangeListeners setObject:listener forKey:[@(replicatorId) stringValue]];
+    [self->replicatorChangeListeners setObject:listener forKey:[replicatorId stringValue]];
   });
 }
 
@@ -969,10 +1008,13 @@
 }
 
 -(void)Replicator_AddDocumentListener:(CAPPluginCall*)call {
-  NSInteger replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
-  
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
   dispatch_async(dispatch_get_main_queue(), ^{
-    CBLReplicator *replicator = [self->replicators objectForKey:[@(replicatorId) stringValue]];
+    CBLReplicator *replicator = [self->replicators objectForKey:[replicatorId stringValue]];
     if (replicator == NULL) {
       return [call reject:@"No such replicator" :NULL :NULL :@{}];
     }
@@ -984,15 +1026,18 @@
       [call resolve:eventJson];
     }];
     
-    [self->replicatorDocumentListeners setObject:listener forKey:[@(replicatorId) stringValue]];
+    [self->replicatorDocumentListeners setObject:listener forKey:[replicatorId stringValue]];
   });
 }
 
 -(void)Replicator_Cleanup:(CAPPluginCall*)call {
-  NSInteger replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
-  
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSString *key = [@(replicatorId) stringValue];
+    NSString *key = [replicatorId stringValue];
     CBLReplicator *replicator = [self->replicators objectForKey:key];
     if (replicator == NULL) {
       return [call reject:@"No such replicator" :NULL :NULL :@{}];
@@ -1017,10 +1062,13 @@
 }
 
 -(void)Replicator_Restart:(CAPPluginCall*)call {
-  NSInteger replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
-  
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSString *key = [@(replicatorId) stringValue];
+    NSString *key = [replicatorId stringValue];
     CBLReplicator *replicator = [self->replicators objectForKey:key];
     if (replicator != NULL) {
       [replicator start];
