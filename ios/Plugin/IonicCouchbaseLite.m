@@ -809,7 +809,7 @@
 }
 
 -(void)Replicator_Start:(CAPPluginCall*)call {
-    NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
   if (replicatorId == NULL) {
     [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
     return;
