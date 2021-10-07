@@ -1,7 +1,7 @@
 {
   "name": "@ionic-enterprise/couchbase-lite",
   "version": "2.0.0-next.0",
-  "description": "Integration for Couchbase Lite in Ionic enterprise apps",
+  "description": "Integration for Couchbase Lite (2.x+) in Ionic enterprise apps",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
