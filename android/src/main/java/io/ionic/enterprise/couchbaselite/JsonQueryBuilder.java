@@ -28,7 +28,7 @@ public class JsonQueryBuilder {
 
       C4Database c4database = getC4Database(db);
 
-      setC4Query(query, c4database.createQuery(json));
+      setC4Query(query, c4database.createJsonQuery(json));
       setColumnNames(query, generateColumnNames(db, json));
     } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | LiteCoreException ex) {
       ex.printStackTrace();

@@ -30,15 +30,19 @@ import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogDomain;
 import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
+import com.couchbase.lite.MaintenanceType;
 import com.couchbase.lite.MutableArray;
 import com.couchbase.lite.MutableDictionary;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.ReplicatedDocument;
 import com.couchbase.lite.Replicator;
+import com.couchbase.lite.ReplicatorActivityLevel;
 import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ReplicatorConfiguration;
+import com.couchbase.lite.ReplicatorProgress;
+import com.couchbase.lite.ReplicatorStatus;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SessionAuthenticator;
@@ -592,7 +596,8 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         Database db = this.openDatabases.get(name);
 
         try {
-            db.compact();
+            // db.compact();
+          db.performMaintenance(MaintenanceType.COMPACT);
         } catch (Exception ex) {
             call.reject("Unable to compact", ex);
         }
@@ -629,7 +634,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         LogLevel logLevel = getLogLevel(logLevelValue);
 
         try {
-            db.setLogLevel(LogDomain.valueOf(domain), logLevel);
+            // db.setLogLevel(LogDomain.valueOf(domain), logLevel);
             call.resolve(null);
         } catch (Exception ex) {
             call.reject("Unable to get document", ex);
@@ -931,7 +936,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             call.reject("No such replicator");
             return;
         }
-        r.resetCheckpoint();
+        // r.resetCheckpoint();
         call.resolve();
     }
 
@@ -943,14 +948,14 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             call.reject("No such replicator");
             return;
         }
-        Replicator.Status status = r.getStatus();
+        ReplicatorStatus status = r.getStatus();
 
         JSObject statusJson = generateStatusJson(status);
 
         call.resolve(statusJson);
     }
 
-    private JSObject generateStatusJson(Replicator.Status status) {
+    private JSObject generateStatusJson(ReplicatorStatus status) {
         CouchbaseLiteException error = status.getError();
         JSObject errorJson = new JSObject();
         if (error != null) {
@@ -960,7 +965,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
                 errorJson.put("info", error.getInfo());
             } catch (Exception ex) {}
         }
-        AbstractReplicator.Progress progress = status.getProgress();
+        ReplicatorProgress progress = status.getProgress();
         JSONObject progressJson = new JSONObject();
         if (progress != null) {
             try {
@@ -970,7 +975,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
 
         int activityLevel = 0;
-        AbstractReplicator.ActivityLevel av = status.getActivityLevel();
+        ReplicatorActivityLevel av = status.getActivityLevel();
         if (av != null) {
             activityLevel = av.ordinal();
         }
@@ -1007,11 +1012,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
                 }
 
                 JSONArray flags = new JSONArray();
-                if (replicatedDocument.flags().contains(DocumentFlag.DocumentFlagsDeleted)) {
+                if (replicatedDocument.getFlags().contains(DocumentFlag.DELETED)) {
                     flags.put("DELETED");
                 }
 
-                if (replicatedDocument.flags().contains(DocumentFlag.DocumentFlagsAccessRemoved)) {
+                if (replicatedDocument.getFlags().contains(DocumentFlag.ACCESS_REMOVED)) {
                     flags.put("ACCESS_REMOVED");
                 }
 
@@ -1168,7 +1173,8 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         if (type.equals("basic")) {
             String username = data.getString("username");
             String password = data.getString("password");
-            return new BasicAuthenticator(username, password);
+
+            return new BasicAuthenticator(username, password.toCharArray());
         }
 
         return null;

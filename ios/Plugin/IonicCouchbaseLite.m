@@ -472,7 +472,7 @@
     }
     
     NSError *error;
-    [db compact:&error];
+    // [db compact:&error];
     
     if ([self checkError:call error:error message:@"Unable to compact database"]) {
       return;
@@ -524,7 +524,7 @@
     else if ([domainValue isEqualToString:@"QUERY"]) domain = kCBLLogDomainQuery;
     else if ([domainValue isEqualToString:@"REPLICATOR"]) domain = kCBLLogDomainReplicator;
     
-    [CBLDatabase setLogLevel:[logLevelValue intValue] domain:domain];
+    // [CBLDatabase setLogLevel:[logLevelValue intValue] domain:domain];
     
     return [call resolve];
   });
@@ -907,7 +907,7 @@
       return [call reject:@"No such replicator" :NULL :NULL :@{}];
     }
     
-    [replicator resetCheckpoint];
+    // [replicator resetCheckpoint];
     
     [call resolve];
   });
