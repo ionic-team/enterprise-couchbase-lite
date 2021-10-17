@@ -65,22 +65,22 @@ public class JsonQueryBuilder {
   }
 
   private static C4Database getC4Database(Database db) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    Class cls = db.getClass().getSuperclass(); // AbstractDatabase
-    Method m = cls.getDeclaredMethod("getC4Database", null);
+    Class cls = db.getClass().getSuperclass().getSuperclass(); // AbstractDatabase
+    Method m = cls.getDeclaredMethod("getOpenC4DbLocked", null);
     m.setAccessible(true);
 
     return (C4Database) m.invoke(db, null);
   }
 
   private static void setC4Query(Query query, C4Query c4query) throws IllegalAccessException, NoSuchFieldException {
-    Class queryClass = query.getClass().getSuperclass(); // AbstractQuery
+    Class queryClass = query.getClass().getSuperclass().getSuperclass(); // AbstractQuery
     Field f = queryClass.getDeclaredField("c4query");
     f.setAccessible(true);
     f.set(query, c4query);
   }
 
   private static void setColumnNames(Query query, Map<String, Integer> columnNames) throws NoSuchFieldException, IllegalAccessException {
-    Class queryClass = query.getClass().getSuperclass(); // AbstractQuery
+    Class queryClass = query.getClass().getSuperclass().getSuperclass(); // AbstractQuery
     Field f = queryClass.getDeclaredField("columnNames");
     f.setAccessible(true);
     f.set(query, columnNames);
