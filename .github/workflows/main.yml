@@ -27,7 +27,7 @@ jobs:
       - name: Build platform
         run: |
           echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > .npmrc
-          $env:NPM_TOKEN="${{ secrets.NPM_TOKEN }}"
+          export NPM_TOKEN="${{ secrets.NPM_TOKEN }}"
           npm install && npm run build
 
       - uses: JS-DevTools/npm-publish@v1
