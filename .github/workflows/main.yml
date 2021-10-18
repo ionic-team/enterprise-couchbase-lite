@@ -26,7 +26,7 @@ jobs:
       # Build platform package including template and CLI scripts
       - name: Build platform
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" >> ~/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
           npm install && npm run build
 
       - uses: JS-DevTools/npm-publish@v1
