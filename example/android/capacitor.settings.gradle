@@ -3,4 +3,4 @@ include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('../../node_modules/@capacitor/android/capacitor')
 
 include ':ionic-enterprise-couchbase-lite'
-project(':ionic-enterprise-couchbase-lite').projectDir = new File('../../android')
+project(':ionic-enterprise-couchbase-lite').projectDir = new File('../node_modules/@ionic-enterprise/couchbase-lite/android')
