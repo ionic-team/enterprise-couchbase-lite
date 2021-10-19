@@ -778,6 +778,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
                 call.resolve(new JSObject());
                 return;
             }
+            Log.d(TAG, "Moving to next result...");
             Result result = r.next();
             if (result == null) {
                 Log.d(TAG, "No results");
@@ -827,7 +828,24 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             Result result;
             int i = 0;
             while (i++ < chunkSize && ((result = r.next()) != null)) {
-                resultsChunk.add(result.toMap());
+                Map<String, Object> data = result.toMap();
+                if (data.containsKey("_id")) {
+                    data.put("id", data.get("_id"));
+                    data.remove("_id");
+                }
+                if (data.containsKey("_sequence")) {
+                    data.put("sequence", data.get("_sequence"));
+                    data.remove("_sequence");
+                }
+                if (data.containsKey("_deleted")) {
+                    data.put("deleted", data.get("_deleted"));
+                    data.remove("_deleted");
+                }
+                if (data.containsKey("_expiration")) {
+                    data.put("expiration", data.get("_expiration"));
+                    data.remove("_expiration");
+                }
+                resultsChunk.add(data);
             }
 
             call.resolve(
@@ -855,13 +873,6 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.setKeepAlive(true);
 
         int chunkSize = this.allResultsChunkSize;
-        /*
-    List<Result> results = r.allResults();
-    if (results == null) {
-      Log.d(TAG, "No results");
-      return;
-    }
-    */
 
         List<Map<String, Object>> resultsChunk = null;
 
@@ -883,7 +894,25 @@ public class IonicCouchbaseLitePlugin extends Plugin {
                 }
             }
 
-            resultsChunk.add(queryResult.toMap());
+            Map<String, Object> data = queryResult.toMap();
+            if (data.containsKey("_id")) {
+                data.put("id", data.get("_id"));
+                data.remove("_id");
+            }
+            if (data.containsKey("_sequence")) {
+                data.put("sequence", data.get("_sequence"));
+                data.remove("_sequence");
+            }
+            if (data.containsKey("_deleted")) {
+                data.put("deleted", data.get("_deleted"));
+                data.remove("_deleted");
+            }
+            if (data.containsKey("_expiration")) {
+                data.put("expiration", data.get("_expiration"));
+                data.remove("_expiration");
+            }
+
+            resultsChunk.add(data);
             i++;
         }
 
