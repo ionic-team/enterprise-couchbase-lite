@@ -19,6 +19,22 @@ To get started, install the `@ionic-enterprise/couchbase-lite` package into your
 npm install @ionic-enterprise/couchbase-lite
 ```
 
+## Android: Add Maven Repo
+
+Edit your `android/build.gradle` file and update the `allprojects` entry to make sure the Couchbase maven repository is listed:
+
+```groovy
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
+    }
+}
+```
+
+## Sync Project
+
 Then, sync your Capacitor app to load any native dependencies:
 
 ```shell
