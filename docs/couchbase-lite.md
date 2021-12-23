@@ -1,7 +1,7 @@
 ---
 title: Couchbase Lite
 template: enterprise-plugin
-version: 1.3.3
+version: 1.3.5
 minor: 1.1.X
 ---
 
@@ -1097,6 +1097,8 @@ config.setPinnedServerCertificate(cert);</code></pre>
 # Changelog
 
 
+
+### [1.3.5] (2021-12-23)
 
 ### [1.3.3] (2021-01-28)
 
