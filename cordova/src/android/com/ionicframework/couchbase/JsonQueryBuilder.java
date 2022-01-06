@@ -44,6 +44,26 @@ public class JsonQueryBuilder {
       JSONObject queryJson = new JSONObject(json);
       JSONArray what = queryJson.getJSONArray("WHAT");
 
+      JSONArray from = null;
+      try {
+        from = queryJson.getJSONArray("FROM");
+      } catch (Exception ex) {}
+
+      String as = null;
+
+      if (from != null) {
+        for (int i = 0; i < from.length(); i++) {
+          try {
+            JSONObject item = from.getJSONObject(i);
+            if (item.has("AS")) {
+              as = item.getString("AS") + ".";
+              break;
+            }
+          } catch (Exception ex) {
+          }
+        }
+      }
+
       for (int i = 0; i < what.length(); i++) {
         JSONArray item = what.getJSONArray(i);
         String column = item.getString(0);
@@ -53,6 +73,15 @@ public class JsonQueryBuilder {
             columns.put(columnName, i);
           } else {
             String columnName = column.substring(1);
+
+            if (as != null) {
+              if (columnName.contains(as)) {
+                columnName = columnName.substring(as.length());
+              }
+              if (columnName.equals("")) {
+                columnName = as.substring(0, as.length() - 1);
+              }
+            }
             columns.put(columnName, i);
           }
         }

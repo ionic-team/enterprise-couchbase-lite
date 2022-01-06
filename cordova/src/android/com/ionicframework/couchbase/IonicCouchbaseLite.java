@@ -743,6 +743,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
       return;
     }
     Map<String, Object> data = result.toMap();
+
     if (data.containsKey("_id")) {
       data.put("id", data.get("_id"));
       data.remove("_id");

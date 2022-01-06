@@ -118,8 +118,13 @@
 
 -(NSDictionary *)resultToMap:(CBLQueryResult *)d dbName:(NSString *)dbName {
   
-  NSDictionary *documentAsMap = [d toDictionary];
-  return [self resultDictionaryToMap:documentAsMap dbName:dbName];
+  NSMutableDictionary *dm = [[d toDictionary] mutableCopy];
+    
+  if ([dm objectForKey:@"_id"]) {
+    [dm setObject:[dm objectForKey:@"_id"] forKey:@"id"];
+    [dm removeObjectForKey:@"_id"];
+  }
+  return [self resultDictionaryToMap:dm dbName:dbName];
 }
 
 -(NSDictionary *)resultDictionaryToMap:(NSDictionary *)d dbName:(NSString *)dbName {
@@ -614,6 +619,10 @@
     NSError *error;
     CustomQuery *query = [[CustomQuery alloc] initWithJson:queryJson database:db];
     CBLQueryResultSet *result = [query execute:&error];
+    
+    if ([self checkError:command error:error message:@"Unable to execute query"]) {
+      return;
+    }
 
     [queryResultSets setObject:result forKey: [@(_queryCount) stringValue]];
     NSInteger queryId = _queryCount;
@@ -1034,4 +1043,49 @@
   }];
 }
 
+-(void)Test_Query:(CDVInvokedUrlCommand*)command {
+    CBLMutableDocument *d = [[CBLMutableDocument alloc] init];
+    [d setString:@"Escape" forKey:@"name"];
+    [d setString:@"hotel" forKey:@"type"];
+    
+    [d setString:NULL forKey:@"asdf"];
+    CBLMutableArray *array = [[CBLMutableArray alloc] initWithData:@[
+        @"hello",
+        @"really",
+        @"cool"
+    ]];
+
+    [d setArray:array forKey:@"items"];
+    
+    NSError *error;
+    
+    [CBLDatabase deleteDatabase:@"asdfasdf" inDirectory:NULL error:NULL];
+    CBLDatabase *database = [[CBLDatabase alloc] initWithName:@"asdfasdf" config:NULL error:&error];
+    [database saveDocument:d error:&error];
+    
+    CBLQuery *query = [CBLQueryBuilder select:@[[CBLQuerySelectResult all]]
+                                         from:[CBLQueryDataSource database:database]];
+    NSEnumerator* rs = [query execute:&error];
+    for (CBLQueryResult *result in rs) {
+        NSDictionary *resultsDict = [result toDictionary];
+        NSLog(@"%@", resultsDict);
+    }
+    /*
+      .setArray("items", ["hello", {
+        "really": "cool"
+      }, 123, true])
+      //.setBlob('profile', new Blob('image/jpeg', 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P//PwAGBAL/VJiKjgAAAABJRU5ErkJggg=='))
+      .setArray("someWithNull", [
+        1,
+        null,
+        4
+      ])
+      .setDictionary("config", {
+        "size": "large",
+        "isCool": false
+      })
+      .setDate("created", new Date());
+    */
+    [self resolve:command];
+}
 @end
