@@ -518,6 +518,28 @@ class CBLTester {
     this.out(`Executed query`);
   }
 
+  async query1From() {
+    console.log('Building query 1');
+    let query = QueryBuilder.select(
+      SelectResult.all().from('fun'),
+      SelectResult.expression(Expression.property('name').from('fun')),
+      SelectResult.expression(Meta.id.from('fun')),
+    )
+      .from(DataSource.database(this.database).as('fun'))
+      .where(
+        Expression.property('type')
+          .from('fun')
+          .equalTo(Expression.string('hotel')),
+      )
+      .orderBy(Ordering.expression(Meta.id.from('fun')));
+
+    const ret = await query.execute();
+    this._query1Results = ret;
+    console.log('Executed query', ret);
+
+    this.out(`Executed query`);
+  }
+
   async ftsQuery() {
     console.log('Building fts query 1');
 
@@ -1072,6 +1094,9 @@ const Home: React.FC = () => {
         <hr />
         <IonButton onClick={() => testerRef.current.query1()}>
           Query 1
+        </IonButton>
+        <IonButton onClick={() => testerRef.current.query1From()}>
+          Query 1 From
         </IonButton>
         <IonButton onClick={() => testerRef.current.ftsQuery()}>
           FTS Query
