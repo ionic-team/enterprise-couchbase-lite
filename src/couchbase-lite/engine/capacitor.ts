@@ -5,6 +5,7 @@ import { DatabaseConfiguration } from '../database-configuration';
 import { ResultSet } from '../result-set';
 import { Result } from '../result';
 import { Query } from '../query';
+import { N1qlQuery } from '../n1ql-query';
 import { Document } from '../document';
 import { ReplicatorConfiguration } from '../replicator-configuration';
 import { AbstractIndex } from '../abstract-index';
@@ -244,6 +245,15 @@ export class CapacitorEngine {
     const ret = await IonicCouchbaseLite.Query_Execute({
       name: database.getName(),
       query: query.toJson(),
+    });
+    return new ResultSet(query, ret.id, query.getColumnNames());
+  }
+
+  async Query_ExecuteN1ql(database: Database, query: N1qlQuery): Promise<ResultSet> {
+    //this\.log('Query_Execute', JSON.stringify(query.toJson()));
+    const ret = await IonicCouchbaseLite.Query_ExecuteN1ql({
+      name: database.getName(),
+      n1qlQuery: query.n1qlQuery
     });
     return new ResultSet(query, ret.id, query.getColumnNames());
   }

@@ -518,6 +518,19 @@ class CBLTester {
     this.out(`Executed query`);
   }
 
+  async query1n1ql() {
+    console.log('Building query 1 n1ql');
+    let query = this.database.createQuery(
+      'select META().id as thisId from _ where type = \"hotel\"'
+    );
+
+    const ret = await query.execute();
+    this._query1Results = ret;
+    console.log('Executed query', ret);
+
+    this.out(`Executed query`);
+  }
+
   async ftsQuery() {
     console.log('Building fts query 1');
 
@@ -1072,6 +1085,9 @@ const Home: React.FC = () => {
         <hr />
         <IonButton onClick={() => testerRef.current.query1()}>
           Query 1
+        </IonButton>
+        <IonButton onClick={() => testerRef.current.query1n1ql()}>
+          Query 1 N1QL
         </IonButton>
         <IonButton onClick={() => testerRef.current.ftsQuery()}>
           FTS Query

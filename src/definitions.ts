@@ -87,6 +87,9 @@ export interface DocumentGetBlobContentArgs extends DatabaseArgs {
 export interface QueryExecuteArgs extends DatabaseArgs {
   query: any;
 }
+export interface QueryExecuteN1qlArgs extends DatabaseArgs {
+  n1qlQuery: string;
+}
 
 export interface ResultSetNextArgs extends DatabaseArgs {
   resultSetId: string;
@@ -164,6 +167,11 @@ export interface IonicCouchbaseLitePlugin {
   }>;
   Query_Execute(
     args: QueryExecuteArgs,
+  ): Promise<{
+    id: string;
+  }>;
+  Query_ExecuteN1ql(
+    args: QueryExecuteN1qlArgs,
   ): Promise<{
     id: string;
   }>;

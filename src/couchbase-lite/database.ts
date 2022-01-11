@@ -6,6 +6,7 @@ import { DatabaseLogging } from './database-logging';
 import { Index, AbstractIndex } from './abstract-index';
 
 import { CapacitorEngine } from './engine/capacitor';
+import { N1qlQuery } from './n1ql-query';
 
 export interface File {}
 
@@ -129,7 +130,7 @@ export class Database {
   }
 
   /**
-   *
+   * Copy the database file to another location
    */
   copy(
     path: string,
@@ -144,11 +145,19 @@ export class Database {
 
   /**
    *
+   * Create an index in the database with the given name
    */
   createIndex(name: string, index: AbstractIndex): Promise<void> {
     name;
     index;
     return this._engine.Database_CreateIndex(this, name, index);
+  }
+
+  /**
+   * Create a query using the N1QL query syntax in Couchbase Lite 3
+   */
+  createQuery(n1qlQuery: string) {
+    return new N1qlQuery(this, n1qlQuery);
   }
 
   /**

@@ -34,6 +34,7 @@ npx cap sync
 * [`Database_SetFileLoggingConfig(...)`](#database_setfileloggingconfig)
 * [`Document_GetBlobContent(...)`](#document_getblobcontent)
 * [`Query_Execute(...)`](#query_execute)
+* [`Query_ExecuteN1ql(...)`](#query_executen1ql)
 * [`ResultSet_Next(...)`](#resultset_next)
 * [`ResultSet_NextBatch(...)`](#resultset_nextbatch)
 * [`ResultSet_AllResults(...)`](#resultset_allresults)
@@ -371,6 +372,21 @@ Query_Execute(args: QueryExecuteArgs) => any
 --------------------
 
 
+### Query_ExecuteN1ql(...)
+
+```typescript
+Query_ExecuteN1ql(args: QueryExecuteN1qlArgs) => any
+```
+
+| Param      | Type                                                                  |
+| ---------- | --------------------------------------------------------------------- |
+| **`args`** | <code><a href="#queryexecuten1qlargs">QueryExecuteN1qlArgs</a></code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
 ### ResultSet_Next(...)
 
 ```typescript
@@ -702,6 +718,13 @@ Replicator_Cleanup(args: ReplicatorArgs) => any
 | Prop        | Type             |
 | ----------- | ---------------- |
 | **`query`** | <code>any</code> |
+
+
+#### QueryExecuteN1qlArgs
+
+| Prop            | Type                |
+| --------------- | ------------------- |
+| **`n1qlQuery`** | <code>string</code> |
 
 
 #### ResultSetNextArgs

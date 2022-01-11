@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@capacitor/core": "file:../../capacitor/core",
+    "@capacitor/core": "^3.3.4",
     "@ionic-enterprise/capacitor-windows": "file:../../capacitor-windows",
-    "@ionic-enterprise/couchbase-lite": "file:..",
+    "@ionic-enterprise/couchbase-lite": "file:../ionic-enterprise-couchbase-lite-3.0.0-next.tgz",
     "@ionic/react": "^5.5.0",
     "@ionic/react-router": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.9",
