@@ -47,6 +47,7 @@ export class ReplicatorConfiguration {
   private pinnedServerCertificate: Int8Array;
   private channels: string[];
   private documentIds: string[];
+  private heartbeat: number;
   private headers: { [name:string]: string };
 
   constructor(private database: Database, private target: Endpoint) {
@@ -87,6 +88,10 @@ export class ReplicatorConfiguration {
   setDocumentIDs(documentIds: string[]) {
     this.documentIds = documentIds;
   }
+
+  setHeartbeat(heartbeat: number) {
+    this.heartbeat = heartbeat;
+  }
   
   toJson() {
     return {
@@ -97,7 +102,8 @@ export class ReplicatorConfiguration {
       headers: this.headers,
       pinnedServerCertificate: this.pinnedServerCertificate,
       channels: this.channels,
-      documentIds: this.documentIds
+      documentIds: this.documentIds,
+      heartbeat: this.heartbeat
     }
   }
 }

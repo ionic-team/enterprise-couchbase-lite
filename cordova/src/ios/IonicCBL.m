@@ -809,6 +809,7 @@
   NSDictionary *target = [data objectForKey:@"target"];
   NSString *url = [target objectForKey:@"url"];
   NSString *replicatorType = [data objectForKey:@"replicatorType"];
+  NSNumber *heartbeat = [data objectForKey:@"heartbeat"];
   BOOL continuous = [data objectForKey:@"continuous"];
   
   CBLURLEndpoint *endpoint = [[CBLURLEndpoint alloc] initWithURL:[NSURL URLWithString:url]];
@@ -828,6 +829,10 @@
     [replConfig setChannels:channels];
   }
     
+  if (heartbeat != NULL) {
+    [replConfig setHeartbeat:[heartbeat intValue]];
+  }
+
   [replConfig setContinuous:continuous];
   
   CBLAuthenticator *authenticator = [self replicatorAuthenticatorFromConfig:authenticatorData];

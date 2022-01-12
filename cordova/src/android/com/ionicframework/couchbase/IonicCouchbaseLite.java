@@ -1077,6 +1077,7 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     String authenticatorType = authenticatorData.getString("type");
     String replicatorType = json.getString("replicatorType");
     boolean continuous = json.getBoolean("continuous");
+    Integer heartbeat = json.getInt("heartbeat");
 
     JSONObject target = json.getJSONObject("target");
     if (target == null) {
@@ -1086,7 +1087,6 @@ public class IonicCouchbaseLite extends CordovaPlugin {
     String url = target.getString("url");
     Endpoint endpoint = new URLEndpoint(new URI(url));
     ReplicatorConfiguration config = new ReplicatorConfiguration(db, endpoint);
-
 
     JSONArray channelJSONArray = json.optJSONArray("channels");
     if (channelJSONArray != null) {
@@ -1103,6 +1103,10 @@ public class IonicCouchbaseLite extends CordovaPlugin {
       config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH);
     } else if (replicatorType.equals("PULL")) {
       config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PULL);
+    }
+
+    if (heartbeat != null) {
+      config.setHeartbeat(heartbeat);
     }
 
     config.setContinuous(continuous);
