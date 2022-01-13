@@ -628,6 +628,37 @@
   //}];
 }
 
+-(void)Query_ExecuteN1ql:(CAPPluginCall*)call {
+
+  //dispatch_async(dispatch_get_main_queue(), ^{
+    NSString *name = [call getString:@"name" defaultValue:NULL];
+    CBLDatabase *db = [self getDatabase:name];
+    if (db == NULL) {
+      [call reject:@"No such open database" :NULL :NULL :@{}];
+      return;
+    }
+    NSString *n1qlQuery = [call getString:@"n1qlQuery" defaultValue:NULL];
+    NSError *error;
+
+    CBLQuery *query = [db createQuery:n1qlQuery];
+    CBLQueryResultSet *result = [query execute:&error];
+    
+    if (error != NULL) {
+      [call reject:@"Unable to execute query" :NULL :error :@{}];
+      return;
+    }
+
+    [queryResultSets setObject:result forKey: [@(_queryCount) stringValue]];
+    NSInteger queryId = _queryCount;
+    _queryCount++;
+    
+    [call resolve:@{
+        @"id": @(queryId),
+        @"columnNames": @{}
+    }];
+  //}];
+}
+
 -(void)ResultSet_Next:(CAPPluginCall*)call {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *name = [call getString:@"name" defaultValue:NULL];
@@ -647,9 +678,7 @@
       return [call resolve];
     }
     
-    return [call resolve:@{
-      @"results": [self resultToMap:result dbName:name]
-    }];
+    return [call resolve:[self resultToMap:result dbName:name]];
   });
 }
 

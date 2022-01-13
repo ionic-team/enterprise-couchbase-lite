@@ -26,6 +26,7 @@ CAP_PLUGIN(IonicCouchbaseLite, "IonicCouchbaseLite",
            CAP_PLUGIN_METHOD(Database_SetFileLoggingConfig, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(Document_GetBlobContent, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(Query_Execute, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(Query_ExecuteN1ql, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(ResultSet_Next, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(ResultSet_NextBatch, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(ResultSet_AllResults, CAPPluginReturnCallback);
