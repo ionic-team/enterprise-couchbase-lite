@@ -174,6 +174,7 @@ export interface IonicCouchbaseLitePlugin {
     args: QueryExecuteN1qlArgs,
   ): Promise<{
     id: string;
+    columnNames: { [name:string]: number };
   }>;
   ResultSet_Next(
     args: ResultSetNextArgs,

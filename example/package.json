@@ -5,7 +5,7 @@
   "dependencies": {
     "@capacitor/core": "^3.3.4",
     "@ionic-enterprise/capacitor-windows": "file:../../capacitor-windows",
-    "@ionic-enterprise/couchbase-lite": "file:../ionic-enterprise-couchbase-lite-3.0.0-next.tgz",
+    "@ionic-enterprise/couchbase-lite": "file:..",
     "@ionic/react": "^5.5.0",
     "@ionic/react-router": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.9",
@@ -63,7 +63,7 @@
     ]
   },
   "devDependencies": {
-    "@capacitor/cli": "file:../../capacitor/cli"
+    "@capacitor/cli": "^3.3.4"
   },
   "description": "An Ionic project"
 }

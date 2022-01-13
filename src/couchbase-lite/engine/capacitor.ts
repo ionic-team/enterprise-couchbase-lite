@@ -255,7 +255,7 @@ export class CapacitorEngine {
       name: database.getName(),
       n1qlQuery: query.n1qlQuery
     });
-    return new ResultSet(query, ret.id, query.getColumnNames());
+    return new ResultSet(query, ret.id, ret.columnNames);
   }
 
   async ResultSet_Next(

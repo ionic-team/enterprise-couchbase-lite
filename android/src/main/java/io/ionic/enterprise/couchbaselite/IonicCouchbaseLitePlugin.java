@@ -65,6 +65,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
@@ -744,6 +745,39 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
     }
 
+    @PluginMethod
+    public void Query_ExecuteN1ql(PluginCall call) throws JSONException, CouchbaseLiteException {
+        String name = call.getString("name");
+        String query = call.getString("n1qlQuery");
+
+        Database db = this.openDatabases.get(name);
+
+        try {
+            Query q = db.createQuery(query);
+            ResultSet rs = q.execute();
+
+            Field columnNamesField = q.getClass().getSuperclass().getDeclaredField("columnNames");
+            columnNamesField.setAccessible(true);
+            HashMap<String, Integer> columnNames = (HashMap<String, Integer>) columnNamesField.get(q);
+
+            JSObject columnNamesJson = new JSObject();
+
+            for (Map.Entry<String, Integer> columnEntry : columnNames.entrySet()) {
+              columnNamesJson.put(columnEntry.getKey(), columnEntry.getValue());
+            }
+
+            int id = queryCount++;
+
+            this.queryResultSets.put(id, rs);
+
+            call.resolve(new JSObject() {{
+                put("id", id);
+                put("columnNames", columnNamesJson);
+            }});
+        } catch (Exception ex) {
+          call.reject("Unable to execute query", ex);
+        }
+    }
 
     @PluginMethod
     public void ResultSet_Next(PluginCall call) throws JSONException, CouchbaseLiteException {
