@@ -1,6 +1,6 @@
 {
   "name": "@ionic-enterprise/couchbase-lite",
-  "version": "1.3.7-next.2",
+  "version": "1.3.7",
   "description": "Couchbase Lite integration for Ionic Enterprise",
   "author": "Ionic Team <hi@ionic.io> (https://ionicframework.com)",
   "license": "SEE LICENSE",
