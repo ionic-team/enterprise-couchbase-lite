@@ -3,6 +3,7 @@ package io.ionic.enterprise.couchbaselite;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.LiteCoreException;
+import com.couchbase.lite.Log;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.internal.core.C4Database;
@@ -17,6 +18,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JsonQueryBuilder {
   public static Query buildQuery(Database db, String json) {
@@ -66,24 +69,27 @@ public class JsonQueryBuilder {
 
       for (int i = 0; i < what.length(); i++) {
         JSONArray item = what.getJSONArray(i);
-        String column = item.getString(0);
+        Pattern p = Pattern.compile("\\.(.*)\\.");
+        Matcher m = p.matcher(item.getString(0));
+        String alias = null;
+        while (m.find()) {
+          alias = m.group(1);
+        }
+        String column = item.getString(0).replaceFirst("\\..*\\.", "");
         if (column != null) {
-          if (column.equals(".")) {
+          if (column.equals(".") || column.equals("")) {
             String columnName = db.getName();
-            columns.put(columnName, i);
-          } else {
-            String columnName = column.substring(1);
-
-            if (as != null) {
-              if (columnName.contains(as)) {
-                columnName = columnName.substring(as.length());
-              }
-              if (columnName.equals("")) {
-                columnName = as.substring(0, as.length() - 1);
-              }
+            if (alias != null) {
+              columns.put(alias, i);
+            } else {
+              columns.put(columnName, i);
             }
-
-            columns.put(columnName, i);
+          } else {
+            if (column.charAt(0) == '.') {
+              columns.put(column.substring(1), i);
+            } else {
+              columns.put(column, i);
+            }
           }
         }
       }

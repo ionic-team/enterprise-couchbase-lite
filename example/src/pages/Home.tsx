@@ -540,6 +540,50 @@ class CBLTester {
     this.out(`Executed query`);
   }
 
+  async joinTest() {
+    let locationDoc = new MutableDocument()
+      .setString('name', 'Madison')
+      .setString('type', 'location');
+    await this.database.save(locationDoc);
+
+    let hotelDoc = new MutableDocument()
+      .setString('name', 'Escape')
+      .setString('type', 'hotel')
+      .setString('hotel_locations_thing', 'what')
+      .setString('location_id', locationDoc.getId());
+
+    await this.database.save(hotelDoc);
+
+    console.log('Building query 2 from');
+    let query = QueryBuilder.select(
+      SelectResult.all().from('hotel_locations'),
+      SelectResult.expression(Expression.property('name').from('hotel_locations')),
+      SelectResult.expression(Meta.id.from('hotel_locations')),
+    )
+      .from(DataSource.database(this.database).as('locations'))
+      .join(
+        Join.join(DataSource.database(this.database).as('hotel_locations')).on(
+          Meta.id
+            .from('locations')
+            .equalTo(Expression.property('location_id').from('hotel_locations'))
+        )
+      )
+      .where(
+        Expression.property('type')
+          .from('hotel_locations')
+          .equalTo(Expression.string('hotel'))
+          .and(
+            Expression.property('type')
+            .from('locations')
+            .equalTo(Expression.string('location'))
+          )
+      );
+
+    const ret = await query.execute();
+    const results = await ret.allResults();
+    this.out(`All results: ${JSON.stringify(results, null, 2)}`);
+  }
+
   async ftsQuery() {
     console.log('Building fts query 1');
 
@@ -1111,6 +1155,9 @@ const Home: React.FC = () => {
           All Results 1
         </IonButton>
         <hr />
+        <IonButton onClick={() => testerRef.current.joinTest()}>
+          Join From Test
+        </IonButton>
         <IonButton onClick={() => testerRef.current.queryDeleted()}>
           Query Deleted
         </IonButton>
