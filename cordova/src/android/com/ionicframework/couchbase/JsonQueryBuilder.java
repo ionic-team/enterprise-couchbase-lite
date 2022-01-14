@@ -3,6 +3,7 @@ package com.ionicframework.couchbase;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.LiteCoreException;
+import com.couchbase.lite.Log;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.internal.core.C4Database;
@@ -17,6 +18,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JsonQueryBuilder {
   static Query buildQuery(Database db, String json) {
