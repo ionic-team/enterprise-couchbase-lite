@@ -47,49 +47,16 @@ public class JsonQueryBuilder {
       JSONObject queryJson = new JSONObject(json);
       JSONArray what = queryJson.getJSONArray("WHAT");
 
-      JSONArray from = null;
-      try {
-        from = queryJson.getJSONArray("FROM");
-      } catch (Exception ex) {}
-
-      String as = null;
-
-      if (from != null) {
-        for (int i = 0; i < from.length(); i++) {
-          try {
-            JSONObject item = from.getJSONObject(i);
-            if (item.has("AS")) {
-              as = item.getString("AS") + ".";
-              break;
-            }
-          } catch (Exception ex) {
-          }
-        }
-      }
-
       for (int i = 0; i < what.length(); i++) {
         JSONArray item = what.getJSONArray(i);
-        Pattern p = Pattern.compile("\\.(.*)\\.");
-        Matcher m = p.matcher(item.getString(0));
-        String alias = null;
-        while (m.find()) {
-          alias = m.group(1);
-        }
-        String column = item.getString(0).replaceFirst("\\..*\\.", "");
+        String column = item.getString(0);
         if (column != null) {
-          if (column.equals(".") || column.equals("")) {
+          if (column.equals(".")) {
             String columnName = db.getName();
-            if (alias != null) {
-              columns.put(alias, i);
-            } else {
-              columns.put(columnName, i);
-            }
+            columns.put(columnName, i);
           } else {
-            if (column.charAt(0) == '.') {
-              columns.put(column.substring(1), i);
-            } else {
-              columns.put(column, i);
-            }
+            String columnName = column.substring(1);
+            columns.put(columnName, i);
           }
         }
       }

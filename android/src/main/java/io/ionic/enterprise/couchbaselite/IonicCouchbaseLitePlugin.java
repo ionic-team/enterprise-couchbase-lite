@@ -65,6 +65,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 /*
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -186,7 +188,8 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             Method method = (q.getClass().getSuperclass()).getDeclaredMethod("encodeAsJSON");
             method.setAccessible(true);
             return (String) method.invoke(q);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
         return null;
     }
 
@@ -197,7 +200,8 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             Object obj1Converted = convertJsonElement(obj1);
             Object obj2Converted = convertJsonElement(obj2);
             return obj1Converted.equals(obj2Converted);
-        } catch (JSONException ex) {}
+        } catch (JSONException ex) {
+        }
         return false;
     }
 
@@ -249,19 +253,19 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
 
         new Handler(Looper.getMainLooper())
-            .post(
-                () -> {
-                    try {
-                        Database d = new Database(name, c);
+          .post(
+            () -> {
+                try {
+                    Database d = new Database(name, c);
 
-                        this.openDatabases.put(name, d);
+                    this.openDatabases.put(name, d);
 
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("Unable to open database", ex);
-                    }
+                    call.resolve();
+                } catch (Exception ex) {
+                    call.reject("Unable to open database", ex);
                 }
-            );
+            }
+          );
     }
 
     @PluginMethod
@@ -277,11 +281,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             String directory = call.getString("directory");
             boolean exists = d.exists(existsName, new File(directory));
             call.resolve(
-                new JSObject() {
-                    {
-                        put("exists", exists);
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("exists", exists);
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Unable to check if database exists", ex);
@@ -314,11 +318,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             d.save(m, concurrencyControl);
 
             call.resolve(
-                new JSObject() {
-                    {
-                        put("_id", m.getId());
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("_id", m.getId());
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Unable to save document", ex);
@@ -346,11 +350,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
         try {
             call.resolve(
-                new JSObject() {
-                    {
-                        put("count", d.getCount());
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("count", d.getCount());
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Error getting count", ex);
@@ -367,11 +371,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
         try {
             call.resolve(
-                new JSObject() {
-                    {
-                        put("path", d.getPath());
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("path", d.getPath());
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Error getting path", ex);
@@ -493,11 +497,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
         try {
             call.resolve(
-                new JSObject() {
-                    {
-                        put("indexes", new JSArray(d.getIndexes()));
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("indexes", new JSArray(d.getIndexes()));
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Error getting indexes", ex);
@@ -518,14 +522,14 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
         try {
             d.addChangeListener(
-                new DatabaseChangeListener() {
-                    @Override
-                    public void changed(DatabaseChange change) {
-                        JSObject ret = new JSObject();
-                        ret.put("documentIDs", new JSONArray(change.getDocumentIDs()));
-                        call.resolve(ret);
-                    }
-                }
+              new DatabaseChangeListener() {
+                  @Override
+                  public void changed(DatabaseChange change) {
+                      JSObject ret = new JSObject();
+                      ret.put("documentIDs", new JSONArray(change.getDocumentIDs()));
+                      call.resolve(ret);
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Unable to add listener", ex);
@@ -561,16 +565,16 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
 
         new Handler(Looper.getMainLooper())
-            .post(
-                () -> {
-                    try {
-                        d.delete();
-                        call.resolve();
-                    } catch (Exception ex) {
-                        call.reject("Unable to delete database", ex);
-                    }
+          .post(
+            () -> {
+                try {
+                    d.delete();
+                    call.resolve();
+                } catch (Exception ex) {
+                    call.reject("Unable to delete database", ex);
                 }
-            );
+            }
+          );
     }
 
     @PluginMethod
@@ -762,11 +766,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             this.queryResultSets.put(id, rs);
 
             call.resolve(
-                new JSObject() {
-                    {
-                        put("id", id);
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("id", id);
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Unable to execute query", ex);
@@ -792,7 +796,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
                 return;
             }
 
-            Map<String, Object> data = result.toMap();
+            Map<String, Object> data = processResultMap(result.toMap());
             if (data.containsKey("_id")) {
                 data.put("id", data.get("_id"));
                 data.remove("_id");
@@ -817,6 +821,42 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
     }
 
+    private Map<String, Object> processResultMap(Map<String, Object> map) {
+        Map<String, Object> newMap = new HashMap<>();
+        Pattern p = Pattern.compile("\\.(.*)\\.");
+
+        String commonAlias = null;
+        Pattern commonPattern = Pattern.compile("(.*\\.)");
+
+        for (String key : map.keySet()) {
+            Matcher m = commonPattern.matcher(key);
+            while (m.find()) {
+                String foundAlias = m.group(1);
+                if (commonAlias == null) {
+                    commonAlias = foundAlias;
+                } else if (!commonAlias.equals(foundAlias)) {
+                  commonAlias = null;
+                }
+            }
+        }
+
+
+        if (commonAlias == null) {
+            return map;
+        }
+
+        for (String key : map.keySet()) {
+            String column = key.replaceFirst(commonAlias, "");
+            if (column.equals("")) {
+                newMap.put(commonAlias.substring(0, commonAlias.length() - 1), map.get(key));
+            } else {
+                newMap.put(column, map.get(key));
+            }
+        }
+
+        return newMap;
+    }
+
     @PluginMethod
     public void ResultSet_NextBatch(PluginCall call) throws JSONException, CouchbaseLiteException {
         String name = call.getString("name");
@@ -834,7 +874,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             Result result;
             int i = 0;
             while (i++ < chunkSize && ((result = r.next()) != null)) {
-                Map<String, Object> data = result.toMap();
+                Map<String, Object> data = processResultMap(result.toMap());
                 if (data.containsKey("_id")) {
                     data.put("id", data.get("_id"));
                     data.remove("_id");
@@ -900,7 +940,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
                 }
             }
 
-            Map<String, Object> data = queryResult.toMap();
+            Map<String, Object> data = processResultMap(queryResult.toMap());
             if (data.containsKey("_id")) {
                 data.put("id", data.get("_id"));
                 data.remove("_id");
