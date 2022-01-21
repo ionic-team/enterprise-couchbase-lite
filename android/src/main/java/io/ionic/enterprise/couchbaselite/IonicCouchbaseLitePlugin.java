@@ -823,8 +823,6 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
     private Map<String, Object> processResultMap(Map<String, Object> map) {
         Map<String, Object> newMap = new HashMap<>();
-        Pattern p = Pattern.compile("\\.(.*)\\.");
-
         String commonAlias = null;
         Pattern commonPattern = Pattern.compile("(.*\\.)");
 
@@ -1298,5 +1296,63 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         }
 
         return null;
+    }
+
+    @PluginMethod
+    public void TestJoinQuery(PluginCall call) throws JSONException, CouchbaseLiteException {
+        Database db = this.getDatabase("thedb3");
+        MutableDocument locationDoc = new MutableDocument()
+          .setString("name", "Madison")
+          .setString("type", "location");
+        db.save(locationDoc);
+
+        MutableDocument categoryDoc = new MutableDocument()
+          .setString("name", "Expensive")
+          .setString("type", "expensive");
+        db.save(categoryDoc);
+
+        MutableDocument hotelDoc = new MutableDocument()
+          .setString("name", "Escape")
+          .setString("type", "hotel")
+          .setString("hotel_locations_thing", "what")
+          .setString("location_id", locationDoc.getId())
+          .setString("category_id", categoryDoc.getId());
+        db.save(hotelDoc);
+
+        Query query = QueryBuilder.select(
+          // SelectResult.all().from('hotel_locations'),
+          SelectResult.expression(Meta.id.from("categories")),
+          SelectResult.expression(Expression.property("name").from("locations")),
+          SelectResult.expression(Meta.id.from("locations")),
+          SelectResult.expression(Meta.id.from("hotels"))
+        )
+          .from(DataSource.database(db).as("hotels"))
+          .join(
+            Join.join(DataSource.database(db).as("locations")).on(
+              Meta.id
+                .from("locations")
+                .equalTo(Expression.property("location_id").from("hotels"))
+            ),
+            Join.join(DataSource.database(db).as("categories")).on(
+              Meta.id
+                .from("categories")
+                .equalTo(Expression.property("category_id").from("hotels"))
+            )
+          )
+          .where(
+            Expression.property("type")
+              .from("hotels")
+              .equalTo(Expression.string("hotel"))
+              .and(
+                Expression.property("type")
+                  .from("locations")
+                  .equalTo(Expression.string("location"))
+              )
+
+          );
+
+        ResultSet rs = query.execute();
+        List<Result> results = rs.allResults();
+        call.resolve();
     }
 }
