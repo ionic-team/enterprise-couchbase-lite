@@ -8,6 +8,7 @@ import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.internal.core.C4Database;
 import com.couchbase.lite.internal.core.C4Query;
+import com.getcapacitor.JSObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,13 +17,14 @@ import org.json.JSONObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JsonQueryBuilder {
-  public static Query buildQuery(Database db, String json) {
+  public static Query buildQuery(Database db, String json, JSObject columnNames) {
     Query query = null;
 
     try {
@@ -31,9 +33,17 @@ public class JsonQueryBuilder {
 
       C4Database c4database = getC4Database(db);
 
+      Map<String, Integer> columns = new HashMap<>();
+      JSONArray columnNamesArray = columnNames.names();
+      for (int i = 0; i < columnNamesArray.length(); i++ ){
+        String columnName = (String) columnNamesArray.get(i);
+        columns.put(columnName, columnNames.getInt(columnName));
+      }
+
       setC4Query(query, c4database.createQuery(json));
-      setColumnNames(query, generateColumnNames(db, json));
-    } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | LiteCoreException ex) {
+      setColumnNames(query, columns);
+      //setColumnNames(query, generateColumnNames(db, json));
+    } catch (NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | LiteCoreException | JSONException ex) {
       ex.printStackTrace();
     }
 
