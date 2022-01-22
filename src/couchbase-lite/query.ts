@@ -36,7 +36,7 @@ export type QueryChangeListener = (change: QueryChange) => void;
 export abstract class Query {
   private parameters: Parameters;
 
-  private columnNames: { [name:string]: any } = {};
+  private columnNames: { [name:string]: any } = null;
 
   // SELECT
   private _select: Select;
@@ -105,6 +105,8 @@ export abstract class Query {
   generateColumnNames() {
     const map: { [name:string]: number } = {};
     let provisionKeyIndex = 0;
+
+    console.log('Generating column names', this._select.getSelectResults());
 
     this._select.getSelectResults().forEach((r, i) => {
       let name = r.getColumnName();

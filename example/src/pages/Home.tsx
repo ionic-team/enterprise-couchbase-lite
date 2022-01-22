@@ -541,44 +541,61 @@ class CBLTester {
   }
 
   async joinTest() {
-    let locationDoc = new MutableDocument()
-      .setString('name', 'Madison')
-      .setString('type', 'location');
-    await this.database.save(locationDoc);
+        let locationDoc = new MutableDocument()
+          .setString('name', 'Madison')
+          .setString('type', 'location');
+        await this.database.save(locationDoc);
 
-    let hotelDoc = new MutableDocument()
-      .setString('name', 'Escape')
-      .setString('type', 'hotel')
-      .setString('hotel_locations_thing', 'what')
-      .setString('location_id', locationDoc.getId());
+        let categoryDoc = new MutableDocument()
+          .setString('name', 'Expensive')
+          .setString('type', 'expensive');
+        await this.database.save(categoryDoc);
 
-    await this.database.save(hotelDoc);
+        let hotelDoc = new MutableDocument()
+          .setString('name', 'Escape')
+          .setString('type', 'hotel')
+          .setString('hotel_locations_thing', 'what')
+          .setString('location_id', locationDoc.getId())
+          .setString('category_id', categoryDoc.getId());
+        await this.database.save(hotelDoc);
 
-    console.log('Building query 2 from');
-    let query = QueryBuilder.select(
-      SelectResult.all().from('hotel_locations'),
-      SelectResult.expression(Expression.property('name').from('hotel_locations')),
-      SelectResult.expression(Meta.id.from('hotel_locations')),
-    )
-      .from(DataSource.database(this.database).as('locations'))
-      .join(
-        Join.join(DataSource.database(this.database).as('hotel_locations')).on(
-          Meta.id
-            .from('locations')
-            .equalTo(Expression.property('location_id').from('hotel_locations'))
+        console.log('Building query 2 from');
+        let query = QueryBuilder.select(
+          // SelectResult.all().from('hotel_locations'),
+          SelectResult.expression(Meta.id.from('categories')).as('categories.id'),
+          SelectResult.expression(
+            Expression.property('name').from('locations'),
+          ),
+          SelectResult.expression(Meta.id.from('locations')).as('locations.id'),
+          SelectResult.expression(Meta.id.from('hotels')).as('hotels.id'),
         )
-      )
-      .where(
-        Expression.property('type')
-          .from('hotel_locations')
-          .equalTo(Expression.string('hotel'))
-          .and(
-            Expression.property('type')
-            .from('locations')
-            .equalTo(Expression.string('location'))
+          .from(DataSource.database(this.database).as('hotels'))
+          .join(
+            Join.join(DataSource.database(this.database).as('locations')).on(
+              Meta.id
+                .from('locations')
+                .equalTo(Expression.property('location_id').from('hotels')),
+            ),
+            Join.join(DataSource.database(this.database).as('categories')).on(
+              Meta.id
+                .from('categories')
+                .equalTo(Expression.property('category_id').from('hotels')),
+            ),
           )
-      );
+          .where(
+            Expression.property('type')
+              .from('hotels')
+              .equalTo(Expression.string('hotel'))
+              .and(
+                Expression.property('type')
+                  .from('locations')
+                  .equalTo(Expression.string('location')),
+              ),
+          );
 
+    console.log('Built join query');
+    console.log(query.toJson());
+    console.log(JSON.stringify(query.toJson(), null, 2));
     const ret = await query.execute();
     const results = await ret.allResults();
     this.out(`All results: ${JSON.stringify(results, null, 2)}`);
