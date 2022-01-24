@@ -824,31 +824,15 @@ public class IonicCouchbaseLitePlugin extends Plugin {
     private Map<String, Object> processResultMap(Map<String, Object> map) {
         Map<String, Object> newMap = new HashMap<>();
         String commonAlias = null;
-        Pattern commonPattern = Pattern.compile("(.*\\.)");
+        Pattern commonPattern = Pattern.compile("(.*)\\.$");
 
         for (String key : map.keySet()) {
             Matcher m = commonPattern.matcher(key);
-            while (m.find()) {
+            if (m.find()) {
                 String foundAlias = m.group(1);
-                if (commonAlias == null) {
-                    commonAlias = foundAlias;
-                } else if (!commonAlias.equals(foundAlias)) {
-                  commonAlias = null;
-                }
-            }
-        }
-
-
-        if (commonAlias == null) {
-            return map;
-        }
-
-        for (String key : map.keySet()) {
-            String column = key.replaceFirst(commonAlias, "");
-            if (column.equals("")) {
-                newMap.put(commonAlias.substring(0, commonAlias.length() - 1), map.get(key));
+                newMap.put(foundAlias, map.get(key));
             } else {
-                newMap.put(column, map.get(key));
+                newMap.put(key, map.get(key));
             }
         }
 
@@ -893,11 +877,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             }
 
             call.resolve(
-                new JSObject() {
-                    {
-                        put("results", new JSArray(resultsChunk));
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("results", new JSArray(resultsChunk));
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Unable to move result set next", ex);
@@ -926,11 +910,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             if (i % chunkSize == 0) {
                 if (resultsChunk != null) {
                     call.resolve(
-                        new JSObject() {
-                            {
-                                put("results", new JSArray());
-                            }
-                        }
+                      new JSObject() {
+                          {
+                              put("results", new JSArray());
+                          }
+                      }
                     );
                     resultsChunk.clear();
                 } else {
@@ -963,20 +947,20 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         if (resultsChunk != null && resultsChunk.size() > 0) {
             JSArray results = new JSArray(resultsChunk);
             call.resolve(
-                new JSObject() {
-                    {
-                        put("results", results);
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("results", results);
+                  }
+              }
             );
         }
 
         call.resolve(
-            new JSObject() {
-                {
-                    put("results", new JSArray());
-                }
-            }
+          new JSObject() {
+              {
+                  put("results", new JSArray());
+              }
+          }
         );
     }
 
@@ -1007,11 +991,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             int id = replicatorCount++;
             this.replicators.put(id, r);
             call.resolve(
-                new JSObject() {
-                    {
-                        put("replicatorId", id);
-                    }
-                }
+              new JSObject() {
+                  {
+                      put("replicatorId", id);
+                  }
+              }
             );
         } catch (Exception ex) {
             call.reject("Error creating replicator: " + ex.getMessage());
@@ -1160,13 +1144,13 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.setKeepAlive(true);
 
         ListenerToken token = r.addChangeListener(
-            new ReplicatorChangeListener() {
-                @Override
-                public void changed(ReplicatorChange change) {
-                    JSObject statusJson = generateStatusJson(change.getStatus());
-                    call.resolve(statusJson);
-                }
-            }
+          new ReplicatorChangeListener() {
+              @Override
+              public void changed(ReplicatorChange change) {
+                  JSObject statusJson = generateStatusJson(change.getStatus());
+                  call.resolve(statusJson);
+              }
+          }
         );
 
         replicatorListeners.put(replicatorId, token);
@@ -1184,13 +1168,13 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.setKeepAlive(true);
 
         ListenerToken token = r.addDocumentReplicationListener(
-            new DocumentReplicationListener() {
-                @Override
-                public void replication(@NonNull DocumentReplication replication) {
-                    JSObject replicationJson = generateDocumentReplicationJson(replication);
-                    call.resolve(replicationJson);
-                }
-            }
+          new DocumentReplicationListener() {
+              @Override
+              public void replication(@NonNull DocumentReplication replication) {
+                  JSObject replicationJson = generateDocumentReplicationJson(replication);
+                  call.resolve(replicationJson);
+              }
+          }
         );
 
         documentListeners.put(replicatorId, token);
