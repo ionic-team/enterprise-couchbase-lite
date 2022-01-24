@@ -44,7 +44,6 @@ export class SelectResultAs extends SelectResult {
 
   asJSON() {
     let prop = super.asJSON();
-    console.log('Select result as json', prop, this.alias);
     if (!this.alias) {
       return prop;
     }

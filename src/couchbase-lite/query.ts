@@ -91,22 +91,18 @@ export abstract class Query {
   }
 
   execute(): Promise<ResultSet> {
-    // console.log(this);
     const db = this._from && this._from.getSource() as Database;
     return db.getEngine().Query_Execute(db, this);
   }
 
   explain(): Promise<string> {
     const json = this._asJSON();
-    console.log('Explaining query', json);
     return Promise.reject(null);
   }
 
   generateColumnNames() {
     const map: { [name:string]: number } = {};
     let provisionKeyIndex = 0;
-
-    console.log('Generating column names', this._select.getSelectResults());
 
     this._select.getSelectResults().forEach((r, i) => {
       let name = r.getColumnName();
@@ -147,8 +143,6 @@ export abstract class Query {
 
   private _asJSON(): { [key:string]: any } {
     const json: { [key:string]: any } = {};
-
-    // console.log('Rendering to json', this._select, this._select.hasSelectResults());
 
     // DISTINCT:
     if (this._select != null && this._select.isDistinct()) {

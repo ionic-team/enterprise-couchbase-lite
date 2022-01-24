@@ -32,7 +32,6 @@ export class Document {
 
   getBlob(key: string): Blob {
     const data = this._get(key);
-    console.log('Got blob data', key, data, this.doc);
     if (data.content_type) {
       const b = new Blob(data.content_type, null);
       b.digest = data.digest;
