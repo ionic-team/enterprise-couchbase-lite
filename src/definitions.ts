@@ -86,6 +86,7 @@ export interface DocumentGetBlobContentArgs extends DatabaseArgs {
 
 export interface QueryExecuteArgs extends DatabaseArgs {
   query: any;
+  columnNames: { [name:string]: any };
 }
 
 export interface ResultSetNextArgs extends DatabaseArgs {
