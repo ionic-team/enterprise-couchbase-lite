@@ -148,9 +148,27 @@ With this code added, a list of all hotels are displayed on the page.
 
 ## Search Hotels
 
+Now that all hotels are displayed, we can build some interactive features such as a search function. Open `database.service.ts` then create a `searchHotels` function. First, build a N1QL query that searches the Couchbase Lite database for hotels that match the provided hotel name the user will enter into a search bar. Return the list of filtered hotels back to the UI layer:
 
-### Search bar
+```typescript
+public async searchHotels(name) {
 
+}
+```
 
+Over in `tab1.page.html`, add an `ion-searchbar` search bar component above the `ion-list`. The `ionChange` event fires each time the user enters new text into the search bar. 
+
+```html
+<ion-searchbar placeholder="Search Name..." (ionChange)="searchQueryChanged($event.target.value)">
+</ion-searchbar>
+```
+
+Within `searchQueryChanged`, pass along the hotel name string into the database service. Since `hotelsDisplayed` represents the array of filtered list of hotels to display to the end user, the UI will update automatically after each character is typed by the user.
+
+```typescript
+async searchQueryChanged(hotelName) {
+  this.hotelsDisplayed = await this.databaseService.searchHotels(hotelName);
+}
+```
 
 ## Bookmark Hotels
