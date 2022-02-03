@@ -51,6 +51,9 @@ public class JsonQueryBuilder {
           if (column.equals(".")) {
             String columnName = db.getName();
             columns.put(columnName, i);
+          } else if (column.equals("AS")) {
+            String columnName = item.getString(2);
+            columns.put(columnName, i);
           } else {
             String columnName = column.substring(1);
             columns.put(columnName, i);

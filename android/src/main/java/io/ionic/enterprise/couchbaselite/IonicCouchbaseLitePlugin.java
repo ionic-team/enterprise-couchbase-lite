@@ -75,6 +75,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.ionic.enterprise.couchbaselite.JsonQueryBuilder;
 
@@ -798,7 +800,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
                 return;
             }
 
-            Map<String, Object> data = result.toMap();
+            Map<String, Object> data = processResultMap(result.toMap());
             if (data.containsKey("_id")) {
                 data.put("id", data.get("_id"));
                 data.remove("_id");
@@ -815,12 +817,30 @@ public class IonicCouchbaseLitePlugin extends Plugin {
                 data.put("expiration", data.get("_expiration"));
                 data.remove("_expiration");
             }
-
-            JSObject ret = JSObject.fromJSONObject(new JSONObject(result.toMap()));
+            
+            JSObject ret = JSObject.fromJSONObject(new JSONObject(data));
             call.resolve(ret);
         } catch (Exception ex) {
             call.reject("Unable to move result set next", ex);
         }
+    }
+
+    private Map<String, Object> processResultMap(Map<String, Object> map) {
+        Map<String, Object> newMap = new HashMap<>();
+        String commonAlias = null;
+        Pattern commonPattern = Pattern.compile("(.*)\\.$");
+
+        for (String key : map.keySet()) {
+            Matcher m = commonPattern.matcher(key);
+            if (m.find()) {
+                String foundAlias = m.group(1);
+                newMap.put(foundAlias, map.get(key));
+            } else {
+                newMap.put(key, map.get(key));
+            }
+        }
+
+        return newMap;
     }
 
     @PluginMethod
@@ -840,7 +860,24 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             Result result;
             int i = 0;
             while (i++ < chunkSize && ((result = r.next()) != null)) {
-                resultsChunk.add(result.toMap());
+                Map<String, Object> data = processResultMap(result.toMap());
+                if (data.containsKey("_id")) {
+                    data.put("id", data.get("_id"));
+                    data.remove("_id");
+                }
+                if (data.containsKey("_sequence")) {
+                    data.put("sequence", data.get("_sequence"));
+                    data.remove("_sequence");
+                }
+                if (data.containsKey("_deleted")) {
+                    data.put("deleted", data.get("_deleted"));
+                    data.remove("_deleted");
+                }
+                if (data.containsKey("_expiration")) {
+                    data.put("expiration", data.get("_expiration"));
+                    data.remove("_expiration");
+                }
+                resultsChunk.add(data);
             }
 
             call.resolve(new JSObject() {{
