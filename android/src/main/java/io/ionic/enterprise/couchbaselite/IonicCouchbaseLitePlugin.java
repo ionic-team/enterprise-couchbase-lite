@@ -1193,6 +1193,7 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         String authenticatorType = authenticatorData.getString("type");
         String replicatorType = json.getString("replicatorType");
         boolean continuous = json.getBoolean("continuous");
+        Integer heartbeat = json.getInt("heartbeat");
 
         JSONObject target = json.getJSONObject("target");
         if (target == null) {
@@ -1219,6 +1220,10 @@ public class IonicCouchbaseLitePlugin extends Plugin {
             config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH);
         } else if (replicatorType.equals("PULL")) {
             config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PULL);
+        }
+
+        if (heartbeat != null) {
+          config.setHeartbeat(heartbeat);
         }
 
         config.setContinuous(continuous);

@@ -58,7 +58,7 @@ class CBLTester {
     console.log('IONIC CBL ON READY');
     const config = new DatabaseConfiguration();
     config.setEncryptionKey('secret');
-    const database = new Database('thedb9', config);
+    const database = new Database('thedb10', config);
     /*
     database.setEngine(
       new CapacitorEngine({

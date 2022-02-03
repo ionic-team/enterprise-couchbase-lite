@@ -41,4 +41,5 @@ CAP_PLUGIN(IonicCouchbaseLite, "IonicCouchbaseLite",
            CAP_PLUGIN_METHOD(Replicator_AddDocumentListener, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(Replicator_Cleanup, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(Replicator_Restart, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(Test_Query, CAPPluginReturnPromise);
 )

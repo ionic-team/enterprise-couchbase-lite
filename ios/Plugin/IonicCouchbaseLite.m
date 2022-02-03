@@ -864,6 +864,7 @@
   NSDictionary *target = [data objectForKey:@"target"];
   NSString *url = [target objectForKey:@"url"];
   NSString *replicatorType = [data objectForKey:@"replicatorType"];
+  NSNumber *heartbeat = [data objectForKey:@"heartbeat"];
   BOOL continuous = [data objectForKey:@"continuous"];
   
   CBLURLEndpoint *endpoint = [[CBLURLEndpoint alloc] initWithURL:[NSURL URLWithString:url]];
@@ -881,6 +882,10 @@
   NSArray *channels = [data objectForKey:@"channels"];
   if (channels != NULL) {
     [replConfig setChannels:channels];
+  }
+    
+  if (heartbeat != NULL) {
+    [replConfig setHeartbeat:[heartbeat intValue]];
   }
     
   [replConfig setContinuous:continuous];
@@ -1115,6 +1120,19 @@
     }
     [call resolve];
   });
+}
+
+-(void)Test_Query:(CAPPluginCall*)call {
+    CBLDatabase *database = [self getDatabase:@"thedb9"];
+    CBLQuery *query = [CBLQueryBuilder select:@[[CBLQuerySelectResult all]]
+                                         from:[CBLQueryDataSource database:database]
+                                        where:[[CBLQueryExpression property:@"type"] equalTo:[CBLQueryExpression string:@"hotel"]]
+                                      groupBy:nil having:nil orderBy:nil
+                                        limit:[CBLQueryLimit limit:[CBLQueryExpression integer:10]]];
+    NSError *error;
+    CBLQueryResultSet* rs = [query execute:&error];
+    CBLQueryResult *result = [rs nextObject];
+    NSLog(@"Did query");
 }
 
 @end
