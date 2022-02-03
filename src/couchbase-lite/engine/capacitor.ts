@@ -242,9 +242,11 @@ export class CapacitorEngine {
 
   async Query_Execute(database: Database, query: Query): Promise<ResultSet> {
     //this\.log('Query_Execute', JSON.stringify(query.toJson()));
+    query.check();
     const ret = await IonicCouchbaseLite.Query_Execute({
       name: database.getName(),
       query: query.toJson(),
+      columnNames: query.getColumnNames()
     });
     return new ResultSet(query, ret.id, query.getColumnNames());
   }

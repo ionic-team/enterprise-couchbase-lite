@@ -78,8 +78,12 @@ class CBLTester {
 
   outputChanged(value: string) {}
   out(value: string) {
-    this.output = value;
-    this.outputChanged(value);
+    if (typeof value === 'object') {
+      this.output = JSON.stringify(value, null, 2);
+    } else {
+      this.output = value;
+    }
+    this.outputChanged(this.output);
   }
 
   async init() {
@@ -521,8 +525,134 @@ class CBLTester {
   async query1n1ql() {
     console.log('Building query 1 n1ql');
     let query = this.database.createQuery(
-      'select META().id as thisId from _ where type = \"hotel\"'
+      'select META().id as thisId from _ where type = "hotel"',
     );
+
+    const ret = await query.execute();
+    this._query1Results = ret;
+    console.log('Executed query', ret);
+
+    this.out(`Executed query`);
+  }
+
+  async query1n1qljoin() {
+    console.log('Building query 1 n1ql with join');
+    let query = this.database.createQuery(
+      'select META().id as thisId from _ where type = "hotel"',
+    );
+
+    const ret = await query.execute();
+    this._query1Results = ret;
+    console.log('Executed query', ret);
+
+    this.out(`Executed query`);
+  }
+
+  async query1From() {
+    console.log('Building query 1');
+    let query = QueryBuilder.select(
+      SelectResult.all().from('fun'),
+      SelectResult.expression(Expression.property('name').from('fun')),
+      SelectResult.expression(Meta.id.from('fun')),
+    )
+      .from(DataSource.database(this.database).as('fun'))
+      .where(
+        Expression.property('type')
+          .from('fun')
+          .equalTo(Expression.string('hotel')),
+      )
+      .orderBy(Ordering.expression(Meta.id.from('fun')));
+
+    const ret = await query.execute();
+    this._query1Results = ret;
+    console.log('Executed query', ret);
+
+    this.out(`Executed query`);
+  }
+
+  async joinTest() {
+    let locationDoc = new MutableDocument()
+      .setString('name', 'Madison')
+      .setString('type', 'location');
+    await this.database.save(locationDoc);
+
+    console.log('Location doc saved', locationDoc);
+
+    let categoryDoc = new MutableDocument()
+      .setString('name', 'Expensive')
+      .setString('type', 'expensive');
+    await this.database.save(categoryDoc);
+
+    console.log('Category doc saved', categoryDoc);
+
+    let hotelDoc = new MutableDocument()
+      .setString('name', 'Escape')
+      .setString('type', 'hotel')
+      .setString('hotel_locations_thing', 'what')
+      .setString('location_id', locationDoc.getId())
+      .setString('category_id', categoryDoc.getId());
+    await this.database.save(hotelDoc);
+
+    console.log('Hotel doc saved', hotelDoc);
+
+    console.log('Building query 2 from');
+    let query = QueryBuilder.select(
+      // SelectResult.all().from('hotel_locations'),
+      SelectResult.expression(Meta.id.from('categories')).as('categories.id'),
+      SelectResult.expression(Expression.property('name').from('locations')).as(
+        'name',
+      ),
+      SelectResult.expression(Meta.id.from('locations')).as('locations.id'),
+      SelectResult.expression(Meta.id.from('hotels')).as('hotels.id'),
+    )
+      .from(DataSource.database(this.database).as('hotels'))
+      .join(
+        Join.join(DataSource.database(this.database).as('locations')).on(
+          Meta.id
+            .from('locations')
+            .equalTo(Expression.property('location_id').from('hotels')),
+        ),
+        Join.join(DataSource.database(this.database).as('categories')).on(
+          Meta.id
+            .from('categories')
+            .equalTo(Expression.property('category_id').from('hotels')),
+        ),
+      )
+      .where(
+        Expression.property('type')
+          .from('hotels')
+          .equalTo(Expression.string('hotel'))
+          .and(
+            Expression.property('type')
+              .from('locations')
+              .equalTo(Expression.string('location')),
+          ),
+      );
+
+    console.log('Built join query');
+    console.log(query.toJson());
+    console.log(JSON.stringify(query.toJson(), null, 2));
+    const ret = await query.execute();
+    const results = await ret.allResults();
+    this.out(`All results: ${JSON.stringify(results, null, 2)}`);
+  }
+
+  async joinTest2() {
+    console.log('Building query 1');
+    let query = QueryBuilder.select(
+      SelectResult.all().from('fun'),
+      SelectResult.expression(Expression.property('name').from('fun')).as(
+        'name',
+      ),
+      SelectResult.expression(Meta.id.from('fun')).as('fun.id'),
+    )
+      .from(DataSource.database(this.database).as('fun'))
+      .where(
+        Expression.property('type')
+          .from('fun')
+          .equalTo(Expression.string('hotel')),
+      )
+      .orderBy(Ordering.expression(Meta.id.from('fun')));
 
     const ret = await query.execute();
     this._query1Results = ret;
@@ -552,7 +682,7 @@ class CBLTester {
     }
     const ret = await this._query1Results.next();
     console.log('Moved next', ret);
-    this.out(`Next result: ${JSON.stringify(ret)}`);
+    this.out(ret as any);
   }
 
   async nextBatch() {
@@ -1016,7 +1146,7 @@ const Home: React.FC = () => {
             <IonTitle size="large">Blank</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <div id="output" dangerouslySetInnerHTML={{ __html: output }} />
+        <pre id="output" dangerouslySetInnerHTML={{ __html: output }} />
         <IonButton onClick={() => testerRef.current.toggleLogLevel()}>
           Toggle Log Level
         </IonButton>
@@ -1086,6 +1216,9 @@ const Home: React.FC = () => {
         <IonButton onClick={() => testerRef.current.query1()}>
           Query 1
         </IonButton>
+        <IonButton onClick={() => testerRef.current.query1From()}>
+          Query 1 From
+        </IonButton>
         <IonButton onClick={() => testerRef.current.query1n1ql()}>
           Query 1 N1QL
         </IonButton>
@@ -1102,6 +1235,12 @@ const Home: React.FC = () => {
           All Results 1
         </IonButton>
         <hr />
+        <IonButton onClick={() => testerRef.current.joinTest()}>
+          Join From Test
+        </IonButton>
+        <IonButton onClick={() => testerRef.current.joinTest2()}>
+          Join From Test 2
+        </IonButton>
         <IonButton onClick={() => testerRef.current.queryDeleted()}>
           Query Deleted
         </IonButton>

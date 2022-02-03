@@ -715,9 +715,10 @@ Replicator_Cleanup(args: ReplicatorArgs) => any
 
 #### QueryExecuteArgs
 
-| Prop        | Type             |
-| ----------- | ---------------- |
-| **`query`** | <code>any</code> |
+| Prop              | Type                                  |
+| ----------------- | ------------------------------------- |
+| **`query`**       | <code>any</code>                      |
+| **`columnNames`** | <code>{ [name: string]: any; }</code> |
 
 
 #### QueryExecuteN1qlArgs

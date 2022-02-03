@@ -41,6 +41,16 @@ export class SelectResultAs extends SelectResult {
     this.alias = alias;
     return this;
   }
+
+  asJSON() {
+    let prop = super.asJSON();
+
+    if (!this.alias) {
+      return prop;
+    }
+
+    return ['AS', prop, this.alias];
+  }
 }
 export class SelectResultFrom extends SelectResult {
   constructor(expression: Expression = null) {

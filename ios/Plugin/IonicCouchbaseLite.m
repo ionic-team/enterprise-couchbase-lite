@@ -87,9 +87,13 @@
 }
 
 -(NSDictionary *)resultToMap:(CBLQueryResult *)d dbName:(NSString *)dbName {
-  
-  NSDictionary *documentAsMap = [d toDictionary];
-  return [self resultDictionaryToMap:documentAsMap dbName:dbName];
+  NSMutableDictionary *dm = [[d toDictionary] mutableCopy];
+
+  if ([dm objectForKey:@"_id"]) {
+    [dm setObject:[dm objectForKey:@"_id"] forKey:@"id"];
+    [dm removeObjectForKey:@"_id"];
+  }
+  return [self resultDictionaryToMap:dm dbName:dbName];
 }
 
 -(NSDictionary *)resultDictionaryToMap:(NSDictionary *)d dbName:(NSString *)dbName {

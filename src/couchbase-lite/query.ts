@@ -36,7 +36,7 @@ export type QueryChangeListener = (change: QueryChange) => void;
 export abstract class Query {
   private parameters: Parameters;
 
-  private columnNames: { [name:string]: any } = {};
+  private columnNames: { [name: string]: any } = null;
 
   // SELECT
   private _select: Select;
