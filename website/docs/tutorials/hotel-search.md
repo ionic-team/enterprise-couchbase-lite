@@ -5,6 +5,8 @@ sidebar_label: Hotel Search
 
 Learn how to build an Angular app with Capacitor that allows users to search and bookmark hotels using data loaded from a Couchbase Lite database. The complete reference app is [available here](https://github.com/ionic-team/demo-couchbaselite-hotels).
 
+> Not an Angular developer? Couchbase Lite concepts and syntax are applicable to all web frameworks.
+
 By completing this tutorial, you'll create an app that:
 * Loads and stores data, including bookmarked hotels, in a Couchbase Lite database.
 * Uses UI components from Ionic: search bar, bookmarks, icons, list items, and more.
@@ -94,8 +96,6 @@ Next, create an initialization function that will run every time the app loads, 
 // src/app/services/database.service.ts
 private async initializeDatabase() {
   await this.seedInitialData();
-
-  this.bookmarkDocument = await this.findOrCreateBookmarkDocument();
 }
 ```
 
@@ -116,7 +116,7 @@ private async seedInitialData() {
 Finish up the `seedInitialData` function by inserting hotel data into the database if this is the first time the app has been loaded. Create a new `MutableDocument` for each hotel record, then insert it into the database.
 
 ```typescript
-// src/app/services/database.service.ts
+// src/app/services/database.service.ts, seedInitialData()
   const len = (await this.getAllHotels()).length;
   if (len === 0) {
     const hotelFile = await import("../data/hotels");
@@ -292,51 +292,58 @@ First, add a call to `findOrCreateBookmarkDocument()` in the initialize method:
 ```typescript
 // src/app/services/database.service.ts
 private async initializeDatabase() {
-  // snip - other code
+  await this.seedInitialData();
 
   // Create the "bookmarked_hotels" document if it doesn't exist
   this.bookmarkDocument = await this.findOrCreateBookmarkDocument();
-
-  // snip - other code
 }
 ```
 
-The bookmarked hotels will be stored in a Couchbase Lite document as an array of hotel ids. Next, implement the method which will retrieve the bookmark document or create it if it doesn't exist.
+The bookmarked hotels will be stored in a Couchbase Lite document as an array of hotel ids. Next, implement the method which will retrieve the bookmark document or create it if it doesn't exist. 
 
 ```typescript
 // src/app/services/database.service.ts
 private async findOrCreateBookmarkDocument(): Promise<MutableDocument> {
-  const query = QueryBuilder.select(SelectResult.expression(Meta.id))
-    .from(DataSource.database(this.database))
-    .where(Expression.property("type").equalTo(Expression.string(this.DOC_TYPE_BOOKMARKED_HOTELS)));
+  // Meta().id is a GUID like e15d1aa2-9be3-4e02-92d8-82bd9d05d8e3
+  const bookmarkQuery = this.database.createQuery(
+    `SELECT META().id AS id FROM _ WHERE type = '${this.DOC_TYPE_BOOKMARKED_HOTELS}'`);
+  const resultSet = await bookmarkQuery.execute();
+  const resultList = await resultSet.allResults();
 
-    const resultSet = await query.execute();
-    const resultList = await resultSet.allResults();
-
-    if (resultList.length === 0) {
-      const mutableDocument = new MutableDocument()
-              .setString("type", this.DOC_TYPE_BOOKMARKED_HOTELS)
-              .setArray("hotels", new Array());
-      this.database.save(mutableDocument);
-      return mutableDocument;
-    } else {
-      const result = resultList[0];
-      const docId = result.getString("id");
-      return MutableDocument.fromDocument(await this.database.getDocument(docId));
+  let mutableDocument: MutableDocument;
+  if (resultList.length === 0) {
+    mutableDocument = new MutableDocument()
+            .setString("type", this.DOC_TYPE_BOOKMARKED_HOTELS)
+            .setArray("hotels", new Array());
+    this.database.save(mutableDocument);
+  } else {
+    const docId = resultList[0]["id"]; 
+    const doc = await this.database.getDocument(docId);
+    mutableDocument = MutableDocument.fromDocument(doc);
   }
+
+  return mutableDocument;
 }
 ```
 
-Next, update the `retrieveHotelList()` method to toggle the `bookmarked` hotel property if the hotel's id is found in the bookmarked hotels document. The `bookmarked` boolean property determines whether to display the hotel as bookmarked for later review in the UI.
+Next, update the `retrieveHotelList()` method to toggle the `bookmarked` hotel property if the hotel's id is found in the bookmarked hotels document. The `bookmarked` boolean property determines whether to display the hotel as bookmarked in the UI. Here's the complete function:
 
 ```typescript
 // src/app/services/database.service.ts
 private async retrieveHotelList(): Promise<Hotel[]> {
-  let bookmarks = this.bookmarkDocument.getArray("hotels");
+  // Get all hotels
+  const hotelResults = this.getAllHotels();
+
+  // Get all bookmarked hotels
+  let bookmarks = this.bookmarkDocument.getArray("hotels") as number[];
+  
   let hotelList: Hotel[] = [];
   for (let key in hotelResults) {
+    // Couchbase can query multiple databases at once, so "_" is just this single database.
+    // [ { "_": { id: "1", name: "Matt" } }, { "_": { id: "2", name: "Max" } }]
+    let singleHotel = hotelResults[key]["_"] as Hotel;
+
     // Set bookmark status
-    let singleHotel = hotelResults[key]["*"] as Hotel;
     singleHotel.bookmarked = bookmarks.includes(singleHotel.id);
 
     hotelList.push(singleHotel);
@@ -346,7 +353,7 @@ private async retrieveHotelList(): Promise<Hotel[]> {
 }
 ```
 
-Finally, update the UI to display each hotel's bookmark status. Show a transparent bookmark icon from Ionicons next to each hotel listing. If the hotel has been bookmarked, then show a filled in icon with the color red.
+Finally, update the UI to display each hotel's bookmark status. Show a transparent bookmark icon from Ionicons next to each hotel listing. If the hotel has been bookmarked, then show a red filled-in icon.
 
 ```html
 <!-- src/app/tab1/tab1.page.html -->
@@ -374,7 +381,12 @@ When the user taps on the bookmark icon next to a hotel entry, we need to update
 async toggleBookmark(hotel) {
   hotel.bookmarked = !hotel.bookmarked;
 
-  await this.databaseService.bookmarkHotel(hotel.id);
+  if (hotel.bookmarked) {
+    await this.databaseService.bookmarkHotel(hotel.id);
+  }
+  else {
+    await this.databaseService.unbookmarkHotel(hotel.id);
+  }
 }
 ```
 
@@ -382,9 +394,24 @@ Next, implement a function to apply the bookmark change to the Couchbase Lite da
 
 ```typescript
 // src/app/services/database.service.ts
-public async bookmarkHotel(hotelId: string) {
-  let hotelArray = this.bookmarkDocument.getArray("hotels");
-  hotelArray.addString(hotelId);
+public async bookmarkHotel(hotelId: number) {
+  let hotelArray = this.bookmarkDocument.getArray("hotels") as number[];
+  hotelArray.push(hotelId); 
+  this.bookmarkDocument.setArray("hotels", hotelArray);
+
+  this.database.save(this.bookmarkDocument);
+}
+```
+
+### Remove Bookmark
+
+If the user can bookmark a hotel, they should also be able to remove the bookmark. A similar implementation as bookmarking hotels, but instead of adding the hotel id, remove it from the bookmark array.
+
+```typescript
+// src/app/services/database.service.ts
+public async unbookmarkHotel(hotelId: number) {
+  let hotelArray = this.bookmarkDocument.getValue("hotels") as number[];
+  hotelArray = hotelArray.filter(id => id !== hotelId);
   this.bookmarkDocument.setArray("hotels", hotelArray);
 
   this.database.save(this.bookmarkDocument);
@@ -402,7 +429,7 @@ export class Tab1Page {
   // snip - other variables
 ```
 
-Next, implement a function that toggles between bookmark states. Invert the bookmark filter property and check if it's `true`. If true, filter the hotel list for only those that have the `bookmarked` property set to true. Update the UI based on the refreshed hotel list.
+Next, implement a function that toggles between bookmark states. Invert the bookmark filter property and check if it's `true`. If true, filter the hotel list for only those that have the `bookmarked` property set to true. Refresh the UI to reflect the updated hotel list.
 
 ```typescript
 // src/app/tab1/tab1.page.ts
@@ -441,4 +468,4 @@ Finally, update the UI so that when a bookmark filter icon is tapped, the `toggl
 
 ## Wrap Up
 
-That's it! You've built an Angular app that allows users to search and bookmark hotels using data loaded from a Couchbase Lite database. Happy app building.
+That's it! You've built an Angular app that allows users to search and bookmark hotels using data loaded from a Couchbase Lite database. Happy app building!
