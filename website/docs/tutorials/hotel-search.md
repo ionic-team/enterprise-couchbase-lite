@@ -10,10 +10,6 @@ By completing this tutorial, you'll create an app that:
 * Uses UI components from Ionic: search bar, bookmarks, icons, list items, and more.
 * Runs on iOS, Android, and native Windows apps all from the same codebase.
 
-Here's a sneak peek at what we're building:
-
-TODO
-
 ## Setup
 
 Begin by installing the Ionic CLI then creating an Ionic app:
@@ -65,17 +61,10 @@ Within `database.service.ts`, import the Couchbase Lite integration and the new 
 ```typescript
 // src/app/services/database.service.ts
 import { Injectable } from '@angular/core';
-import { Directory, Filesystem } from '@capacitor/filesystem';
 import {
   Database,
   DatabaseConfiguration,
-  DataSource,
-  Meta,
-  MutableDocument,
-  Ordering,
-  QueryBuilder,
-  SelectResult,
-  Expression
+  MutableDocument
 } from '@ionic-enterprise/couchbase-lite';
 import { Hotel } from '../models/hotel';
 
@@ -85,16 +74,114 @@ import { Hotel } from '../models/hotel';
 export class DatabaseService { }
 ```
 
+Next, add some private variables to the beginning of the `DatabaseService` class. `database` will hold an open connection to the Couchbase Lite database so we can perform operations on it, `bookmarkDocument` will be used for allowing users to bookmark hotels, and the two `DOC_TYPE` constants will be used repeatably in database querying. 
+
+```typescript
+// src/app/services/database.service.ts
+export class DatabaseService {
+  private database: Database;
+  private DOC_TYPE_HOTEL = "hotel";
+  private DOC_TYPE_BOOKMARKED_HOTELS = "bookmarked_hotels";
+  private bookmarkDocument: MutableDocument;
+}
+```
+
 ### Initialize the Database
 
+Next, create an initialization function that will run every time the app loads, configuring the Couchbase Lite database.
 
-## Retrieve Hotel Data
+```typescript
+// src/app/services/database.service.ts
+private async initializeDatabase() {
+  await this.seedInitialData();
 
-todo: load hotel data from cb db
+  this.bookmarkDocument = await this.findOrCreateBookmarkDocument();
+}
+```
+
+Next, create a function to seed the Couchbase database with hotel data. First, create then open the Couchbase Lite database. You can set an encryption key to encrypt the database with if you'd like, too. Give the database a name like "travel."
+
+```typescript
+// src/app/services/database.service.ts
+private async seedInitialData() { 
+  /* Note about encryption: In a real-world app, the encryption key should not be hardcoded like it is here. 
+      One strategy is to auto generate a unique encryption key per user on initial app load, then store it securely in the device's keychain for later retrieval.
+      Ionic's Identity Vault (https://ionic.io/docs/identity-vault) plugin is an option. Using IV’s storage API, you can ensure that the key cannot be read or accessed without the user being authenticated first. */
+  let dc = new DatabaseConfiguration();
+  dc.setEncryptionKey('8e31f8f6-60bd-482a-9c70-69855dd02c39');
+  this.database = new Database("travel", dc);
+  await this.database.open();
+```
+
+Finish up the `seedInitialData` function by inserting hotel data into the database if this is the first time the app has been loaded. Create a new `MutableDocument` for each hotel record, then insert it into the database.
+
+```typescript
+// src/app/services/database.service.ts
+  const len = (await this.getAllHotels()).length;
+  if (len === 0) {
+    const hotelFile = await import("../data/hotels");
+
+    for (let hotel of hotelFile.hotelData) {
+      let doc = new MutableDocument()
+        .setNumber('id', hotel.id)
+        .setString('name', hotel.name)
+        .setString('address', hotel.address)
+        .setString('phone', hotel.phone)
+        .setString('type', this.DOC_TYPE_HOTEL);
+      
+      this.database.save(doc);
+    }
+  }
+}
+```
+
+Next, implement the `getAllHotels` helper function that returns all hotels from the database. The steps are the same for retrieving data from a Couchbase Lite database: create a query, execute it, then parse the results. `SELECT *` means select all records, `FROM _` means from the current database (Couchbase can query multiple databases at once, but since there is only one, `_` refers to the main one), `WHERE type = '${this.DOC_TYPE_HOTEL}'` means where the type property is equal to 'hotel' (database documents are either of type 'hotel' or 'bookmarked_hotels' in our dataset), and `ORDER BY name` means to return the results in ascending order using the hotel name property.
+
+```typescript
+// src/app/services/database.service.ts
+private async getAllHotels() {
+  const query = this.database.createQuery(`SELECT * FROM _ WHERE type = '${this.DOC_TYPE_HOTEL}' ORDER BY name`);
+  const result = await query.execute();
+  return await result.allResults();
+}
+```
 
 ### Display Hotel Data
 
-We'll create the hotel search experience on the tab1 page. Open `tab1.page.ts` then import the `DatabaseService`. Retrieve the hotel data when the page first loads.
+With database setup in place, we can retrieve and display hotel data next. Create a public function that the UI will call, `getHotels`, that calls the above work we just created to initialize the Couchbase Lite database and return the list of all hotels.
+
+```typescript
+// src/app/services/database.service.ts
+public async getHotels(): Promise<Hotel[]> {
+  await this.initializeDatabase();
+
+  return await this.retrieveHotelList();
+}
+```
+
+Next, create a function that queries the database for all hotel records and transforms them into an array of `Hotel` objects. Since Couchbase can query multiple databases at once, the array format is a bit unique. Access each hotel record by using `hotelResults[key]["_"]`.
+
+
+```typescript
+// src/app/services/database.service.ts
+private async retrieveHotelList(): Promise<Hotel[]> {
+  // Get all hotels
+  const hotelResults = this.getAllHotels();
+  
+  let hotelList: Hotel[] = [];
+  for (let key in hotelResults) {
+    // Couchbase can query multiple databases at once, so "_" is just this single database.
+    // [ { "_": { id: "1", firstName: "Matt" } }, { "_": { id: "2", firstName: "Max" } }]
+    let singleHotel = hotelResults[key]["_"] as Hotel;
+
+    hotelList.push(singleHotel);
+  }
+
+  return hotelList;
+}
+```
+
+We now have enough of the `DatabaseService` functionality built to be able to display hotels to the user. Open `tab1.page.ts` then import the `DatabaseService`. Retrieve the hotel data when the page first loads.
 
 ```typescript
 // src/app/tab1/tab1.page.ts
@@ -148,15 +235,29 @@ To display the hotels on the `tab1.page.html` page, use the `ion-list` component
 </ion-content>
 ```
 
-With this code added, a list of all hotels are displayed on the page.
+A list of all hotels are now displayed on the page.
 
 ## Search Hotels
 
-Now that all hotels are displayed, we can build some interactive features such as a search function. Open `database.service.ts` then create a `searchHotels` function. First, build a N1QL query that searches the Couchbase Lite database for hotels that match the provided hotel name the user will enter into a search bar. Return the list of filtered hotels back to the UI layer:
+Now that all hotels are displayed, we can build some interactive features such as search functionality. Open `database.service.ts` then create a `searchHotels` function. First, build a N1QL query that searches the Couchbase Lite database for hotels that match the provided hotel name the user types into a search bar. The query is similar to the one that retrieves all hotel data, except for the `LIKE` comparison operator which performs string wildcard pattern matching comparisons. In this case, we're searching broadly - any hotel name that includes any of the characters the user enters. `%` here will match zero or more characters.
+
+Finally, return the list of filtered hotels back to the UI layer.
 
 ```typescript
-public async searchHotels(name) {
- // todo
+// src/app/services/database.service.ts
+public async searchHotels(name): Promise<Hotel[]> {
+  const query = this.database.createQuery(
+      `SELECT * FROM _ WHERE name LIKE '%${name}%' AND type = '${this.DOC_TYPE_HOTEL}' ORDER BY name`);
+  const results = await (await query.execute()).allResults();
+
+  let filteredHotels: Hotel[] = [];
+  for (var key in results) {
+    let singleHotel = results[key]["_"] as Hotel;
+
+    filteredHotels.push(singleHotel);
+  }
+
+  return filteredHotels;
 }
 ```
 
@@ -177,6 +278,8 @@ async searchQueryChanged(hotelName) {
   this.hotelsDisplayed = await this.databaseService.searchHotels(hotelName);
 }
 ```
+
+With this code in place, the user can successfully filter through hotels.
 
 ## Bookmark Hotels
 
