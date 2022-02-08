@@ -3,7 +3,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['overview', 'installation'],
+      items: ['overview', 'installation', 'usage'],
     },
     {
       type: 'category',
@@ -11,5 +11,21 @@ module.exports = {
       collapsed: false,
       items: ['tutorials/hotel-search'],
     },
+    {
+      type: 'category',
+      label: 'Reference',
+      collapsed: false,
+      items: [
+        {
+          type: 'link',
+          label: 'Couchbase Lite v3.0 Docs',
+          href: 'https://docs.couchbase.com/couchbase-lite/3.0/index.html',
+        },
+        {
+          type:"link",
+          label:"N1QL Query Strings",
+          href: 'https://docs.couchbase.com/couchbase-lite/3.0/c/query-n1ql-mobile.html#introduction'
+        }],
+    }
   ]
 };
