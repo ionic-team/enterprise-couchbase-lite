@@ -3,6 +3,7 @@
   position: fixed;
   opacity: 0.9;
 
+  border-radius: 24px 24px 0 0;
   bottom: -22px;
   left: 0px;
   width: 100%;

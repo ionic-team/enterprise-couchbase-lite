@@ -42,9 +42,11 @@ import {
   ValueIndexItem,
 } from '@ionic-enterprise/couchbase-lite';
 
-const assert = (v, msg = '') => {
+const assert = (v, msg = '', expecting = null, received = null) => {
   if (!v) {
-    throw new Error(`Test failed${msg ? ` ${msg}` : ''}`);
+    throw new Error(`${msg ? msg : `Test failed`}${expecting ? `\nExpecting: \n${
+      typeof expecting === 'object' ? JSON.stringify(expecting, null, 2) : expecting}`: null}${received ?
+        `\nReceived:\n${typeof received === 'object' ? JSON.stringify(received, null, 2) : received}` : null}`);
   }
 }
 
@@ -115,6 +117,7 @@ class CBLTester {
     this.out(`Exists? ${doesExist}`);
   }
 
+  /*
   async queryTest() {
     if (!this.database) {
       return;
@@ -290,27 +293,24 @@ class CBLTester {
       .limit(Expression.intValue(10));
 
     try {
-      /*
-      await window.IonicCouchbaseLite.exec('Query_Test', [
-        this.database.getName(),
-        query1.toJson(),
-        query2.toJson(),
-        query3.toJson(),
-        query4.toJson(),
-        query5.toJson(),
-        query6.toJson(),
-        query7.toJson(),
-        query8.toJson(),
-        query9.toJson(),
-        query10.toJson(),
-        query11.toJson(),
-        query12.toJson(),
+        // query1.toJson(),
+        // query2.toJson(),
+        // query3.toJson(),
+        // query4.toJson(),
+        // query5.toJson(),
+        // query6.toJson(),
+        // query7.toJson(),
+        // query8.toJson(),
+        // query9.toJson(),
+        // query10.toJson(),
+        // query11.toJson(),
+        // query12.toJson(),
       ]);
-      */
     } catch (e) {
       this.out('Fail: ' + e);
     }
   }
+  */
 
   async close() {
     this.database && this.database.close();
@@ -527,7 +527,8 @@ class CBLTester {
       SelectResult.expression(Meta.id),
     )
       .from(DataSource.database(this.database))
-      .where(Expression.property('type').equalTo(Expression.string('hotel')))
+      .where(Expression.property('type').equalTo(Expression.string('hotel')).and(
+        Expression.property('name').equalTo(Expression.string('Escape'))))
       .orderBy(Ordering.expression(Meta.id));
 
     const ret = await query.execute();
@@ -698,6 +699,7 @@ class CBLTester {
     const ret = await this._query1Results.next();
     console.log('Moved next', ret);
     this.out(ret as any);
+    return ret;
   }
 
   async nextBatch() {
@@ -1135,6 +1137,8 @@ class CBLTester {
     try {
       await this.init();
 
+      await this.wait(500);
+
       await this.delete();
 
       await this.init();
@@ -1173,7 +1177,19 @@ class CBLTester {
 
       console.log(doc.toDictionary());
 
-      await this.createIndex();
+      await this.query1();
+
+      const ret = await this.next1();
+
+      console.log('Got ret', ret);
+
+      assert(isMatch(ret, {
+        name: 'Escape',
+        type: 'hotel',
+      }), 'Query doc matches', ret, {
+        name: 'Escape',
+        type: 'hotel',
+      });
 
       // Tear down
       /*
@@ -1187,7 +1203,7 @@ class CBLTester {
 
       this.out('Tests passed');
     } catch (e) {
-      this.out('Tests failed!');
+      this.out(`Tests failed: ${e.message ?? ''}`);
       throw e;
     }
   }
@@ -1240,9 +1256,11 @@ const Home: React.FC = () => {
         <IonButton onClick={() => testerRef.current.exists()}>
           DB Exists
         </IonButton>
+        {/*
         <IonButton onClick={() => testerRef.current.queryTest()}>
           Query Test
         </IonButton>
+        */}
         <IonButton onClick={() => testerRef.current.delete()}>
           Delete DB
         </IonButton>
