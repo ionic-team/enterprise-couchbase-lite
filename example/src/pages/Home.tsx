@@ -7,6 +7,7 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { isMatch } from 'lodash';
 import './Home.css';
 
 import {
@@ -18,6 +19,7 @@ import {
   DatabaseChange,
   DatabaseConfiguration,
   DataSource,
+  Document,
   Expression,
   FullTextExpression,
   FullTextIndexItem,
@@ -40,6 +42,12 @@ import {
   ValueIndexItem,
 } from '@ionic-enterprise/couchbase-lite';
 
+const assert = (v, msg = '') => {
+  if (!v) {
+    throw new Error(`Test failed${msg ? ` ${msg}` : ''}`);
+  }
+}
+
 class CBLTester {
   database: Database;
   database2: Database;
@@ -49,6 +57,8 @@ class CBLTester {
   lastDocId: string;
 
   output: string;
+
+  _createdDocs: Document[] = [];
 
   _query1Results: ResultSet;
 
@@ -401,6 +411,8 @@ class CBLTester {
     await this.database.save(doc3);
     await this.database.save(doc4);
 
+    this._createdDocs.push(...[doc, doc2, doc3, doc4]);
+
     this.lastDocId = doc.getId();
 
     console.log('Saved document, id is', doc.getId());
@@ -455,6 +467,7 @@ class CBLTester {
 
     this.out(`Doc count: ${count}`);
     console.log(`Doc count: ${count}`);
+    return count;
   }
 
   async update() {
@@ -479,6 +492,7 @@ class CBLTester {
     console.log('Got document', doc);
 
     this.out(doc.toDictionary());
+    return doc;
   }
 
   async deleteDocument() {
@@ -526,7 +540,7 @@ class CBLTester {
   async query1n1ql() {
     console.log('Building query 1 n1ql');
     let query = this.database.createQuery(
-      'select META().id as thisId, name, items  from _ where type = "hotel"',
+      'select *, META().id as thisId, name, items  from _ where type = "hotel"',
     );
 
     const ret = await query.execute();
@@ -635,7 +649,7 @@ class CBLTester {
     console.log(JSON.stringify(query.toJson(), null, 2));
     const ret = await query.execute();
     const results = await ret.allResults();
-    this.out(`All results: ${JSON.stringify(results, null, 2)}`);
+    this.out(results);
   }
 
   async joinTest2() {
@@ -1116,6 +1130,67 @@ class CBLTester {
     console.log(b642);
     // console.log('Got profile blob', newDoc.getBlob('profile'));
   }
+
+  async testSuite() {
+    try {
+      await this.init();
+
+      await this.delete();
+
+      await this.init();
+
+      let documentCount = await this.getCount();
+      assert(documentCount === 0, 'Database is empty');
+
+      await this.save();
+
+      documentCount = await this.getCount();
+      assert(documentCount === this._createdDocs.length, 'Count of docs equals ones we collected');
+
+      let doc: Document = this.doc;
+      assert(doc.getId() === this.lastDocId, 'Last document id is the same as the one we stored');
+
+      doc = await this.getDocument();
+      assert(isMatch(doc.toDictionary(), {
+        name: 'Escape',
+        type: 'hotel',
+        asdf: null,
+        testArray: [],
+        items: [
+          'hello',
+          {
+            really: 'cool'
+          },
+          123,
+          true
+        ],
+        someWithNull: [1, null, 4],
+        config: {
+          size: 'large',
+          isCool: false
+        },
+      }), 'Grabbing latest matches provided object');
+
+      console.log(doc.toDictionary());
+
+      await this.createIndex();
+
+      // Tear down
+      /*
+      await Promise.all(this._createdDocs.map(async d => {
+        await this.database.deleteDocument(d);
+        let newCount = await this.database.getCount();
+        assert(newCount === documentCount - 1, 'Document count is one less');
+        documentCount = newCount;
+      }));
+      */
+
+      this.out('Tests passed');
+    } catch (e) {
+      this.out('Tests failed!');
+      throw e;
+    }
+  }
 }
 
 const tester = new CBLTester();
@@ -1141,13 +1216,16 @@ const Home: React.FC = () => {
           <IonTitle>Blank</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent fullscreen >
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Blank</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <pre id="output" dangerouslySetInnerHTML={{ __html: output }} />
+        <IonButton onClick={() => testerRef.current.testSuite()}>
+          Test Suite
+        </IonButton>
+        <hr />
         <IonButton onClick={() => testerRef.current.toggleLogLevel()}>
           Toggle Log Level
         </IonButton>
@@ -1290,6 +1368,7 @@ const Home: React.FC = () => {
           Replicator Test 2
         </IonButton>
       </IonContent>
+      <pre id="output" className="result-pane" dangerouslySetInnerHTML={{ __html: output }} />
     </IonPage>
   );
 };
