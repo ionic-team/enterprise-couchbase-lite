@@ -105,28 +105,33 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
     private JSObject documentToMap(Document d) {
         // Map<String, Object> docMap = new HashMap<>();
-        JSObject docMap = new JSObject();
+        try {
+            JSObject docMap = new JSObject();
 
-        Map<String, Object> documentAsMap = d.toMap();
+            JSObject documentAsMap = new JSObject(d.toJSON());
 
-        // Map<String, Object> finalDocumentMap = new HashMap<>();
-        JSObject finalDocumentMap = new JSObject();
+            JSObject finalDocumentMap = new JSObject();
 
-        for (String key : documentAsMap.keySet()) {
-            Object value = documentAsMap.get(key);
-            if (value instanceof Blob) {
-                JSONObject blobProps = new JSONObject(((Blob) value).getProperties());
-                // JSObject blobProperties = JSObject.fromJSONObject(blobProps);
-                finalDocumentMap.put(key, blobProps);
-            } else {
-                finalDocumentMap.put(key, value);
+            Iterator<String> keys = documentAsMap.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object value = documentAsMap.get(key);
+                if (value instanceof Blob) {
+                    JSONObject blobProps = new JSONObject(((Blob) value).getProperties());
+                    // JSObject blobProperties = JSObject.fromJSONObject(blobProps);
+                    finalDocumentMap.put(key, blobProps);
+                } else {
+                    finalDocumentMap.put(key, value);
+                }
             }
-        }
 
-        docMap.put("_data", finalDocumentMap);
-        docMap.put("_id", d.getId());
-        docMap.put("_sequence", d.getSequence());
-        return docMap;
+            docMap.put("_data", finalDocumentMap);
+            docMap.put("_id", d.getId());
+            docMap.put("_sequence", d.getSequence());
+            return docMap;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     private JSONObject json(Map<String, Object> data) {

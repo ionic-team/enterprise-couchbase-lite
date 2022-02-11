@@ -77,7 +77,7 @@ class CBLTester {
   }
 
   outputChanged(value: string) {}
-  out(value: string) {
+  out(value: string | any) {
     if (typeof value === 'object') {
       this.output = JSON.stringify(value, null, 2);
     } else {
@@ -364,6 +364,7 @@ class CBLTester {
       .setString('name', 'Escape')
       .setString('type', 'hotel')
       .setString('asdf', null)
+      .setArray('testArray', new Array())
       .setArray('items', [
         'hello',
         {
@@ -477,7 +478,7 @@ class CBLTester {
     const doc = await this.database.getDocument(this.lastDocId);
     console.log('Got document', doc);
 
-    this.out(`Got document: ${JSON.stringify(doc.toDictionary())}`);
+    this.out(doc.toDictionary());
   }
 
   async deleteDocument() {
@@ -525,7 +526,7 @@ class CBLTester {
   async query1n1ql() {
     console.log('Building query 1 n1ql');
     let query = this.database.createQuery(
-      'select META().id as thisId from _ where type = "hotel"',
+      'select META().id as thisId, name, items  from _ where type = "hotel"',
     );
 
     const ret = await query.execute();
