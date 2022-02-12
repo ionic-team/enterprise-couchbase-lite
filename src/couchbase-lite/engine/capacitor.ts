@@ -385,6 +385,13 @@ export class CapacitorEngine {
     });
   }
 
+  async Replicator_GetPendingDocumentIds(replicatorId: string): Promise<{ pendingDocumentIds: string[] }> {
+    //this\.log('Replicator_GetStatus');
+    return IonicCouchbaseLite.Replicator_GetPendingDocumentIds({
+      replicatorId,
+    });
+  }
+
   async Replicator_Cleanup(replicatorId: string): Promise<void> {
     //this\.log('Replicator_Stop');
     return IonicCouchbaseLite.Replicator_Cleanup({

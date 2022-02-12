@@ -169,6 +169,12 @@ export class Replicator {
     return db.getEngine().Replicator_GetStatus(this.replicatorId);
   }
 
+  async getPendingDocumentIds() {
+    const db = this.config.getDatabase();
+    const ret = await db.getEngine().Replicator_GetPendingDocumentIds(this.replicatorId);
+    return ret.pendingDocumentIds;
+  }
+
   addChangeListener(listener: ReplicatorChangeListener) {
     this.changeListenerTokens.push(listener);
   }

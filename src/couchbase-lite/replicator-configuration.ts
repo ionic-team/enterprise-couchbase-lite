@@ -109,13 +109,13 @@ export class ReplicatorConfiguration {
       continuous: this.continuous,
       authenticator: { type: this.authenticator.getType(), data: this.authenticator.toJson() },
       target: this.target.toJson(),
-      headers: this.headers,
-      pinnedServerCertificate: this.pinnedServerCertificate,
-      channels: this.channels,
-      documentIds: this.documentIds,
-      heartbeat: this.heartbeat,
-      maxAttempts: this.maxAttempts,
-      maxAttemptWaitTime: this.maxAttemptWaitTime
+      headers: this.headers ?? null,
+      pinnedServerCertificate: this.pinnedServerCertificate ?? null,
+      channels: this.channels ?? null,
+      documentIds: this.documentIds ?? null,
+      heartbeat: this.heartbeat ?? null,
+      maxAttempts: this.maxAttempts ?? null,
+      maxAttemptWaitTime: this.maxAttemptWaitTime ?? null
     }
   }
 }

@@ -208,5 +208,6 @@ export interface IonicCouchbaseLitePlugin {
   Replicator_Stop(args: ReplicatorArgs): Promise<void>;
   Replicator_ResetCheckpoint(args: ReplicatorArgs): Promise<void>;
   Replicator_GetStatus(args: ReplicatorArgs): Promise<void>;
+  Replicator_GetPendingDocumentIds(args: ReplicatorArgs): Promise<{ pendingDocumentIds: string[] }>;
   Replicator_Cleanup(args: ReplicatorArgs): Promise<void>;
 }

@@ -1031,6 +1031,21 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         call.resolve(statusJson);
     }
 
+    @PluginMethod
+    public void Replicator_GetPendingDocumentIds(PluginCall call) throws JSONException, CouchbaseLiteException {
+        int replicatorId = call.getInt("replicatorId");
+        Replicator r = this.replicators.get(replicatorId);
+        if (r == null) {
+            call.reject("No such replicator");
+            return;
+        }
+        Set<String> pendingDocumentIds = r.getPendingDocumentIds();
+
+        call.resolve(new JSObject() {{
+            put("pendingDocumentIds", new JSArray(pendingDocumentIds.toArray(new String[0])));
+        }});
+    }
+
     private JSObject generateStatusJson(ReplicatorStatus status) {
         CouchbaseLiteException error = status.getError();
         JSObject errorJson = new JSObject();
@@ -1193,14 +1208,14 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
     // Utilities
 
-    private ReplicatorConfiguration replicatorConfigFromJson(Database db, JSONObject json) throws Exception {
+    private ReplicatorConfiguration replicatorConfigFromJson(Database db, JSObject json) throws Exception {
         JSONObject authenticatorData = json.getJSONObject("authenticator");
         String authenticatorType = authenticatorData.getString("type");
         String replicatorType = json.getString("replicatorType");
         boolean continuous = json.getBoolean("continuous");
-        Integer heartbeat = json.getInt("heartbeat");
-        Integer maxAttempts = json.getInt("maxAttempts");
-        Integer maxAttemptWaitTime = json.getInt("maxAttemptWaitTime");
+        Integer heartbeat = json.getInteger("heartbeat");
+        Integer maxAttempts = json.getInteger("maxAttempts");
+        Integer maxAttemptWaitTime = json.getInteger("maxAttemptWaitTime");
 
         JSONObject target = json.getJSONObject("target");
         if (target == null) {

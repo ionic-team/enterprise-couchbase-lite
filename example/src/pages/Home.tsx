@@ -976,6 +976,16 @@ class CBLTester {
     this.out(`Replicator getStatus: ${JSON.stringify(status)}`);
   }
 
+  async replicatorGetPendingDocumentIds() {
+    if (!this.replicator) {
+      return;
+    }
+
+    const ids = await this.replicator.getPendingDocumentIds();
+    console.log('Got ids', ids);
+    this.out(ids);
+  }
+
   async toggleLogLevel() {
     await this.database.setLogLevel(LogDomain.ALL, LogLevel.VERBOSE);
     this.out(`Log level toggled`);
@@ -1396,140 +1406,140 @@ const Home: React.FC = () => {
             <IonTitle size="large">Blank</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonButton onClick={() => testerRef.current.testSuite()}>
+        <IonButton size="small" onClick={() => testerRef.current.testSuite()}>
           Test Suite
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.toggleLogLevel()}>
+        <IonButton size="small" onClick={() => testerRef.current.toggleLogLevel()}>
           Toggle Log Level
         </IonButton>
-        <IonButton onClick={() => testerRef.current.setFileConfig()}>
+        <IonButton size="small" onClick={() => testerRef.current.setFileConfig()}>
           Set File Logging Config
         </IonButton>
-        <IonButton onClick={() => testerRef.current.init()}>Open DB</IonButton>
-        <IonButton onClick={() => testerRef.current.close()}>
+        <IonButton size="small" onClick={() => testerRef.current.init()}>Open DB</IonButton>
+        <IonButton size="small" onClick={() => testerRef.current.close()}>
           Close DB
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.exists()}>
+        <IonButton size="small" onClick={() => testerRef.current.exists()}>
           DB Exists
         </IonButton>
         {/*
-        <IonButton onClick={() => testerRef.current.queryTest()}>
+        <IonButton size="small" onClick={() => testerRef.current.queryTest()}>
           Query Test
         </IonButton>
         */}
-        <IonButton onClick={() => testerRef.current.delete()}>
+        <IonButton size="small" onClick={() => testerRef.current.delete()}>
           Delete DB
         </IonButton>
-        <IonButton onClick={() => testerRef.current.compact()}>
+        <IonButton size="small" onClick={() => testerRef.current.compact()}>
           Compact DB
         </IonButton>
-        <IonButton onClick={() => testerRef.current.getPath()}>
+        <IonButton size="small" onClick={() => testerRef.current.getPath()}>
           Get DB Path
         </IonButton>
-        <IonButton onClick={() => testerRef.current.delete()}>
+        <IonButton size="small" onClick={() => testerRef.current.delete()}>
           Delete DB
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.createIndex()}>
+        <IonButton size="small" onClick={() => testerRef.current.createIndex()}>
           Create Index
         </IonButton>
-        <IonButton onClick={() => testerRef.current.deleteIndex()}>
+        <IonButton size="small" onClick={() => testerRef.current.deleteIndex()}>
           Delete Index
         </IonButton>
-        <IonButton onClick={() => testerRef.current.getIndexes()}>
+        <IonButton size="small" onClick={() => testerRef.current.getIndexes()}>
           Get Indexes
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.save()}>
+        <IonButton size="small" onClick={() => testerRef.current.save()}>
           Save Document
         </IonButton>
-        <IonButton onClick={() => testerRef.current.saveMany()}>
+        <IonButton size="small" onClick={() => testerRef.current.saveMany()}>
           Save Many
         </IonButton>
-        <IonButton onClick={() => testerRef.current.getCount()}>
+        <IonButton size="small" onClick={() => testerRef.current.getCount()}>
           Get Count
         </IonButton>
-        <IonButton onClick={() => testerRef.current.update()}>
+        <IonButton size="small" onClick={() => testerRef.current.update()}>
           Update Document
         </IonButton>
-        <IonButton onClick={() => testerRef.current.getDocument()}>
+        <IonButton size="small" onClick={() => testerRef.current.getDocument()}>
           Get Document
         </IonButton>
-        <IonButton onClick={() => testerRef.current.deleteDocument()}>
+        <IonButton size="small" onClick={() => testerRef.current.deleteDocument()}>
           Delete Document
         </IonButton>
-        <IonButton onClick={() => testerRef.current.purgeDocument()}>
+        <IonButton size="small" onClick={() => testerRef.current.purgeDocument()}>
           Purge Document
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.blobTest()}>
+        <IonButton size="small" onClick={() => testerRef.current.blobTest()}>
           Blob Test
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.query1()}>
+        <IonButton size="small" onClick={() => testerRef.current.query1()}>
           Query 1
         </IonButton>
-        <IonButton onClick={() => testerRef.current.query1From()}>
+        <IonButton size="small" onClick={() => testerRef.current.query1From()}>
           Query 1 From
         </IonButton>
-        <IonButton onClick={() => testerRef.current.query1n1ql()}>
+        <IonButton size="small" onClick={() => testerRef.current.query1n1ql()}>
           Query 1 N1QL
         </IonButton>
-        <IonButton onClick={() => testerRef.current.ftsQuery()}>
+        <IonButton size="small" onClick={() => testerRef.current.ftsQuery()}>
           FTS Query
         </IonButton>
-        <IonButton onClick={() => testerRef.current.next1()}>
+        <IonButton size="small" onClick={() => testerRef.current.next1()}>
           Next Result 1
         </IonButton>
-        <IonButton onClick={() => testerRef.current.nextBatch()}>
+        <IonButton size="small" onClick={() => testerRef.current.nextBatch()}>
           Next Result Batch 1
         </IonButton>
-        <IonButton onClick={() => testerRef.current.all1()}>
+        <IonButton size="small" onClick={() => testerRef.current.all1()}>
           All Results 1
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.query1n1qljoin()}>
+        <IonButton size="small" onClick={() => testerRef.current.query1n1qljoin()}>
           N1QL Join Query
         </IonButton>
-        <IonButton onClick={() => testerRef.current.joinTest()}>
+        <IonButton size="small" onClick={() => testerRef.current.joinTest()}>
           Join From Test
         </IonButton>
-        <IonButton onClick={() => testerRef.current.joinTest2()}>
+        <IonButton size="small" onClick={() => testerRef.current.joinTest2()}>
           Join From Test 2
         </IonButton>
-        <IonButton onClick={() => testerRef.current.queryDeleted()}>
+        <IonButton size="small" onClick={() => testerRef.current.queryDeleted()}>
           Query Deleted
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.query2()}>
+        <IonButton size="small" onClick={() => testerRef.current.query2()}>
           Query many
         </IonButton>
-        <IonButton onClick={() => testerRef.current.all2()}>
+        <IonButton size="small" onClick={() => testerRef.current.all2()}>
           All Results many
         </IonButton>
-        <IonButton onClick={() => testerRef.current.allBatched()}>
+        <IonButton size="small" onClick={() => testerRef.current.allBatched()}>
           All Results many batched
         </IonButton>
-        <IonButton onClick={() => testerRef.current.foreach1()}>
+        <IonButton size="small" onClick={() => testerRef.current.foreach1()}>
           For Each 1
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.queryCreateTest()}>
+        <IonButton size="small" onClick={() => testerRef.current.queryCreateTest()}>
           Query Memory Test
         </IonButton>
-        <IonButton onClick={() => testerRef.current.queryCreateTestCleanup()}>
+        <IonButton size="small" onClick={() => testerRef.current.queryCreateTestCleanup()}>
           Query Memory Test Cleanup
         </IonButton>
-        <IonButton onClick={() => testerRef.current.documentIdTest()}>
+        <IonButton size="small" onClick={() => testerRef.current.documentIdTest()}>
           Document ID Test
         </IonButton>
         <hr />
-        <IonButton onClick={() => testerRef.current.replicatorStart()}>
+        <IonButton size="small" onClick={() => testerRef.current.replicatorStart()}>
           Replicator Start
         </IonButton>
-        <IonButton onClick={() => testerRef.current.replicatorStop()}>
+        <IonButton size="small" onClick={() => testerRef.current.replicatorStop()}>
           Replicator Stop
         </IonButton>
         <IonButton
@@ -1537,13 +1547,16 @@ const Home: React.FC = () => {
         >
           Replicator Reset Checkpoint
         </IonButton>
-        <IonButton onClick={() => testerRef.current.replicatorGetStatus()}>
+        <IonButton size="small" onClick={() => testerRef.current.replicatorGetStatus()}>
           Replicator Get Status
         </IonButton>
-        <IonButton onClick={() => testerRef.current.replicatorTest()}>
+        <IonButton size="small" onClick={() => testerRef.current.replicatorGetPendingDocumentIds()}>
+          Replicator Get Pending Doc Ids
+        </IonButton>
+        <IonButton size="small" onClick={() => testerRef.current.replicatorTest()}>
           Replicator Test
         </IonButton>
-        <IonButton onClick={() => testerRef.current.replicatorTest2()}>
+        <IonButton size="small" onClick={() => testerRef.current.replicatorTest2()}>
           Replicator Test 2
         </IonButton>
         <div style={{ height: '500px' }} />

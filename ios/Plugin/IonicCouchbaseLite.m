@@ -981,6 +981,32 @@
   });
 }
 
+-(void)Replicator_GetPendingDocumentIds:(CAPPluginCall*)call {
+  NSNumber *replicatorId = [call getNumber:@"replicatorId" defaultValue:NULL];
+  if (replicatorId == NULL) {
+    [call reject:@"No replicatorId supplied" :NULL :NULL :@{}];
+    return;
+  }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    CBLReplicator *replicator = [self->replicators objectForKey:[replicatorId stringValue]];
+    if (replicator == NULL) {
+      return [call reject:@"No such replicator" :NULL :NULL :@{}];
+    }
+    
+    NSError *error;
+    NSSet<NSString *> *pendingDocumentIds = [replicator pendingDocumentIDs:&error];
+    
+    if (error != NULL) {
+      [call reject:@"Error getting pending document ids" :NULL :error :@{}];
+      return;
+    }
+    
+    [call resolve:@{
+      @"pendingDocumentIds": [pendingDocumentIds allObjects]
+    }];
+  });
+}
+
 -(NSDictionary *)generateStatusJson:(CBLReplicatorStatus *)status {
     NSDictionary *errorJson = nil;
     NSError *error = status.error;

@@ -47,6 +47,7 @@ npx cap sync
 * [`Replicator_Stop(...)`](#replicator_stop)
 * [`Replicator_ResetCheckpoint(...)`](#replicator_resetcheckpoint)
 * [`Replicator_GetStatus(...)`](#replicator_getstatus)
+* [`Replicator_GetPendingDocumentIds(...)`](#replicator_getpendingdocumentids)
 * [`Replicator_Cleanup(...)`](#replicator_cleanup)
 * [Interfaces](#interfaces)
 * [Enums](#enums)
@@ -559,6 +560,21 @@ Replicator_ResetCheckpoint(args: ReplicatorArgs) => any
 
 ```typescript
 Replicator_GetStatus(args: ReplicatorArgs) => any
+```
+
+| Param      | Type                                                      |
+| ---------- | --------------------------------------------------------- |
+| **`args`** | <code><a href="#replicatorargs">ReplicatorArgs</a></code> |
+
+**Returns:** <code>any</code>
+
+--------------------
+
+
+### Replicator_GetPendingDocumentIds(...)
+
+```typescript
+Replicator_GetPendingDocumentIds(args: ReplicatorArgs) => any
 ```
 
 | Param      | Type                                                      |
