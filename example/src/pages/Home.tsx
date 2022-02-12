@@ -577,7 +577,7 @@ class CBLTester {
           .from('fun')
           .equalTo(Expression.string('hotel')),
       )
-      .orderBy(Ordering.expression(Meta.id.from('fun')));
+      .orderBy(Ordering.expression(Expression.property('fun').from('fun')));
 
     const ret = await query.execute();
     this._query1Results = ret;
@@ -651,6 +651,7 @@ class CBLTester {
     const ret = await query.execute();
     const results = await ret.allResults();
     this.out(results);
+    return results;
   }
 
   async joinTest2() {
@@ -1227,6 +1228,19 @@ class CBLTester {
       }
 
       assert(isMatch(ret, expected), 'Query 1 From matches', expected, ret);
+
+      ret = await this.joinTest();
+
+      expected = [
+        {
+          'hotels.id': ret[0]['hotels.id'],
+          'locations.id': ret[0]['locations.id'],
+          'categories.id': ret[0]['categories.id'],
+          'name': 'Madison'
+        }
+      ];
+
+      assert(isMatch(ret, expected), 'Join test matches', expected, ret);
 
       await this.query1n1ql();
 
