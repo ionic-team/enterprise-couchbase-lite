@@ -554,7 +554,7 @@ class CBLTester {
   async query1n1qljoin() {
     console.log('Building query 1 n1ql with join');
     let query = this.database.createQuery(
-      'select META().id as thisId from _ where type = "hotel"',
+      'select * from _ d where type = "hotel"',
     );
 
     const ret = await query.execute();
@@ -1179,10 +1179,11 @@ class CBLTester {
 
       await this.query1();
 
-      const ret = await this.next1();
+      let ret = await this.next1();
 
       console.log('Got ret', ret);
 
+      /*
       assert(isMatch(ret, {
         name: 'Escape',
         type: 'hotel',
@@ -1190,6 +1191,89 @@ class CBLTester {
         name: 'Escape',
         type: 'hotel',
       });
+      */
+
+      await this.query1From();
+
+      ret = await this.next1();
+
+      let expected: any = {
+        "name": "Escape",
+        // "id": "-dn0azUFH0eKGHvxH_c0jvz",
+        "fun": {
+          "config": {
+            "isCool": false,
+            "size": "large"
+          },
+          "someWithNull": [
+            1,
+            null,
+            4
+          ],
+          "testArray": [],
+          "items": [
+            "hello",
+            {
+              "really": "cool"
+            },
+            123,
+            true
+          ],
+          //"created": "2022-02-12T16:17:02.260Z",
+          "asdf": null,
+          "name": "Escape",
+          "type": "hotel"
+        }
+      }
+
+      assert(isMatch(ret, expected), 'Query 1 From matches', expected, ret);
+
+      await this.query1n1ql();
+
+      ret = await this.next1();
+
+      expected = {
+        "items": [
+          "hello",
+          {
+            "really": "cool"
+          },
+          123,
+          true
+        ],
+        "name": "Escape",
+        // "thisId": "-NrHJOWRo-3uXPOd4GnCTkj",
+        "_": {
+          "name": "Escape",
+          "someWithNull": [
+            1,
+            null,
+            4
+          ],
+          // "created": "2022-02-11T22:56:19.020Z",
+          "config": {
+            "size": "large",
+            "isCool": false
+          },
+          "items": [
+            "hello",
+            {
+              "really": "cool"
+            },
+            123,
+            true
+          ],
+          "testArray": [],
+          "asdf": null,
+          "type": "hotel"
+        }
+      }
+
+      assert(isMatch(ret, expected), 'N1QL Query doc matches', ret, expected);
+
+      await this.query1n1qljoin();
+
+      ret = await this.next1();
 
       // Tear down
       /*
@@ -1332,6 +1416,9 @@ const Home: React.FC = () => {
           All Results 1
         </IonButton>
         <hr />
+        <IonButton onClick={() => testerRef.current.query1n1qljoin()}>
+          N1QL Join Query
+        </IonButton>
         <IonButton onClick={() => testerRef.current.joinTest()}>
           Join From Test
         </IonButton>
@@ -1385,6 +1472,7 @@ const Home: React.FC = () => {
         <IonButton onClick={() => testerRef.current.replicatorTest2()}>
           Replicator Test 2
         </IonButton>
+        <div style={{ height: '500px' }} />
       </IonContent>
       <pre id="output" className="result-pane" dangerouslySetInnerHTML={{ __html: output }} />
     </IonPage>
