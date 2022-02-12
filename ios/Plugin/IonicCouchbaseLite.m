@@ -620,7 +620,7 @@
     CBLQueryResultSet *result = [query execute:&error];
     
     if (error != NULL) {
-      [call reject:@"Unable to execute query" :NULL :error :@{}];
+      [call reject:[NSString stringWithFormat:@"Unable to execute query: %@", error.localizedDescription] :NULL :error :@{}];
       return;
     }
 

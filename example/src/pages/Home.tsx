@@ -592,7 +592,17 @@ class CBLTester {
 
     console.log('Building query 2 from');
 
-    let queryString = `select META().id from categories, locations.name from locations as name, META().id from locations, META().id from hotels from _ as hotels join locations on locations.id = hotels.location_id, join categories on categories.id = hotels.category_id where hotels.type = "hotel" and locations.type = "location";
+    let queryString = `select META().id from categories  categories.id, 
+    locations.name from locations as name,
+    META().id from locations as locations.id,
+    META().id from hotels
+      from _ as hotels
+        join locations on
+          locations.id = hotels.location_id,
+        join categories on
+          categories.id = hotels.category_id
+        where hotels.type = "hotel" and locations.type = "location";
+    
     `
 
     let query = this.database.createQuery(queryString);
@@ -1267,6 +1277,17 @@ class CBLTester {
       }
 
       assert(isMatch(ret, expected), 'Query 1 From matches', expected, ret);
+
+      await this.createIndex();
+      await this.ftsQuery();
+
+      ret = await this.next1();
+      expected = {
+        "thisdb3": {
+          type: 'parlour',
+          name: 'Ice Cream'
+        }
+      }
 
       ret = await this.joinTest();
 
