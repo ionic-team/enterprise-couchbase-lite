@@ -1199,6 +1199,8 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         String replicatorType = json.getString("replicatorType");
         boolean continuous = json.getBoolean("continuous");
         Integer heartbeat = json.getInt("heartbeat");
+        Integer maxAttempts = json.getInt("maxAttempts");
+        Integer maxAttemptWaitTime = json.getInt("maxAttemptWaitTime");
 
         JSONObject target = json.getJSONObject("target");
         if (target == null) {
@@ -1229,6 +1231,14 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
         if (heartbeat != null) {
           config.setHeartbeat(heartbeat);
+        }
+
+        if (maxAttempts != null) {
+          config.setMaxAttempts(maxAttempts);
+        }
+
+        if (maxAttemptWaitTime != null) {
+            config.setMaxAttemptWaitTime(maxAttemptWaitTime);
         }
 
         config.setContinuous(continuous);

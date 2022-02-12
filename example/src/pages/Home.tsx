@@ -551,10 +551,11 @@ class CBLTester {
     this.out(`Executed query`);
   }
 
+  /*
   async query1n1qljoin() {
     console.log('Building query 1 n1ql with join');
     let query = this.database.createQuery(
-      'select * from _ d where type = "hotel"',
+      'select * from _ d join where type = "hotel"',
     );
 
     const ret = await query.execute();
@@ -562,6 +563,44 @@ class CBLTester {
     console.log('Executed query', ret);
 
     this.out(`Executed query`);
+  }
+  */
+  async query1n1qljoin() {
+    let locationDoc = new MutableDocument()
+      .setString('name', 'Madison')
+      .setString('type', 'location');
+    await this.database.save(locationDoc);
+
+    console.log('Location doc saved', locationDoc);
+
+    let categoryDoc = new MutableDocument()
+      .setString('name', 'Expensive')
+      .setString('type', 'expensive');
+    await this.database.save(categoryDoc);
+
+    console.log('Category doc saved', categoryDoc);
+
+    let hotelDoc = new MutableDocument()
+      .setString('name', 'Escape')
+      .setString('type', 'hotel')
+      .setString('hotel_locations_thing', 'what')
+      .setString('location_id', locationDoc.getId())
+      .setString('category_id', categoryDoc.getId());
+    await this.database.save(hotelDoc);
+
+    console.log('Hotel doc saved', hotelDoc);
+
+    console.log('Building query 2 from');
+
+    let queryString = `select META().id from categories, locations.name from locations as name, META().id from locations, META().id from hotels from _ as hotels join locations on locations.id = hotels.location_id, join categories on categories.id = hotels.category_id where hotels.type = "hotel" and locations.type = "location";
+    `
+
+    let query = this.database.createQuery(queryString);
+    console.log('Built join query');
+    const ret = await query.execute();
+    const results = await ret.allResults();
+    this.out(results);
+    return results;
   }
 
   async query1From() {

@@ -648,7 +648,7 @@
     CBLQueryResultSet *result = [query execute:&error];
     
     if (error != NULL) {
-      [call reject:@"Unable to execute query" :NULL :error :@{}];
+      [call reject:[NSString stringWithFormat:@"Unable to execute query: %@", error.localizedDescription] :NULL :error :@{}];
       return;
     }
 
@@ -865,6 +865,8 @@
   NSString *url = [target objectForKey:@"url"];
   NSString *replicatorType = [data objectForKey:@"replicatorType"];
   NSNumber *heartbeat = [data objectForKey:@"heartbeat"];
+  NSNumber *maxAttempts = [data objectForKey:@"maxAttempts"];
+  NSNumber *maxAttemptWaitTime = [data objectForKey:@"maxAttemptWaitTime"];
   BOOL continuous = [data objectForKey:@"continuous"];
   
   CBLURLEndpoint *endpoint = [[CBLURLEndpoint alloc] initWithURL:[NSURL URLWithString:url]];
@@ -886,6 +888,14 @@
     
   if (heartbeat != NULL) {
     [replConfig setHeartbeat:[heartbeat intValue]];
+  }
+  
+  if (maxAttempts != NULL) {
+    [replConfig setMaxAttempts:[maxAttempts intValue]];
+  }
+  
+  if (maxAttemptWaitTime != NULL) {
+    [replConfig setMaxAttemptWaitTime:[maxAttemptWaitTime intValue]];
   }
     
   [replConfig setContinuous:continuous];

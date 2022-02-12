@@ -48,6 +48,8 @@ export class ReplicatorConfiguration {
   private channels: string[];
   private documentIds: string[];
   private heartbeat: number;
+  private maxAttempts: number;
+  private maxAttemptWaitTime: number;
   private headers: { [name:string]: string };
 
   constructor(private database: Database, private target: Endpoint) {
@@ -93,6 +95,14 @@ export class ReplicatorConfiguration {
     this.heartbeat = heartbeat;
   }
 
+  setMaxAttempts(maxAttempts: number) {
+    this.maxAttempts = maxAttempts;
+  }
+
+  setMaxAttemptWaitTime(maxAttemptWaitTime: number) {
+    this.maxAttemptWaitTime = maxAttemptWaitTime;
+  }
+
   toJson() {
     return {
       replicatorType: this.replicatorType,
@@ -103,7 +113,9 @@ export class ReplicatorConfiguration {
       pinnedServerCertificate: this.pinnedServerCertificate,
       channels: this.channels,
       documentIds: this.documentIds,
-      heartbeat: this.heartbeat
+      heartbeat: this.heartbeat,
+      maxAttempts: this.maxAttempts,
+      maxAttemptWaitTime: this.maxAttemptWaitTime
     }
   }
 }
