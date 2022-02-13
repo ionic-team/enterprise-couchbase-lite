@@ -51,6 +51,7 @@ import {
 } from '@ionic-enterprise/couchbase-lite';
 
 const assert = (v, msg = '', expecting = null, received = null) => {
+  console.log('%c[TEST] %s','color: #e8c93c; font-weight: bold', msg);
   if (!v) {
     throw new Error(`${msg ? msg : `Test failed`}${expecting ? `\nExpecting: \n${
       typeof expecting === 'object' ? JSON.stringify(expecting, null, 2) : expecting}`: null}${received ?
@@ -630,8 +631,8 @@ class CBLTester {
     console.log('Building query 1');
     let query = QueryBuilder.select(
       SelectResult.all().from('fun'),
-      SelectResult.expression(Expression.property('name').from('fun')),
-      SelectResult.expression(Meta.id.from('fun')),
+      SelectResult.expression(Expression.property('name').from('fun')).as('name'),
+      SelectResult.expression(Meta.id.from('fun')).as('id'),
     )
       .from(DataSource.database(this.database).as('fun'))
       .where(
@@ -1483,17 +1484,6 @@ const Home: React.FC = () => {
             Delete DB
           </IonButton>
         </Section>
-        <Section title="Full Text Search" expanded={sections['fts']} onToggle={() => toggleSection('fts')}>
-          <IonButton size="small" onClick={() => tester.createIndex()}>
-            Create Index
-          </IonButton>
-          <IonButton size="small" onClick={() => tester.deleteIndex()}>
-            Delete Index
-          </IonButton>
-          <IonButton size="small" onClick={() => tester.getIndexes()}>
-            Get Indexes
-          </IonButton>
-        </Section>
         <Section title="Document" expanded={sections['document']} onToggle={() => toggleSection('document')}>
           <IonButton size="small" onClick={() => tester.save()}>
             Save Document
@@ -1575,6 +1565,17 @@ const Home: React.FC = () => {
           </IonButton>
           <IonButton size="small" onClick={() => tester.documentIdTest()}>
             Document ID Test
+          </IonButton>
+        </Section>
+        <Section title="Full Text Search" expanded={sections['fts']} onToggle={() => toggleSection('fts')}>
+          <IonButton size="small" onClick={() => tester.createIndex()}>
+            Create Index
+          </IonButton>
+          <IonButton size="small" onClick={() => tester.deleteIndex()}>
+            Delete Index
+          </IonButton>
+          <IonButton size="small" onClick={() => tester.getIndexes()}>
+            Get Indexes
           </IonButton>
         </Section>
         <Section title="Blob" expanded={sections['blob']} onToggle={() => toggleSection('blob')}>
