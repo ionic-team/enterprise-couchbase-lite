@@ -1444,9 +1444,11 @@ const Home: React.FC = () => {
             <IonTitle size="large">Couchbase Lite</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonButton size="small" onClick={() => tester.testSuite()}>
-          Test Suite
-        </IonButton>
+        <Section title="Tests" expanded={sections['tests']} onToggle={() => toggleSection('tests')}>
+          <IonButton size="small" onClick={() => tester.testSuite()}>
+            Test Suite
+          </IonButton>
+        </Section>
         <Section title="Database" expanded={sections['db']} onToggle={() => toggleSection('db')}>
           <IonButton size="small" onClick={() => tester.toggleLogLevel()}>
             Toggle Log Level
