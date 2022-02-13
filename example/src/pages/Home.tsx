@@ -1257,15 +1257,17 @@ class CBLTester {
 
       console.log('Got ret', ret);
 
-      /*
       assert(isMatch(ret, {
         name: 'Escape',
-        type: 'hotel',
-      }), 'Query doc matches', ret, {
+        thedb10: {
+          type: 'hotel'
+        }
+      }), 'Query doc matches', {
         name: 'Escape',
-        type: 'hotel',
-      });
-      */
+        thedb10: {
+          type: 'hotel'
+        }
+      }, ret);
 
       await this.query1From();
 
@@ -1368,10 +1370,12 @@ class CBLTester {
       }
 
       assert(isMatch(ret, expected), 'N1QL Query doc matches', ret, expected);
-
+      
+      /*
       await this.query1n1qljoin();
 
       ret = await this.next1();
+      */
 
       // Tear down
       /*
