@@ -89,6 +89,11 @@
 -(NSDictionary *)resultToMap:(CBLQueryResult *)d dbName:(NSString *)dbName {
   NSMutableDictionary *dm = [[d toDictionary] mutableCopy];
 
+  if ([dm objectForKey:@"_doc"]) {
+    [dm setObject:[dm objectForKey:@"_doc"] forKey:dbName];
+    [dm removeObjectForKey:@"_doc"];
+  }
+  
   if ([dm objectForKey:@"_id"]) {
     [dm setObject:[dm objectForKey:@"_id"] forKey:@"id"];
     [dm removeObjectForKey:@"_id"];
