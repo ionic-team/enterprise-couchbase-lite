@@ -606,18 +606,7 @@ class CBLTester {
 
     console.log('Building query 2 from');
 
-    let queryString = `select META().id from categories  categories.id, 
-    locations.name from locations as name,
-    META().id from locations as locations.id,
-    META().id from hotels
-      from _ as hotels
-        join locations on
-          locations.id = hotels.location_id,
-        join categories on
-          categories.id = hotels.category_id
-        where hotels.type = "hotel" and locations.type = "location";
-    
-    `
+    let queryString = `select META(categories).id as categoriesId, locations.name as name, META(locations).id as locationsId, META(hotels).id as hotelsId from _ as hotels join _ as locations on META(locations).id = hotels.location_id join _ as categories on META(categories).id = hotels.category_id where hotels.type = "hotel" and locations.type = "location"`;
 
     let query = this.database.createQuery(queryString);
     console.log('Built join query');
@@ -1371,11 +1360,18 @@ class CBLTester {
 
       assert(isMatch(ret, expected), 'N1QL Query doc matches', ret, expected);
       
-      /*
-      await this.query1n1qljoin();
+      ret = await this.query1n1qljoin();
 
-      ret = await this.next1();
-      */
+      expected = [
+        {
+          hotelsId: ret[0].hotelsId,
+          categoriesId: ret[0].categoriesId,
+          locationsId: ret[0].locationsId,
+          name: 'Madison'
+        }
+      ];
+
+      assert(isMatch(ret, expected), 'N1QL Join Query doc matches', ret, expected);
 
       // Tear down
       /*
