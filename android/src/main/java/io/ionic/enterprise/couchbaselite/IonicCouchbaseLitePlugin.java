@@ -102,28 +102,30 @@ public class IonicCouchbaseLitePlugin extends Plugin {
 
     private JSObject documentToMap(Document d) {
         // Map<String, Object> docMap = new HashMap<>();
-        JSObject docMap = new JSObject();
+        try {
+            JSONObject docJson = new JSONObject(d.toMap());
 
-        Map<String, Object> documentAsMap = d.toMap();
-
-        // Map<String, Object> finalDocumentMap = new HashMap<>();
-        JSObject finalDocumentMap = new JSObject();
-
-        for (String key : documentAsMap.keySet()) {
-            Object value = documentAsMap.get(key);
-            if (value instanceof Blob) {
-                JSONObject blobProps = new JSONObject(((Blob) value).getProperties());
-                // JSObject blobProperties = JSObject.fromJSONObject(blobProps);
-                finalDocumentMap.put(key, blobProps);
-            } else {
-                finalDocumentMap.put(key, value);
+            //for (String key : documentAsMap.keySet()) {
+            Iterator keys = docJson.keys();
+            while (keys.hasNext()) {
+                String key = (String) keys.next();
+                Object value = docJson.get(key);
+                if (value instanceof Blob) {
+                    JSONObject blobProps = new JSONObject(((Blob) value).getProperties());
+                    // JSObject blobProperties = JSObject.fromJSONObject(blobProps);
+                    // finalDocumentMap.put(key, blobProps);
+                    docJson.put(key, blobProps);
+                }
             }
-        }
 
-        docMap.put("_data", finalDocumentMap);
-        docMap.put("_id", d.getId());
-        docMap.put("_sequence", d.getSequence());
-        return docMap;
+            JSObject docMap = new JSObject();
+            docMap.put("_data", docJson);
+            docMap.put("_id", d.getId());
+            docMap.put("_sequence", d.getSequence());
+            return (JSObject) docMap;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     private JSONObject json(Map<String, Object> data) {
