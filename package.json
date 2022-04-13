@@ -1,6 +1,6 @@
 {
   "name": "@ionic-enterprise/couchbase-lite",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "Integration for Couchbase Lite (2.x+) in Ionic enterprise apps",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -11,7 +11,8 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "IonicEnterpriseCouchbaseLite.podspec"
+    "IonicEnterpriseCouchbaseLite.podspec",
+    "windows"
   ],
   "author": "Max Lynch <max@ionic.io>",
   "license": "UNLICENSED",
