@@ -3,7 +3,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['overview', 'installation', 'usage'],
+      items: ['overview', 'installation', 'windows-installation', 'usage'],
     },
     {
       type: 'category',
@@ -22,10 +22,12 @@ module.exports = {
           href: 'https://docs.couchbase.com/couchbase-lite/3.0/index.html',
         },
         {
-          type:"link",
-          label:"N1QL Query Strings",
-          href: 'https://docs.couchbase.com/couchbase-lite/3.0/c/query-n1ql-mobile.html#introduction'
-        }],
-    }
-  ]
+          type: 'link',
+          label: 'N1QL Query Strings',
+          href:
+            'https://docs.couchbase.com/couchbase-lite/3.0/c/query-n1ql-mobile.html#introduction',
+        },
+      ],
+    },
+  ],
 };
