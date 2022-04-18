@@ -143,10 +143,12 @@ namespace IonicCouchbaseLite {
 
         private int allResultsChunkSize = 256;
 
-        public void Load() {
+        public override void Load() {
             base.Load();
+            Activator.Activate();
             Logger.debug("Loading IonicCouchbaseLitePlugin");
-            Couchbase.Lite.Support.NetDesktop.Activate();
+            // Couchbase.Lite.Enterprise.Support.NetDesktop.Activate();
+            // Couchbase.Lite.Support.NetDesktop.Activate();
         }
 
         public IonicCouchbaseLite() {
@@ -323,7 +325,7 @@ namespace IonicCouchbaseLite {
                 call.Reject("Database not found");
                 return;
             }
-            db.Compact();
+            // db.Compact();
             call.Resolve();
         }
 
@@ -508,7 +510,7 @@ namespace IonicCouchbaseLite {
                 case "REPLICATOR": domain = LogDomain.Replicator; break;
             }
 
-            Database.SetLogLevel(domain, logLevel);
+            // Database.SetLogLevel(domain, logLevel);
             call.Resolve();
         }
 
@@ -947,7 +949,7 @@ namespace IonicCouchbaseLite {
             if (replicators.ContainsKey(replicatorId)) {
                 Replicator r = replicators[replicatorId];
                 Console.WriteLine($"Got it here");
-                r.ResetCheckpoint();
+                // r.ResetCheckpoint();
             }
             call.Resolve();
         }
