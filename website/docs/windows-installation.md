@@ -30,8 +30,8 @@ Open the Package Manager Console:
 Then run:
 
 ```shell
-Install-Package Couchbase.Lite.Enterprise -Version 2.8.6 -ProjectName App
 Install-Package IonicCouchbaseLite -ProjectName App
+Install-Package Couchbase.Lite.Enterprise -Version 2.8.6 -ProjectName App
 ```
 
 ## Installation Complete
