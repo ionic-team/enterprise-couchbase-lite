@@ -25,7 +25,7 @@ This will attempt to automatically locate your Visual Studio 2022 or 2019 instal
 
 Open the Package Manager Console:
 
-![Package Manager Console](/static/img/couchbase-lite/package-manager-console.png)
+![Package Manager Console](/img/couchbase-lite/package-manager-console.png)
 
 Then run:
 
