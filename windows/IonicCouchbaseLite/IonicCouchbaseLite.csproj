@@ -12,7 +12,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Capacitor" Version="1.2.0" />
+		<PackageReference Include="CapacitorWpf" Version="1.*" />
 		<PackageReference Include="Couchbase.Lite.Enterprise" Version="2.8.6">
 			<IncludeAssets>compile</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>

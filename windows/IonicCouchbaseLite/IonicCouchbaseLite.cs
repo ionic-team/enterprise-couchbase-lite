@@ -145,10 +145,10 @@ namespace IonicCouchbaseLite {
 
         public override void Load() {
             base.Load();
-            Activator.Activate();
+            // Activator.Activate();
             Logger.debug("Loading IonicCouchbaseLitePlugin");
             // Couchbase.Lite.Enterprise.Support.NetDesktop.Activate();
-            // Couchbase.Lite.Support.NetDesktop.Activate();
+            Couchbase.Lite.Support.NetDesktop.Activate();
         }
 
         public IonicCouchbaseLite() {

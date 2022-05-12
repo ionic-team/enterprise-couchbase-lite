@@ -51,12 +51,11 @@ private async initializeDatabase(): Promise<void> {
     return new Promise(resolve => {
         IonicCBL.onReady(async () => {
             const config = new DatabaseConfiguration();
+            // On windows, specify the path to the directory the database will be stored
+            // in explicitly to ensure user can write to it
+            // config.directory = 'C:\\Users\\...';
             config.setEncryptionKey('8e31f8f6-60bd-482a-9c70-69855dd02c38');
             this.database = new Database('DATABASE_NAME', config);
-            this.database.setEngine(
-            new CordovaEngine({
-                allResultsChunkSize: 9999
-            }));
             await this.database.open();
 
             resolve();

@@ -7,7 +7,7 @@
     <description>Package Description</description>
     <dependencies>
       <group targetFramework="net5.0-windows10.0.19041">
-        <dependency id="Capacitor" version="1.2.0" exclude="Build,Analyzers" />
+        <dependency id="CapacitorWpf" version="1.2.0" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Win32.Primitives" version="4.3.0" exclude="Build,Analyzers" />
         <dependency id="System.Diagnostics.Tracing" version="4.3.0" exclude="Build,Analyzers" />
         <dependency id="System.IO.FileSystem" version="4.3.0" exclude="Build,Analyzers" />
@@ -19,7 +19,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="F:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" target="lib\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" />
-    <file src="F:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.pri" target="lib\net5.0-windows10.0.19041\IonicCouchbaseLite.pri" />
+    <file src="E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" target="lib\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" />
   </files>
 </package>
