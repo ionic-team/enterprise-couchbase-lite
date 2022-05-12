@@ -5,7 +5,7 @@
   },
   "projects": {
     "F:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj": {
-      "version": "1.5.0",
+      "version": "2.5.0",
       "restore": {
         "projectUniqueName": "F:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj",
         "projectName": "IonicCouchbaseLite",
@@ -49,6 +49,8 @@
           "targetAlias": "net5.0-windows10.0.19041",
           "dependencies": {
             "CapacitorWpf": {
+              "include": "Compile",
+              "suppressParent": "All",
               "target": "Package",
               "version": "[1.*, )"
             },
