@@ -706,7 +706,7 @@ class CBLTester {
     }
     const ret = await this._query1Results.allResults();
     console.log('All results', ret);
-    this.out(`All results: ${JSON.stringify(ret)}`);
+    this.out(`All results (${ret.length}): ${JSON.stringify(ret)}`);
   }
 
   async queryDeleted() {
@@ -778,7 +778,7 @@ class CBLTester {
       return;
     }
     console.log('For each');
-    this._query1Results.forEach((result: Result) => {
+    await this._query1Results.forEach((result: Result) => {
       console.log('FOR', result);
     });
     this.out(`For query`);
