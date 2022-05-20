@@ -5,7 +5,7 @@
   "dependencies": {
     "@capacitor/core": "^3.3.4",
     "@ionic-enterprise/capacitor-windows": "file:../../capacitor-windows",
-    "@ionic-enterprise/couchbase-lite": "file:../ionic-enterprise-couchbase-lite-2.0.8.tgz",
+    "@ionic-enterprise/couchbase-lite": "^2.0.11",
     "@ionic/react": "^5.5.0",
     "@ionic/react-router": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.9",

@@ -911,10 +911,11 @@ public class IonicCouchbaseLitePlugin extends Plugin {
         while ((queryResult = r.next()) != null) {
             if (i % chunkSize == 0) {
                 if (resultsChunk != null) {
+                    JSArray results = new JSArray(resultsChunk);
                     call.resolve(
                       new JSObject() {
                           {
-                              put("results", new JSArray());
+                              put("results", results);
                           }
                       }
                     );
