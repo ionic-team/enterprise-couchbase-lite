@@ -4907,10 +4907,10 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "3.0.0",
+    "version": "2.5.5",
     "restore": {
       "projectUniqueName": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite.WPF.csproj",
-      "projectName": "IonicCouchbaseLite",
+      "projectName": "IonicCouchbaseLite.WPF",
       "projectPath": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite.WPF.csproj",
       "packagesPath": "C:\\Users\\max\\.nuget\\packages\\",
       "outputPath": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\obj\\",

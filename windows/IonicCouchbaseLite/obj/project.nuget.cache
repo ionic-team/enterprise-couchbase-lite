@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "JXzCDvSOr56oKI/1x7ufkPjYMGX2wq/3mbZAsFjaaC4qlXQGiGNwIXoKVAuaIvxJDnZYvSP+U4H8dZFI/dajSw==",
+  "dgSpecHash": "3l+x8IXcHtstBsWt2TEQakceRbsRUnejmL82a5WHG27Ugv3ca7BaC0I3OhSOW+GH750RT/XFtb94fXqakhgUjQ==",
   "success": true,
   "projectFilePath": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite.WPF.csproj",
   "expectedPackageFiles": [
