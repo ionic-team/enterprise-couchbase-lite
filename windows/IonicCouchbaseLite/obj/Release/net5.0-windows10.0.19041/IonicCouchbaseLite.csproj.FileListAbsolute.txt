@@ -64,3 +64,15 @@ F:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.
 F:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\qualifiers.txt
 F:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\qualifiers.txt.intermediate
 F:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\MultipleQualifiersPerDimensionFound.txt
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\bin\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.deps.json
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\bin\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.dll
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\bin\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.pdb
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.csproj.AssemblyReference.cache
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.GeneratedMSBuildEditorConfig.editorconfig
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.AssemblyInfoInputs.cache
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.AssemblyInfo.cs
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.csproj.CoreCompileInputs.cache
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.dll
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\refint\IonicCouchbaseLite.dll
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.pdb
+E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\obj\Release\net5.0-windows10.0.19041\ref\IonicCouchbaseLite.dll

@@ -6,13 +6,13 @@
 	  <AssemblyName>IonicCouchbaseLite</AssemblyName>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	  <RootNamespace>IonicCouchbaseLite</RootNamespace>
-	  <Version>2.5.0</Version>
+	  <Version>3.0.0</Version>
 	  <Platforms>AnyCPU;x64</Platforms>
 	  <GenerateLibraryLayout>true</GenerateLibraryLayout>
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CapacitorWpf" Version="1.*">
+		<PackageReference Include="Capacitor" Version="1.*">
 			<IncludeAssets>compile</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>

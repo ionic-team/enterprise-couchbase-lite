@@ -18,6 +18,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\bin\Debug\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" target="lib\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" />
+    <file src="E:\GitHub\enterprise-couchbase-lite\windows\IonicCouchbaseLite\bin\Release\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" target="lib\net5.0-windows10.0.19041\IonicCouchbaseLite.dll" />
   </files>
 </package>
