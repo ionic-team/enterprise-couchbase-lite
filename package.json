@@ -80,7 +80,8 @@
     },
     "windows": {
       "src": "windows",
-      "assembly": "IonicCouchbaseLite"
+      "assembly": "IonicCouchbaseLite",
+      "assemblyUnpackaged": "IonicCouchbaseLite.WPF"
     }
   }
 }
