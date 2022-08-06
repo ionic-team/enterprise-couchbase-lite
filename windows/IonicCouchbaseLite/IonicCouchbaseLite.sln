@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IonicCouchbaseLite", "IonicCouchbaseLite.csproj", "{FCF522FF-DFB5-43CE-A3D3-F6DB54D37452}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IonicCouchbaseLite", "IonicCouchbaseLite\IonicCouchbaseLite.csproj", "{FCF522FF-DFB5-43CE-A3D3-F6DB54D37452}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IonicCouchbaseLite.WPF", "IonicCouchbaseLite.WPF.csproj", "{266EF2D5-FB0D-4B09-861A-84532547A8BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IonicCouchbaseLite.WPF", "IonicCouchbaseLite.WPF\IonicCouchbaseLite.WPF.csproj", "{266EF2D5-FB0D-4B09-861A-84532547A8BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
