@@ -3,7 +3,9 @@ title: Windows Installation
 sidebar_label: Windows Installation
 ---
 
-To install the Ionic Couchbase Lite integration into Capacitor Windows, first follow the [Installation](./installation) guide to install the `@ionic-enterprise/couchbase-lite` package. Note: the instructions below only apply to version `1.3.0` and above.
+To install the Ionic Couchbase Lite integration into Capacitor Windows, first follow the [Installation](./installation) guide to install the `@ionic-enterprise/couchbase-lite` package.
+
+Note: this plugin requires `@ionic-enterprise/capacitor-windows` `1.5.0` or greater.
 
 Then, run:
 
