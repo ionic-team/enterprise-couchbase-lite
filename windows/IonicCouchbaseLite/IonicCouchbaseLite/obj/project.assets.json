@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net5.0-windows10.0.19041": {
-      "Capacitor/1.2.0": {
+      "Capacitor/1.5.3": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -1396,7 +1396,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-arm": {
-      "Capacitor/1.2.0": {
+      "Capacitor/1.5.3": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -3040,7 +3040,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-arm-aot": {
-      "Capacitor/1.2.0": {
+      "Capacitor/1.5.3": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -4637,7 +4637,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-arm64-aot": {
-      "Capacitor/1.2.0": {
+      "Capacitor/1.5.3": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -6240,7 +6240,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-x64": {
-      "Capacitor/1.2.0": {
+      "Capacitor/1.5.3": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -7890,7 +7890,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-x64-aot": {
-      "Capacitor/1.2.0": {
+      "Capacitor/1.5.3": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -9493,7 +9493,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-x86": {
-      "Capacitor/1.2.0": {
+      "Capacitor/1.5.3": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -11143,7 +11143,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-x86-aot": {
-      "Capacitor/1.2.0": {
+      "Capacitor/1.5.3": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -12747,13 +12747,13 @@
     }
   },
   "libraries": {
-    "Capacitor/1.2.0": {
-      "sha512": "yHsMdzean59lhZlQQIyussEr3ePg54gKv7+Devyyv4gtxv5yz+tuCodfSOiZZdwZlyGviXROgzOyd1rVgMqqvw==",
+    "Capacitor/1.5.3": {
+      "sha512": "mNv6oTkm8RJuChmTZfsYhUA/uo8/SXAO7+LUX7mBy+ZUrbWzNTs1ubiojolBytm8clHn/uZLTwqlvdbeBIKjSQ==",
       "type": "package",
-      "path": "capacitor/1.2.0",
+      "path": "capacitor/1.5.3",
       "files": [
         ".nupkg.metadata",
-        "capacitor.1.2.0.nupkg.sha512",
+        "capacitor.1.5.3.nupkg.sha512",
         "capacitor.nuspec",
         "lib/net5.0-windows10.0.19041/Capacitor.dll",
         "lib/net5.0-windows10.0.19041/Capacitor.pri"
@@ -18012,7 +18012,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0-windows10.0.19041": [
-      "Capacitor >= 1.2.0",
+      "Capacitor >= 1.5.3",
       "Couchbase.Lite.Enterprise >= 2.8.6",
       "Microsoft.Win32.Primitives >= 4.3.0",
       "System.Diagnostics.Tracing >= 4.3.0",
@@ -18075,7 +18075,7 @@
         "dependencies": {
           "Capacitor": {
             "target": "Package",
-            "version": "[1.2.0, )"
+            "version": "[1.5.3, )"
           },
           "Couchbase.Lite.Enterprise": {
             "include": "Compile",

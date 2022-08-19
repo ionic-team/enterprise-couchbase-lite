@@ -1483,7 +1483,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "Capacitor": "1.2.0",
+          "Capacitor": "1.5.3",
           "Microsoft.Win32.Primitives": "4.3.0",
           "System.Diagnostics.Tracing": "4.3.0",
           "System.IO.FileSystem": "4.3.0",
@@ -3151,7 +3151,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "Capacitor": "1.2.0",
+          "Capacitor": "1.5.3",
           "Microsoft.Win32.Primitives": "4.3.0",
           "System.Diagnostics.Tracing": "4.3.0",
           "System.IO.FileSystem": "4.3.0",
@@ -4823,7 +4823,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "Capacitor": "1.2.0",
+          "Capacitor": "1.5.3",
           "Microsoft.Win32.Primitives": "4.3.0",
           "System.Diagnostics.Tracing": "4.3.0",
           "System.IO.FileSystem": "4.3.0",
@@ -6495,7 +6495,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
-          "Capacitor": "1.2.0",
+          "Capacitor": "1.5.3",
           "Microsoft.Win32.Primitives": "4.3.0",
           "System.Diagnostics.Tracing": "4.3.0",
           "System.IO.FileSystem": "4.3.0",
