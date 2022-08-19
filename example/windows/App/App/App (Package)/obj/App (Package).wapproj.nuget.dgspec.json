@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\App (Package).wapproj": {}
+    "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\App (Package).wapproj": {}
   },
   "projects": {
-    "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\App (Package).wapproj": {
+    "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\App (Package).wapproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\App (Package).wapproj",
+        "projectUniqueName": "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\App (Package).wapproj",
         "projectName": "App (Package)",
-        "projectPath": "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\App (Package).wapproj",
-        "packagesPath": "C:\\Users\\Max\\.nuget\\packages\\",
-        "outputPath": "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\obj\\",
+        "projectPath": "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\App (Package).wapproj",
+        "packagesPath": "C:\\Users\\max\\.nuget\\packages\\",
+        "outputPath": "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App (Package)\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\NuGet.Config",
-          "C:\\Users\\Max\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\NuGet.Config",
+          "C:\\Users\\max\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -27,16 +27,17 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "F:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
-          "F:\\GitHub\\enterprise-couchbase-lite\\windows": {},
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\couchbase-lite\\windows": {},
+          "E:\\apps\\BlankPackaged\\node_modules\\@ionic-enterprise\\capacitor-windows": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "uap10.0.17763": {
             "targetAlias": "net451",
             "projectReferences": {
-              "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj": {
-                "projectPath": "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj"
+              "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj": {
+                "projectPath": "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj"
               }
             }
           }
@@ -46,15 +47,10 @@
         "uap10.0.17763": {
           "targetAlias": "net451",
           "dependencies": {
-            "Microsoft.ProjectReunion": {
+            "Microsoft.WindowsAppSDK": {
               "include": "Build",
               "target": "Package",
-              "version": "[0.8.1, 0.8.1]"
-            },
-            "Microsoft.ProjectReunion.WinUI": {
-              "include": "Build",
-              "target": "Package",
-              "version": "[0.8.1, 0.8.1]"
+              "version": "[1.0.2, 1.0.2]"
             },
             "Newtonsoft.Json": {
               "target": "Package",
@@ -71,13 +67,12 @@
             "net471",
             "net472",
             "net48",
-            "net5.0-windows10.0.17763",
-            "net6.0-windows10.0.17763",
+            "net6.0-windows10.0.19041",
             "net461"
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {
@@ -104,21 +99,22 @@
         }
       }
     },
-    "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj": {
+    "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj",
+        "projectUniqueName": "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj",
         "projectName": "App",
-        "projectPath": "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj",
-        "packagesPath": "C:\\Users\\Max\\.nuget\\packages\\",
-        "outputPath": "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\obj\\",
+        "projectPath": "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\App.csproj",
+        "packagesPath": "C:\\Users\\max\\.nuget\\packages\\",
+        "outputPath": "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\App\\App\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "F:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\NuGet.Config",
-          "C:\\Users\\Max\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\NuGet.Config",
+          "C:\\Users\\max\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -127,14 +123,19 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "F:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
-          "F:\\GitHub\\enterprise-couchbase-lite\\windows": {},
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\couchbase-lite\\windows": {},
+          "E:\\apps\\BlankPackaged\\node_modules\\@ionic-enterprise\\capacitor-windows": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0-windows10.0.19041": {
             "targetAlias": "net5.0-windows10.0.19041.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj": {
+                "projectPath": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -149,27 +150,47 @@
           "dependencies": {
             "Capacitor": {
               "target": "Package",
-              "version": "[1.0.0, )"
+              "version": "[1.*, )"
             },
-            "IonicCouchbaseLite": {
+            "Couchbase.Lite.Enterprise": {
               "target": "Package",
-              "version": "[1.0.0, )"
+              "version": "[2.8.6, )"
             },
-            "Microsoft.ProjectReunion": {
+            "Microsoft.Win32.Primitives": {
               "target": "Package",
-              "version": "[0.8.1, )"
+              "version": "[4.3.0, )"
             },
-            "Microsoft.ProjectReunion.Foundation": {
+            "Microsoft.WindowsAppSDK": {
               "target": "Package",
-              "version": "[0.8.1, )"
-            },
-            "Microsoft.ProjectReunion.WinUI": {
-              "target": "Package",
-              "version": "[0.8.1, )"
+              "version": "[1.0.2, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.1, )"
+            },
+            "System.Diagnostics.Tracing": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.IO.FileSystem": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.IO.FileSystem.Primitives": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Net.Primitives": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Runtime.InteropServices": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Text.Encoding.Extensions": {
+              "target": "Package",
+              "version": "[4.3.0, )"
             }
           },
           "imports": [
@@ -185,43 +206,43 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Runtime.win-arm64",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             },
             {
               "name": "Microsoft.AspNetCore.App.Runtime.win-x86",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.win-arm64",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.win-x64",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             },
             {
               "name": "Microsoft.NETCore.App.Runtime.win-x86",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             },
             {
               "name": "Microsoft.Windows.SDK.NET.Ref",
-              "version": "[10.0.19041.18, 10.0.19041.18]"
+              "version": "[10.0.19041.24, 10.0.19041.24]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Runtime.win-arm64",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Runtime.win-x86",
-              "version": "[5.0.8, 5.0.8]"
+              "version": "[5.0.16, 5.0.16]"
             }
           ],
           "frameworkReferences": {
@@ -232,7 +253,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {
@@ -243,6 +264,185 @@
           "#import": []
         },
         "win10-x86": {
+          "#import": []
+        }
+      }
+    },
+    "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj": {
+      "version": "2.5.6",
+      "restore": {
+        "projectUniqueName": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj",
+        "projectName": "IonicCouchbaseLite",
+        "projectPath": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj",
+        "packagesPath": "C:\\Users\\max\\.nuget\\packages\\",
+        "outputPath": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\NuGet.Config",
+          "C:\\Users\\max\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net5.0-windows10.0.19041"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\couchbase-lite\\windows": {},
+          "E:\\apps\\BlankPackaged\\node_modules\\@ionic-enterprise\\capacitor-windows": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net5.0-windows10.0.19041": {
+            "targetAlias": "net5.0-windows10.0.19041",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net5.0-windows10.0.19041": {
+          "targetAlias": "net5.0-windows10.0.19041",
+          "dependencies": {
+            "Capacitor": {
+              "target": "Package",
+              "version": "[1.2.0, )"
+            },
+            "Couchbase.Lite.Enterprise": {
+              "include": "Compile",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.8.6, )"
+            },
+            "Microsoft.Win32.Primitives": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Diagnostics.Tracing": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.IO.FileSystem": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.IO.FileSystem.Primitives": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Net.Primitives": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Runtime.InteropServices": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.Text.Encoding.Extensions": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Runtime.win-arm",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.AspNetCore.App.Runtime.win-arm64",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.AspNetCore.App.Runtime.win-x86",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Runtime.win-arm",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Runtime.win-arm64",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Runtime.win-x64",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Runtime.win-x86",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.Windows.SDK.NET.Ref",
+              "version": "[10.0.19041.24, 10.0.19041.24]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Runtime.win-arm64",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
+              "version": "[5.0.16, 5.0.16]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x86",
+              "version": "[5.0.16, 5.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.Windows.SDK.NET.Ref": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "win10-arm": {
+          "#import": []
+        },
+        "win10-arm-aot": {
+          "#import": []
+        },
+        "win10-arm64-aot": {
+          "#import": []
+        },
+        "win10-x64": {
+          "#import": []
+        },
+        "win10-x64-aot": {
+          "#import": []
+        },
+        "win10-x86": {
+          "#import": []
+        },
+        "win10-x86-aot": {
           "#import": []
         }
       }

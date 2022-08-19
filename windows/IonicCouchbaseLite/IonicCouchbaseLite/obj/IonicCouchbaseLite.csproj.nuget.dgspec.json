@@ -18,7 +18,7 @@
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\NuGet.Config",
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\NuGet.Config",
           "C:\\Users\\max\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -28,7 +28,8 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "E:\\GitHub\\enterprise-couchbase-lite\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
+          "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\couchbase-lite\\windows": {},
           "E:\\apps\\BlankPackaged\\node_modules\\@ionic-enterprise\\capacitor-windows": {},
           "https://api.nuget.org/v3/index.json": {}
         },

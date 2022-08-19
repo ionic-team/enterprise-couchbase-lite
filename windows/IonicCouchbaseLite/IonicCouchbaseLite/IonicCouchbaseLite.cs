@@ -672,13 +672,14 @@ namespace IonicCouchbaseLite {
         [PluginMethod(PluginMethodReturnType.Promise)]
         public void Query_Execute(PluginCall call) {
             var dbName = call.GetString("name");
-            var json = call.GetString("query");
+            var json = call.GetObject("query");
             Database db = getDatabase(dbName);
             if (db == null) {
                 call.Reject("Database not found");
                 return;
             }
-            XQueryPatch.Json = json;
+            var jsonString = JsonConvert.SerializeObject(json);
+            XQueryPatch.Json = jsonString;
             XQueryPatch.DbName = dbName;
             var query = QueryBuilder.Select(SelectResult.All()).From(DataSource.Database(db));
             var rs = query.Execute();
@@ -719,9 +720,10 @@ namespace IonicCouchbaseLite {
                     var result = e.Current;
                     if (result != null) {
                         var resultDict = documentDictToJson(result.ToDictionary());
-                        call.Resolve(new JSObject() {
-                            { "result", resultDict }
-                        });
+
+                        var jsObject = new JSObject(resultDict);
+
+                        call.Resolve(jsObject);
                         return;
                     }
                 }
@@ -777,36 +779,43 @@ namespace IonicCouchbaseLite {
 
         [PluginMethod(PluginMethodReturnType.Promise)]
         public void ResultSet_AllResults(PluginCall call) {
-            var dbName = call.GetString("name");
-            var resultSetId = "" + call.Data["resultSetId"];
-            var db = getDatabase(dbName);
-            if (db == null) {
-                call.Reject("Database not found");
-                return;
-            }
-
-            var docs = new List<Doc>();
-
-            var rsId = resultSetId;
-
-            if (queryResultSets.ContainsKey(rsId)) {
-                var rs = queryResultSets[resultSetId];
-                foreach (var r in rs.AllResults()) {
-                    docs.Add(documentDictToJson(r.ToDictionary()));
+            try {
+                var dbName = call.GetString("name");
+                var resultSetId = "" + call.Data["resultSetId"];
+                var db = getDatabase(dbName);
+                if (db == null)
+                {
+                    call.Reject("Database not found");
+                    return;
                 }
+
+                var docs = new List<Doc>();
+
+                var rsId = resultSetId;
+
+                if (queryResultSets.ContainsKey(rsId))
+                {
+                    var rs = queryResultSets[resultSetId];
+                    foreach (var r in rs.AllResults())
+                    {
+                        docs.Add(documentDictToJson(r.ToDictionary()));
+                    }
+                }
+
+                call.KeepAlive = true;
+                call.Resolve(new JSObject() {
+                    { "results", docs.ToArray() }
+                });
+
+                call.KeepAlive = false;
+
+                // Send empty list to end the response
+                call.Resolve(new JSObject() {
+                    { "results", new List<Doc>() }
+                });
+            } catch (Exception ex) {
+                call.Reject("Unable to execute query", ex);
             }
-
-            call.KeepAlive = true;
-            call.Resolve(new JSObject() {
-                { "results", docs.ToArray() }
-            });
-
-            call.KeepAlive = false;
-
-            // Send empty list to end the response
-            call.Resolve(new JSObject() {
-                { "results", new List<Doc>() }
-            });
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]
