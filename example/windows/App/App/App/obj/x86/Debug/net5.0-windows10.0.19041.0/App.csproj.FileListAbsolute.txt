@@ -99,3 +99,10 @@ E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\obj\x86\Debug\ne
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\obj\x86\Debug\net5.0-windows10.0.19041.0\qualifiers.txt
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\obj\x86\Debug\net5.0-windows10.0.19041.0\qualifiers.txt.intermediate
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\obj\x86\Debug\net5.0-windows10.0.19041.0\MultipleQualifiersPerDimensionFound.txt
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\0Harmony.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\Mono.Cecil.Mdb.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\Mono.Cecil.Pdb.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\Mono.Cecil.Rocks.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\Mono.Cecil.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\MonoMod.Common.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\System.Text.Json.dll

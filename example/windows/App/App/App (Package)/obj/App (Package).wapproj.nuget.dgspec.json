@@ -323,6 +323,10 @@
               "target": "Package",
               "version": "[2.8.6, )"
             },
+            "Lib.Harmony": {
+              "target": "Package",
+              "version": "[2.2.2, )"
+            },
             "Microsoft.Win32.Primitives": {
               "target": "Package",
               "version": "[4.3.0, )"

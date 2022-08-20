@@ -221,3 +221,14 @@ E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x8
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\obj\x86\Debug\App (Package).wapproj.AssemblyReference.cache
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\obj\x86\Debug\App.pri.xml
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\obj\x86\Debug\90D70C0TE0310D0B20570T0CP0B10U0BK0Q70F0060J10G00409\IonicCouchbaseLite.pri.xml
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\0Harmony.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.Mdb.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.Pdb.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.Rocks.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\MonoMod.Common.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\System.Text.Json.dll
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.Mdb.pdb
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.Pdb.pdb
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.Rocks.pdb
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.pdb

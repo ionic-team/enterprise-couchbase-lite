@@ -8,6 +8,7 @@
     <dependencies>
       <group targetFramework="net5.0-windows10.0.19041">
         <dependency id="Capacitor" version="1.5.3" exclude="Build,Analyzers" />
+        <dependency id="Lib.Harmony" version="2.2.2" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Win32.Primitives" version="4.3.0" exclude="Build,Analyzers" />
         <dependency id="System.Diagnostics.Tracing" version="4.3.0" exclude="Build,Analyzers" />
         <dependency id="System.IO.FileSystem" version="4.3.0" exclude="Build,Analyzers" />

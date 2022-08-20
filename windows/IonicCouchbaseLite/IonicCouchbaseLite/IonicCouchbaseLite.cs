@@ -9,6 +9,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 
+using HarmonyLib;
+
 using Couchbase.Lite;
 using Couchbase.Lite.Sync;
 using Couchbase.Lite.Logging;
@@ -50,6 +52,8 @@ namespace IonicCouchbaseLite {
                         string columnName;
                         if (column == ".") {
                             columnName = DbName;
+                        } else if (column.Equals("AS")) {
+                            columnName = entry[2].Value<string>();
                         } else {
                             columnName = column.Substring(1);
                         }
@@ -129,6 +133,83 @@ namespace IonicCouchbaseLite {
         }
     }
 
+    [HarmonyPatch]
+    class MyXQueryPatchEncodeAsJSON {
+        public static string Json { get; set; }
+
+        public static MethodBase TargetMethod() {
+            var DLL = Assembly.Load("Couchbase.Lite");
+            Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
+            var xqpType = typeof(XQueryPatch);
+            return native.GetMethod("EncodeAsJSON", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        }
+
+        public static bool Prefix(ref string __result) {
+            __result  = Json;
+            return false;
+        }
+    }
+
+    /*
+    [HarmonyPatch]
+    class MyXQueryPatchExecute {
+        public static MethodBase TargetMethod() {
+            var DLL = Assembly.Load("Couchbase.Lite");
+            Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
+            var xqpType = typeof(XQueryPatch);
+            return native.GetMethod("Execute", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        }
+        public static void Prefix(dynamic __instance) {
+            var DLL = Assembly.Load("Couchbase.Lite");
+            // Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
+        }
+    }
+    */
+
+    [HarmonyPatch]
+    class MyXQueryPatchCreateColumnNames {
+        public static string Json { get; set; }
+        public static string DbName { get; set; }
+
+        public static MethodBase TargetMethod() {
+            var DLL = Assembly.Load("Couchbase.Lite");
+            Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
+            var xqpType = typeof(XQueryPatch);
+            return native.GetMethod("CreateColumnNames", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        }
+
+        public static bool Prefix(ref Dictionary<string, int> __result) {
+            var parsed = JObject.Parse(Json);
+            JArray what = (JArray)parsed["WHAT"];
+            var columns = new Dictionary<string, int>();
+
+            int i = -1;
+            foreach (var item in what) {
+                i++;
+                try {
+                    JArray entry = (JArray)(item);
+                    string column = (string)entry[0];
+                    if (column != null) {
+                        string columnName;
+                        if (column == ".") {
+                            columnName = DbName;
+                        } else if (column.Equals("AS")) {
+                            columnName = entry[2].Value<string>();
+                        } else {
+                            columnName = column.Substring(1);
+                        }
+                        columns[columnName] = i;
+                    }
+                } catch {
+                    continue;
+                }
+            }
+
+            __result  = columns;
+            return false;
+        }
+    }
+
     [CapacitorPlugin]
     public class IonicCouchbaseLite : Plugin {
         Dictionary<string, Database> openDatabases = new Dictionary<string, Database>();
@@ -164,12 +245,16 @@ namespace IonicCouchbaseLite {
         }
 
         void PatchQuery() {
+            var harmony = new Harmony("Couchbase.Lite");
+
             var DLL = Assembly.Load("Couchbase.Lite");
 
+            harmony.PatchAll();
+
             Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
-
-
             var xqpType = typeof(XQueryPatch);
+
+            /*
             var methodToReplace = native.GetMethod("EncodeAsJSON", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             var methodToInject = xqpType.GetMethod("EncodeAsJSON", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             DynamicMojo.SwapMethodBodies(methodToReplace, methodToInject);
@@ -177,6 +262,7 @@ namespace IonicCouchbaseLite {
             var methodToReplace2 = native.GetMethod("CreateColumnNames", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             var methodToInject2 = xqpType.GetMethod("CreateColumnNames", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             DynamicMojo.SwapMethodBodies(methodToReplace2, methodToInject2);
+            */
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]
@@ -679,9 +765,20 @@ namespace IonicCouchbaseLite {
                 return;
             }
             var jsonString = JsonConvert.SerializeObject(json);
+            // MyXQueryPatchEncodeAsJSON.DbName = dbName;
+            MyXQueryPatchEncodeAsJSON.Json = jsonString;
+            MyXQueryPatchCreateColumnNames.DbName = dbName;
+            MyXQueryPatchCreateColumnNames.Json = jsonString;
             XQueryPatch.Json = jsonString;
             XQueryPatch.DbName = dbName;
-            var query = QueryBuilder.Select(SelectResult.All()).From(DataSource.Database(db));
+            // var query = QueryBuilder.Select().From(DataSource.Database(db));
+            /*
+            var selectArgs = MakeSelectArgs(jsonString, dbName);
+            var selectMethod = typeof(QueryBuilder).GetMethod("Select", BindingFlags.Static | BindingFlags.Public);
+            var select = selectMethod.Invoke(null, new ISelectResult[][] { selectArgs }) as ISelect;
+            var query = select.From(DataSource.Database(db));
+            */
+            var query = QueryBuilder.Select().From(DataSource.Database(db));
             var rs = query.Execute();
 
             queryResultSets["" + queryCount] = rs;
@@ -693,6 +790,46 @@ namespace IonicCouchbaseLite {
                 { "id", queryId }
             });
         }
+
+        private ISelectResult[] MakeSelectArgs(string json, string dbName) {
+            var args = new List<ISelectResult>();
+
+            var parsed = JObject.Parse(json);
+            JArray what = (JArray)parsed["WHAT"];
+
+            foreach (var item in what) {
+                try {
+                    JArray entry = (JArray)(item);
+                    string column = (string)entry[0];
+                    if (column != null) {
+                        string columnName;
+                        if (column == ".") {
+                            columnName = dbName;
+                        } else {
+                            columnName = column.Substring(1);
+                        }
+
+                        if (columnName == null) {
+                            continue;
+                        }
+
+                        if (column.Equals(".")) {
+                            args.Add(SelectResult.All());
+                        } else if (columnName.Equals("_id")) {
+                            args.Add(SelectResult.Expression(Meta.ID));
+                        } else if (columnName.Equals("_sequence")) {
+                            args.Add(SelectResult.Expression(Meta.Sequence));
+                        } else {
+                            args.Add(SelectResult.Property(columnName));
+                        }
+                    }
+                } catch {
+                    continue;
+                }
+            }
+            return args.ToArray();
+        }
+
 
         [PluginMethod(PluginMethodReturnType.Promise)]
         public void ResultSet_Next(PluginCall call) {

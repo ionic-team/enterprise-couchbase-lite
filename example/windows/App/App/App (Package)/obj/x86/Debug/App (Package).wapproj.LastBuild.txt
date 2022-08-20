@@ -150,6 +150,7 @@ C:\Users\max\.nuget\packages\capacitor\1.5.3\lib\net5.0-windows10.0.19041\Capaci
 C:\Users\max\.nuget\packages\couchbase.lite.enterprise\2.8.6\lib\netcoreapp2.0\Couchbase.Lite.dll
 C:\Users\max\.nuget\packages\couchbase.lite.enterprise.support.netdesktop\2.8.6\lib\netcoreapp2.0\Couchbase.Lite.Support.NetDesktop.dll
 C:\Users\max\.nuget\packages\desktopbridge.helpers\1.2.2\lib\netstandard2.0\DesktopBridge.Helpers.dll
+C:\Users\max\.nuget\packages\lib.harmony\2.2.2\lib\net5.0\0Harmony.dll
 C:\Users\max\.nuget\packages\microsoft.data.sqlite.core\6.0.0\lib\netstandard2.0\Microsoft.Data.Sqlite.dll
 C:\Users\max\.nuget\packages\microsoft.windowsappsdk\1.0.2\lib\net5.0-windows10.0.18362.0\Microsoft.InteractiveExperiences.Projection.dll
 C:\Users\max\.nuget\packages\microsoft.windowsappsdk\1.0.2\lib\net5.0-windows10.0.18362.0\Microsoft.WinUI.dll
@@ -159,11 +160,17 @@ C:\Users\max\.nuget\packages\microsoft.windowsappsdk\1.0.2\lib\net5.0-windows10.
 C:\Users\max\.nuget\packages\microsoft.windowsappsdk\1.0.2\lib\net5.0-windows10.0.18362.0\Microsoft.Windows.ApplicationModel.WindowsAppRuntime.Projection.dll
 C:\Users\max\.nuget\packages\microsoft.windowsappsdk\1.0.2\lib\net5.0-windows10.0.18362.0\Microsoft.Windows.System.Power.Projection.dll
 C:\Users\max\.nuget\packages\microsoft.windowsappsdk\1.0.2\lib\net5.0-windows10.0.18362.0\Microsoft.WindowsAppRuntime.Bootstrap.Net.dll
+C:\Users\max\.nuget\packages\mono.cecil\0.11.4\lib\netstandard2.0\Mono.Cecil.Mdb.dll
+C:\Users\max\.nuget\packages\mono.cecil\0.11.4\lib\netstandard2.0\Mono.Cecil.Pdb.dll
+C:\Users\max\.nuget\packages\mono.cecil\0.11.4\lib\netstandard2.0\Mono.Cecil.Rocks.dll
+C:\Users\max\.nuget\packages\mono.cecil\0.11.4\lib\netstandard2.0\Mono.Cecil.dll
+C:\Users\max\.nuget\packages\monomod.common\22.6.3.1\lib\net5.0\MonoMod.Common.dll
 C:\Users\max\.nuget\packages\newtonsoft.json\13.0.1\lib\netstandard2.0\Newtonsoft.Json.dll
 C:\Users\max\.nuget\packages\simpleinjector\4.0.12\lib\netstandard1.3\SimpleInjector.dll
 C:\Users\max\.nuget\packages\sqlitepclraw.bundle_e_sqlite3\2.0.6\lib\netstandard2.0\SQLitePCLRaw.batteries_v2.dll
 C:\Users\max\.nuget\packages\sqlitepclraw.core\2.0.6\lib\netstandard2.0\SQLitePCLRaw.core.dll
 C:\Users\max\.nuget\packages\sqlitepclraw.provider.e_sqlite3\2.0.6\lib\net5.0\SQLitePCLRaw.provider.e_sqlite3.dll
+C:\Users\max\.nuget\packages\system.text.json\5.0.2\lib\netcoreapp3.0\System.Text.Json.dll
 C:\Users\max\.nuget\packages\couchbase.lite.enterprise.support.netdesktop\2.8.6\runtimes\linux-x64\native\libLiteCore.so
 C:\Users\max\.nuget\packages\couchbase.lite.enterprise.support.netdesktop\2.8.6\runtimes\linux-x64\native\libicudata.so.54
 C:\Users\max\.nuget\packages\couchbase.lite.enterprise.support.netdesktop\2.8.6\runtimes\linux-x64\native\libicui18n.so.54
@@ -205,6 +212,10 @@ E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\obj\x86\Debug\ne
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\obj\x86\Debug\net5.0-windows10.0.19041.0\apphost.exe
 C:\Users\max\.nuget\packages\couchbase.lite.enterprise\2.8.6\lib\netcoreapp2.0\Couchbase.Lite.pdb
 C:\Users\max\.nuget\packages\couchbase.lite.enterprise.support.netdesktop\2.8.6\lib\netcoreapp2.0\Couchbase.Lite.Support.NetDesktop.pdb
+C:\Users\max\.nuget\packages\mono.cecil\0.11.4\lib\netstandard2.0\Mono.Cecil.Mdb.pdb
+C:\Users\max\.nuget\packages\mono.cecil\0.11.4\lib\netstandard2.0\Mono.Cecil.Pdb.pdb
+C:\Users\max\.nuget\packages\mono.cecil\0.11.4\lib\netstandard2.0\Mono.Cecil.Rocks.pdb
+C:\Users\max\.nuget\packages\mono.cecil\0.11.4\lib\netstandard2.0\Mono.Cecil.pdb
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\App.runtimeconfig.json
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\App.dll
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App\bin\x86\Debug\net5.0-windows10.0.19041.0\App.pdb
