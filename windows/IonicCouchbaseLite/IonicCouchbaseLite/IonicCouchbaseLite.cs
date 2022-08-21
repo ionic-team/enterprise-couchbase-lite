@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
-using System.Diagnostics;
 
 using HarmonyLib;
 
@@ -15,10 +11,6 @@ using Couchbase.Lite;
 using Couchbase.Lite.Sync;
 using Couchbase.Lite.Logging;
 using Couchbase.Lite.Query;
-
-using LiteCore;
-using LiteCore.Util;
-using LiteCore.Interop;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -69,62 +61,6 @@ namespace IonicCouchbaseLite {
     }
 
 
-    public static class DynamicMojo {
-        /// <summary>
-        /// Swaps the function pointers for a and b, effectively swapping the method bodies.
-        /// </summary>
-        /// <exception cref="ArgumentException">
-        /// a and b must have same signature
-        /// </exception>
-        /// <param name="a">Method to swap</param>
-        /// <param name="b">Method to swap</param>
-        public static void SwapMethodBodies(MethodInfo a, MethodInfo b) {
-            /*
-            if (!HasSameSignature(a, b)) {
-              throw new ArgumentException("a and b must have have same signature");
-            }
-            */
-
-            RuntimeHelpers.PrepareMethod(a.MethodHandle);
-            RuntimeHelpers.PrepareMethod(b.MethodHandle);
-
-            unsafe {
-                if (IntPtr.Size == 4) {
-                    int* inj = (int*)b.MethodHandle.Value.ToPointer() + 2;
-                    int* tar = (int*)a.MethodHandle.Value.ToPointer() + 2;
-
-                    Console.WriteLine("\nVersion x86 Release\n");
-                    *tar = *inj;
-                } else {
-
-                    long* inj = (long*)b.MethodHandle.Value.ToPointer() + 1;
-                    long* tar = (long*)a.MethodHandle.Value.ToPointer() + 1;
-                    /*
-                    if (Debugger.IsAttached) {
-                      Console.WriteLine("\nVersion x64 Debug\n");
-                      byte* injInst = (byte*)*inj;
-                      byte* tarInst = (byte*)*tar;
-
-
-                      int* injSrc = (int*)(injInst + 1);
-                      int* tarSrc = (int*)(tarInst + 1);
-
-                      *tarSrc = (((int)injInst + 5) + *injSrc) - ((int)tarInst + 5);
-                    }
-                    else {*/
-                    Console.WriteLine("\nVersion x64 Release\n");
-                    *tar = *inj;
-                    //}
-                }
-            }
-        }
-
-        private static bool HasSameSignature(MethodInfo a, MethodInfo b) {
-            bool sameParams = !a.GetParameters().Any(x => !b.GetParameters().Any(y => x == y));
-            bool sameReturnType = a.ReturnType == b.ReturnType;
-            return sameParams && sameReturnType;
-        }
-    }
 
     public static class DictUtils {
         public static TV GetValue<TK, TV>(this IDictionary<TK, TV> dict, TK key, TV defaultValue = default(TV)) {
@@ -247,14 +183,13 @@ namespace IonicCouchbaseLite {
         void PatchQuery() {
             var harmony = new Harmony("Couchbase.Lite");
 
-            var DLL = Assembly.Load("Couchbase.Lite");
-
             harmony.PatchAll();
 
+            /*
+            var DLL = Assembly.Load("Couchbase.Lite");
             Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
             var xqpType = typeof(XQueryPatch);
 
-            /*
             var methodToReplace = native.GetMethod("EncodeAsJSON", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             var methodToInject = xqpType.GetMethod("EncodeAsJSON", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             DynamicMojo.SwapMethodBodies(methodToReplace, methodToInject);
@@ -856,7 +791,7 @@ namespace IonicCouchbaseLite {
                 if (e.MoveNext()) {
                     var result = e.Current;
                     if (result != null) {
-                        var resultDict = documentDictToJson(result.ToDictionary());
+                        var resultDict = ProcessResultMap(result.ToDictionary());
 
                         var jsObject = new JSObject(resultDict);
 
@@ -867,6 +802,24 @@ namespace IonicCouchbaseLite {
             }
 
             call.Resolve();
+        }
+
+        private Dictionary<string, object> ProcessResultMap(Dictionary<string, object> map) {
+            var newMap = new Dictionary<string, object>();
+            string commonAlias = null;
+            Regex commonPattern = new Regex("(.*)\\.$");
+
+            foreach (var key in map.Keys) {
+                var m = commonPattern.Match(key);
+                if (m.Success) {
+                    var foundAlias = m.Groups[1].Value;
+                    newMap.Add(foundAlias, map[key]);
+                } else {
+                    newMap.Add(key, map[key]);
+                }
+            }
+
+            return newMap;
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]
@@ -914,7 +867,7 @@ namespace IonicCouchbaseLite {
 
         }
 
-        [PluginMethod(PluginMethodReturnType.Promise)]
+        [PluginMethod(PluginMethodReturnType.Callback)]
         public void ResultSet_AllResults(PluginCall call) {
             try {
                 var dbName = call.GetString("name");
@@ -944,7 +897,7 @@ namespace IonicCouchbaseLite {
                     { "results", docs.ToArray() }
                 });
 
-                call.KeepAlive = false;
+                // call.KeepAlive = false;
 
                 // Send empty list to end the response
                 call.Resolve(new JSObject() {

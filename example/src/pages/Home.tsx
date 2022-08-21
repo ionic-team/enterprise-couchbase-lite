@@ -15,7 +15,12 @@ import {
 } from '@ionic/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isMatch } from 'lodash';
-import { caretDownOutline, caretForwardOutline, playCircleOutline, stopCircleOutline } from 'ionicons/icons';
+import {
+  caretDownOutline,
+  caretForwardOutline,
+  playCircleOutline,
+  stopCircleOutline,
+} from 'ionicons/icons';
 import './Home.css';
 
 import {
@@ -51,13 +56,29 @@ import {
 } from '@ionic-enterprise/couchbase-lite';
 
 const assert = (v, msg = '', expecting = null, received = null) => {
-  console.log('%c[TEST] %s','color: #e8c93c; font-weight: bold', msg);
+  console.log('%c[TEST] %s', 'color: #e8c93c; font-weight: bold', msg);
   if (!v) {
-    throw new Error(`${msg ? msg : `Test failed`}${expecting ? `\nExpecting: \n${
-      typeof expecting === 'object' ? JSON.stringify(expecting, null, 2) : expecting}`: null}${received ?
-        `\nReceived:\n${typeof received === 'object' ? JSON.stringify(received, null, 2) : received}` : null}`);
+    throw new Error(
+      `${msg ? msg : `Test failed`}${
+        expecting
+          ? `\nExpecting: \n${
+              typeof expecting === 'object'
+                ? JSON.stringify(expecting, null, 2)
+                : expecting
+            }`
+          : null
+      }${
+        received
+          ? `\nReceived:\n${
+              typeof received === 'object'
+                ? JSON.stringify(received, null, 2)
+                : received
+            }`
+          : null
+      }`,
+    );
   }
-}
+};
 
 class CBLTester {
   database: Database;
@@ -541,8 +562,13 @@ class CBLTester {
       SelectResult.expression(Meta.id),
     )
       .from(DataSource.database(this.database))
-      .where(Expression.property('type').equalTo(Expression.string('hotel')).and(
-        Expression.property('name').equalTo(Expression.string('Escape'))))
+      .where(
+        Expression.property('type')
+          .equalTo(Expression.string('hotel'))
+          .and(
+            Expression.property('name').equalTo(Expression.string('Escape')),
+          ),
+      )
       .orderBy(Ordering.expression(Meta.id));
 
     const ret = await query.execute();
@@ -556,7 +582,9 @@ class CBLTester {
     console.log('Building query 1');
     let query = QueryBuilder.select(
       SelectResult.all().from('fun'),
-      SelectResult.expression(Expression.property('name').from('fun')).as('name'),
+      SelectResult.expression(Expression.property('name').from('fun')).as(
+        'name',
+      ),
       SelectResult.expression(Meta.id.from('fun')).as('id'),
     )
       .from(DataSource.database(this.database).as('fun'))
@@ -1138,31 +1166,40 @@ class CBLTester {
       await this.save();
 
       documentCount = await this.getCount();
-      assert(documentCount === this._createdDocs.length, 'Count of docs equals ones we collected');
+      assert(
+        documentCount === this._createdDocs.length,
+        'Count of docs equals ones we collected',
+      );
 
       let doc: Document = this.doc;
-      assert(doc.getId() === this.lastDocId, 'Last document id is the same as the one we stored');
+      assert(
+        doc.getId() === this.lastDocId,
+        'Last document id is the same as the one we stored',
+      );
 
       doc = await this.getDocument();
-      assert(isMatch(doc.toDictionary(), {
-        name: 'Escape',
-        type: 'hotel',
-        asdf: null,
-        testArray: [],
-        items: [
-          'hello',
-          {
-            really: 'cool'
+      assert(
+        isMatch(doc.toDictionary(), {
+          name: 'Escape',
+          type: 'hotel',
+          asdf: null,
+          testArray: [],
+          items: [
+            'hello',
+            {
+              really: 'cool',
+            },
+            123,
+            true,
+          ],
+          someWithNull: [1, null, 4],
+          config: {
+            size: 'large',
+            isCool: false,
           },
-          123,
-          true
-        ],
-        someWithNull: [1, null, 4],
-        config: {
-          size: 'large',
-          isCool: false
-        },
-      }), 'Grabbing latest matches provided object');
+        }),
+        'Grabbing latest matches provided object',
+      );
 
       console.log(doc.toDictionary());
 
@@ -1172,50 +1209,51 @@ class CBLTester {
 
       console.log('Got ret', ret);
 
-      assert(isMatch(ret, {
-        name: 'Escape',
-        thedb10: {
-          type: 'hotel'
-        }
-      }), 'Query doc matches', {
-        name: 'Escape',
-        thedb10: {
-          type: 'hotel'
-        }
-      }, ret);
+      assert(
+        isMatch(ret, {
+          name: 'Escape',
+          thedb10: {
+            type: 'hotel',
+          },
+        }),
+        'Query doc matches',
+        {
+          name: 'Escape',
+          thedb10: {
+            type: 'hotel',
+          },
+        },
+        ret,
+      );
 
       await this.query1From();
 
       ret = await this.next1();
 
       let expected: any = {
-        "name": "Escape",
+        name: 'Escape',
         // "id": "-dn0azUFH0eKGHvxH_c0jvz",
-        "fun": {
-          "config": {
-            "isCool": false,
-            "size": "large"
+        fun: {
+          config: {
+            isCool: false,
+            size: 'large',
           },
-          "someWithNull": [
-            1,
-            null,
-            4
-          ],
-          "testArray": [],
-          "items": [
-            "hello",
+          someWithNull: [1, null, 4],
+          testArray: [],
+          items: [
+            'hello',
             {
-              "really": "cool"
+              really: 'cool',
             },
             123,
-            true
+            true,
           ],
           //"created": "2022-02-12T16:17:02.260Z",
-          "asdf": null,
-          "name": "Escape",
-          "type": "hotel"
-        }
-      }
+          asdf: null,
+          name: 'Escape',
+          type: 'hotel',
+        },
+      };
 
       assert(isMatch(ret, expected), 'Query 1 From matches', expected, ret);
 
@@ -1224,25 +1262,29 @@ class CBLTester {
 
       ret = await this.next1();
       expected = {
-        "thisdb3": {
+        thisdb3: {
           type: 'parlour',
-          name: 'Ice Cream'
-        }
-      }
+          name: 'Ice Cream',
+        },
+      };
+
+      console.log('Doing join test');
 
       ret = await this.joinTest();
 
+      console.log('Finished join test', ret);
       expected = [
         {
           'hotels.id': ret[0]['hotels.id'],
           'locations.id': ret[0]['locations.id'],
           'categories.id': ret[0]['categories.id'],
-          'name': 'Madison'
-        }
+          'name': 'Madison',
+        },
       ];
 
       assert(isMatch(ret, expected), 'Join test matches', expected, ret);
 
+      console.log('All tests pass!');
       // Tear down
       /*
       await Promise.all(this._createdDocs.map(async d => {
@@ -1261,25 +1303,29 @@ class CBLTester {
   }
 }
 
-
 const Home: React.FC = () => {
   const outputRef = useRef<HTMLDivElement | null>(null);
   const [output, setOutput] = useState('');
   const [isDbOpen, setIsDbOpen] = useState(false);
   const [sections, setSections] = useState<any>({});
 
-  const toggleSection = useCallback((section) => {
-    setSections(() => ({
-      ...sections,
-      [section]: !!!sections[section]
-    }));
-  }, [sections]);
+  const toggleSection = useCallback(
+    section => {
+      setSections(() => ({
+        ...sections,
+        [section]: !!!sections[section],
+      }));
+    },
+    [sections],
+  );
 
-  const handleOpenChange = useCallback((isOpen) => {
+  const handleOpenChange = useCallback(isOpen => {
     setIsDbOpen(tester.isOpen);
   }, []);
 
-  const tester = useMemo<CBLTester>(() => new CBLTester(handleOpenChange), [handleOpenChange]);
+  const tester = useMemo<CBLTester>(() => new CBLTester(handleOpenChange), [
+    handleOpenChange,
+  ]);
 
   const doChange = useCallback(() => {
     console.log('OUTPUT CHANGED', tester.output);
@@ -1297,30 +1343,54 @@ const Home: React.FC = () => {
           <IonButtons slot="end">
             {isDbOpen ? (
               <IonButton size="small" onClick={() => tester.close()}>
-                <IonIcon icon={stopCircleOutline} color="#ee2222" style={{ fill: '#ee2222', stroke: '#ee2222', marginRight: '2px' }}/>
+                <IonIcon
+                  icon={stopCircleOutline}
+                  color="#ee2222"
+                  style={{
+                    fill: '#ee2222',
+                    stroke: '#ee2222',
+                    marginRight: '2px',
+                  }}
+                />
                 Close DB
               </IonButton>
             ) : (
               <IonButton size="small" onClick={() => tester.init()}>
-                <IonIcon icon={playCircleOutline} color="#22ee22" style={{ fill: '#22ee22', stroke: '#22ee22', marginRight: '2px' }} />
+                <IonIcon
+                  icon={playCircleOutline}
+                  color="#22ee22"
+                  style={{
+                    fill: '#22ee22',
+                    stroke: '#22ee22',
+                    marginRight: '2px',
+                  }}
+                />
                 Open DB
               </IonButton>
             )}
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen >
+      <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Couchbase Lite</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <Section title="Tests" expanded={sections['tests']} onToggle={() => toggleSection('tests')}>
+        <Section
+          title="Tests"
+          expanded={sections['tests']}
+          onToggle={() => toggleSection('tests')}
+        >
           <IonButton size="small" onClick={() => tester.testSuite()}>
             Test Suite
           </IonButton>
         </Section>
-        <Section title="Database" expanded={sections['db']} onToggle={() => toggleSection('db')}>
+        <Section
+          title="Database"
+          expanded={sections['db']}
+          onToggle={() => toggleSection('db')}
+        >
           <IonButton size="small" onClick={() => tester.toggleLogLevel()}>
             Toggle Log Level
           </IonButton>
@@ -1354,7 +1424,11 @@ const Home: React.FC = () => {
             Delete DB
           </IonButton>
         </Section>
-        <Section title="Document" expanded={sections['document']} onToggle={() => toggleSection('document')}>
+        <Section
+          title="Document"
+          expanded={sections['document']}
+          onToggle={() => toggleSection('document')}
+        >
           <IonButton size="small" onClick={() => tester.save()}>
             Save Document
           </IonButton>
@@ -1377,7 +1451,11 @@ const Home: React.FC = () => {
             Purge Document
           </IonButton>
         </Section>
-        <Section title="Query" expanded={sections['query']} onToggle={() => toggleSection('query')}>
+        <Section
+          title="Query"
+          expanded={sections['query']}
+          onToggle={() => toggleSection('query')}
+        >
           <IonButton size="small" onClick={() => tester.query1()}>
             Query 1
           </IonButton>
@@ -1397,7 +1475,11 @@ const Home: React.FC = () => {
             All Results 1
           </IonButton>
         </Section>
-        <Section title="Query (misc)" expanded={sections['query-misc']} onToggle={() => toggleSection('query-misc')}>
+        <Section
+          title="Query (misc)"
+          expanded={sections['query-misc']}
+          onToggle={() => toggleSection('query-misc')}
+        >
           <IonButton size="small" onClick={() => tester.joinTest()}>
             Join From Test
           </IonButton>
@@ -1422,14 +1504,21 @@ const Home: React.FC = () => {
           <IonButton size="small" onClick={() => tester.queryCreateTest()}>
             Query Memory Test
           </IonButton>
-          <IonButton size="small" onClick={() => tester.queryCreateTestCleanup()}>
+          <IonButton
+            size="small"
+            onClick={() => tester.queryCreateTestCleanup()}
+          >
             Query Memory Test Cleanup
           </IonButton>
           <IonButton size="small" onClick={() => tester.documentIdTest()}>
             Document ID Test
           </IonButton>
         </Section>
-        <Section title="Full Text Search" expanded={sections['fts']} onToggle={() => toggleSection('fts')}>
+        <Section
+          title="Full Text Search"
+          expanded={sections['fts']}
+          onToggle={() => toggleSection('fts')}
+        >
           <IonButton size="small" onClick={() => tester.createIndex()}>
             Create Index
           </IonButton>
@@ -1440,21 +1529,27 @@ const Home: React.FC = () => {
             Get Indexes
           </IonButton>
         </Section>
-        <Section title="Blob" expanded={sections['blob']} onToggle={() => toggleSection('blob')}>
+        <Section
+          title="Blob"
+          expanded={sections['blob']}
+          onToggle={() => toggleSection('blob')}
+        >
           <IonButton size="small" onClick={() => tester.blobTest()}>
             Blob Test
           </IonButton>
         </Section>
-        <Section title="Replicator" expanded={sections['replicator']} onToggle={() => toggleSection('replicator')}>
+        <Section
+          title="Replicator"
+          expanded={sections['replicator']}
+          onToggle={() => toggleSection('replicator')}
+        >
           <IonButton size="small" onClick={() => tester.replicatorStart()}>
             Replicator Start
           </IonButton>
           <IonButton size="small" onClick={() => tester.replicatorStop()}>
             Replicator Stop
           </IonButton>
-          <IonButton
-            onClick={() => tester.replicatorResetCheckpoint()}
-          >
+          <IonButton onClick={() => tester.replicatorResetCheckpoint()}>
             Replicator Reset Checkpoint
           </IonButton>
           <IonButton size="small" onClick={() => tester.replicatorGetStatus()}>
@@ -1469,7 +1564,11 @@ const Home: React.FC = () => {
         </Section>
         <div style={{ height: '500px' }} />
       </IonContent>
-      <pre id="output" className="result-pane" dangerouslySetInnerHTML={{ __html: output }} />
+      <pre
+        id="output"
+        className="result-pane"
+        dangerouslySetInnerHTML={{ __html: output }}
+      />
     </IonPage>
   );
 };
@@ -1487,13 +1586,9 @@ const Section = ({ title, expanded, onToggle, children }) => {
           )}
         </IonCardTitle>
       </IonCardHeader>
-      {expanded ? (
-        <IonCardContent>
-          {children}
-        </IonCardContent>
-      ) : null}
+      {expanded ? <IonCardContent>{children}</IonCardContent> : null}
     </IonCard>
-  )
-}
+  );
+};
 
 export default Home;

@@ -124,8 +124,6 @@ E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x8
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\8.ae07c3fe.chunk.js.map
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\9.2b653a7f.chunk.js
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\9.2b653a7f.chunk.js.map
-E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\main.ba96fbac.chunk.js
-E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\main.ba96fbac.chunk.js.map
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\polyfills-dom.85f89811.chunk.js
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\polyfills-dom.85f89811.chunk.js.LICENSE.txt
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\polyfills-dom.85f89811.chunk.js.map
@@ -232,3 +230,5 @@ E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x8
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.Pdb.pdb
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.Rocks.pdb
 E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\App\Mono.Cecil.pdb
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\main.a2553a91.chunk.js
+E:\GitHub\enterprise-couchbase-lite\example\windows\App\App\App (Package)\bin\x86\Debug\Public\static\js\main.a2553a91.chunk.js.map
