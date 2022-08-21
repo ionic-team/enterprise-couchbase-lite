@@ -388,7 +388,7 @@ namespace IonicCouchbaseLite {
             });
         }
 
-        [PluginMethod(PluginMethodReturnType.Promise)]
+        [PluginMethod(PluginMethodReturnType.Callback)]
         public void Database_AddChangeListener(PluginCall call) {
             var dbName = call.GetString("name");
             var db = getDatabase(dbName);
@@ -1090,7 +1090,7 @@ namespace IonicCouchbaseLite {
             };
         }
 
-        [PluginMethod(PluginMethodReturnType.Promise)]
+        [PluginMethod(PluginMethodReturnType.Callback)]
         public void Replicator_AddChangeListener(PluginCall call) {
             var replicatorId = call.GetString("replicatorId");
             Replicator r;
@@ -1145,7 +1145,7 @@ namespace IonicCouchbaseLite {
             };
         }
 
-        [PluginMethod(PluginMethodReturnType.Promise)]
+        [PluginMethod(PluginMethodReturnType.Callback)]
         public void Replicator_AddDocumentListener(PluginCall call) {
             var replicatorId = call.GetString("replicatorId");
             Replicator r;
