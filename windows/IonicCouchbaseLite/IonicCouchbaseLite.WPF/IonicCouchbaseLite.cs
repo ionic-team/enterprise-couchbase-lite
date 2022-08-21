@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
-using System.Diagnostics;
+
+using HarmonyLib;
 
 using Couchbase.Lite;
 using Couchbase.Lite.Sync;
 using Couchbase.Lite.Logging;
 using Couchbase.Lite.Query;
-
-using LiteCore;
-using LiteCore.Util;
-using LiteCore.Interop;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -50,6 +44,8 @@ namespace IonicCouchbaseLite {
                         string columnName;
                         if (column == ".") {
                             columnName = DbName;
+                        } else if (column.Equals("AS")) {
+                            columnName = entry[2].Value<string>();
                         } else {
                             columnName = column.Substring(1);
                         }
@@ -65,67 +61,88 @@ namespace IonicCouchbaseLite {
     }
 
 
-    public static class DynamicMojo {
-        /// <summary>
-        /// Swaps the function pointers for a and b, effectively swapping the method bodies.
-        /// </summary>
-        /// <exception cref="ArgumentException">
-        /// a and b must have same signature
-        /// </exception>
-        /// <param name="a">Method to swap</param>
-        /// <param name="b">Method to swap</param>
-        public static void SwapMethodBodies(MethodInfo a, MethodInfo b) {
-            /*
-            if (!HasSameSignature(a, b)) {
-              throw new ArgumentException("a and b must have have same signature");
-            }
-            */
-
-            RuntimeHelpers.PrepareMethod(a.MethodHandle);
-            RuntimeHelpers.PrepareMethod(b.MethodHandle);
-
-            unsafe {
-                if (IntPtr.Size == 4) {
-                    int* inj = (int*)b.MethodHandle.Value.ToPointer() + 2;
-                    int* tar = (int*)a.MethodHandle.Value.ToPointer() + 2;
-
-                    Console.WriteLine("\nVersion x86 Release\n");
-                    *tar = *inj;
-                } else {
-
-                    long* inj = (long*)b.MethodHandle.Value.ToPointer() + 1;
-                    long* tar = (long*)a.MethodHandle.Value.ToPointer() + 1;
-                    /*
-                    if (Debugger.IsAttached) {
-                      Console.WriteLine("\nVersion x64 Debug\n");
-                      byte* injInst = (byte*)*inj;
-                      byte* tarInst = (byte*)*tar;
-
-
-                      int* injSrc = (int*)(injInst + 1);
-                      int* tarSrc = (int*)(tarInst + 1);
-
-                      *tarSrc = (((int)injInst + 5) + *injSrc) - ((int)tarInst + 5);
-                    }
-                    else {*/
-                    Console.WriteLine("\nVersion x64 Release\n");
-                    *tar = *inj;
-                    //}
-                }
-            }
-        }
-
-        private static bool HasSameSignature(MethodInfo a, MethodInfo b) {
-            bool sameParams = !a.GetParameters().Any(x => !b.GetParameters().Any(y => x == y));
-            bool sameReturnType = a.ReturnType == b.ReturnType;
-            return sameParams && sameReturnType;
-        }
-    }
 
     public static class DictUtils {
         public static TV GetValue<TK, TV>(this IDictionary<TK, TV> dict, TK key, TV defaultValue = default(TV)) {
             TV value;
             return dict.TryGetValue(key, out value) ? value : defaultValue;
+        }
+    }
+
+    [HarmonyPatch]
+    class MyXQueryPatchEncodeAsJSON {
+        public static string Json { get; set; }
+
+        public static MethodBase TargetMethod() {
+            var DLL = Assembly.Load("Couchbase.Lite");
+            Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
+            var xqpType = typeof(XQueryPatch);
+            return native.GetMethod("EncodeAsJSON", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        }
+
+        public static bool Prefix(ref string __result) {
+            __result  = Json;
+            return false;
+        }
+    }
+
+    /*
+    [HarmonyPatch]
+    class MyXQueryPatchExecute {
+        public static MethodBase TargetMethod() {
+            var DLL = Assembly.Load("Couchbase.Lite");
+            Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
+            var xqpType = typeof(XQueryPatch);
+            return native.GetMethod("Execute", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        }
+        public static void Prefix(dynamic __instance) {
+            var DLL = Assembly.Load("Couchbase.Lite");
+            // Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
+        }
+    }
+    */
+
+    [HarmonyPatch]
+    class MyXQueryPatchCreateColumnNames {
+        public static string Json { get; set; }
+        public static string DbName { get; set; }
+
+        public static MethodBase TargetMethod() {
+            var DLL = Assembly.Load("Couchbase.Lite");
+            Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
+            var xqpType = typeof(XQueryPatch);
+            return native.GetMethod("CreateColumnNames", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        }
+
+        public static bool Prefix(ref Dictionary<string, int> __result) {
+            var parsed = JObject.Parse(Json);
+            JArray what = (JArray)parsed["WHAT"];
+            var columns = new Dictionary<string, int>();
+
+            int i = -1;
+            foreach (var item in what) {
+                i++;
+                try {
+                    JArray entry = (JArray)(item);
+                    string column = (string)entry[0];
+                    if (column != null) {
+                        string columnName;
+                        if (column == ".") {
+                            columnName = DbName;
+                        } else if (column.Equals("AS")) {
+                            columnName = entry[2].Value<string>();
+                        } else {
+                            columnName = column.Substring(1);
+                        }
+                        columns[columnName] = i;
+                    }
+                } catch {
+                    continue;
+                }
+            }
+
+            __result  = columns;
+            return false;
         }
     }
 
@@ -145,10 +162,10 @@ namespace IonicCouchbaseLite {
 
         public override void Load() {
             base.Load();
-            // Activator.Activate();
+            Activator.Activate();
             Logger.debug("Loading IonicCouchbaseLitePlugin");
             // Couchbase.Lite.Enterprise.Support.NetDesktop.Activate();
-            Couchbase.Lite.Support.NetDesktop.Activate();
+            // Couchbase.Lite.Support.NetDesktop.Activate();
         }
 
         public IonicCouchbaseLite() {
@@ -164,12 +181,15 @@ namespace IonicCouchbaseLite {
         }
 
         void PatchQuery() {
+            var harmony = new Harmony("Couchbase.Lite");
+
+            harmony.PatchAll();
+
+            /*
             var DLL = Assembly.Load("Couchbase.Lite");
-
             Type native = DLL.GetType("Couchbase.Lite.Internal.Query.XQuery");
-
-
             var xqpType = typeof(XQueryPatch);
+
             var methodToReplace = native.GetMethod("EncodeAsJSON", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             var methodToInject = xqpType.GetMethod("EncodeAsJSON", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             DynamicMojo.SwapMethodBodies(methodToReplace, methodToInject);
@@ -177,6 +197,7 @@ namespace IonicCouchbaseLite {
             var methodToReplace2 = native.GetMethod("CreateColumnNames", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             var methodToInject2 = xqpType.GetMethod("CreateColumnNames", BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
             DynamicMojo.SwapMethodBodies(methodToReplace2, methodToInject2);
+            */
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]
@@ -367,7 +388,7 @@ namespace IonicCouchbaseLite {
             });
         }
 
-        [PluginMethod(PluginMethodReturnType.Promise)]
+        [PluginMethod(PluginMethodReturnType.Callback)]
         public void Database_AddChangeListener(PluginCall call) {
             var dbName = call.GetString("name");
             var db = getDatabase(dbName);
@@ -672,15 +693,27 @@ namespace IonicCouchbaseLite {
         [PluginMethod(PluginMethodReturnType.Promise)]
         public void Query_Execute(PluginCall call) {
             var dbName = call.GetString("name");
-            var json = call.GetString("query");
+            var json = call.GetObject("query");
             Database db = getDatabase(dbName);
             if (db == null) {
                 call.Reject("Database not found");
                 return;
             }
-            XQueryPatch.Json = json;
+            var jsonString = JsonConvert.SerializeObject(json);
+            // MyXQueryPatchEncodeAsJSON.DbName = dbName;
+            MyXQueryPatchEncodeAsJSON.Json = jsonString;
+            MyXQueryPatchCreateColumnNames.DbName = dbName;
+            MyXQueryPatchCreateColumnNames.Json = jsonString;
+            XQueryPatch.Json = jsonString;
             XQueryPatch.DbName = dbName;
-            var query = QueryBuilder.Select(SelectResult.All()).From(DataSource.Database(db));
+            // var query = QueryBuilder.Select().From(DataSource.Database(db));
+            /*
+            var selectArgs = MakeSelectArgs(jsonString, dbName);
+            var selectMethod = typeof(QueryBuilder).GetMethod("Select", BindingFlags.Static | BindingFlags.Public);
+            var select = selectMethod.Invoke(null, new ISelectResult[][] { selectArgs }) as ISelect;
+            var query = select.From(DataSource.Database(db));
+            */
+            var query = QueryBuilder.Select().From(DataSource.Database(db));
             var rs = query.Execute();
 
             queryResultSets["" + queryCount] = rs;
@@ -692,6 +725,46 @@ namespace IonicCouchbaseLite {
                 { "id", queryId }
             });
         }
+
+        private ISelectResult[] MakeSelectArgs(string json, string dbName) {
+            var args = new List<ISelectResult>();
+
+            var parsed = JObject.Parse(json);
+            JArray what = (JArray)parsed["WHAT"];
+
+            foreach (var item in what) {
+                try {
+                    JArray entry = (JArray)(item);
+                    string column = (string)entry[0];
+                    if (column != null) {
+                        string columnName;
+                        if (column == ".") {
+                            columnName = dbName;
+                        } else {
+                            columnName = column.Substring(1);
+                        }
+
+                        if (columnName == null) {
+                            continue;
+                        }
+
+                        if (column.Equals(".")) {
+                            args.Add(SelectResult.All());
+                        } else if (columnName.Equals("_id")) {
+                            args.Add(SelectResult.Expression(Meta.ID));
+                        } else if (columnName.Equals("_sequence")) {
+                            args.Add(SelectResult.Expression(Meta.Sequence));
+                        } else {
+                            args.Add(SelectResult.Property(columnName));
+                        }
+                    }
+                } catch {
+                    continue;
+                }
+            }
+            return args.ToArray();
+        }
+
 
         [PluginMethod(PluginMethodReturnType.Promise)]
         public void ResultSet_Next(PluginCall call) {
@@ -718,16 +791,35 @@ namespace IonicCouchbaseLite {
                 if (e.MoveNext()) {
                     var result = e.Current;
                     if (result != null) {
-                        var resultDict = documentDictToJson(result.ToDictionary());
-                        call.Resolve(new JSObject() {
-                            { "result", resultDict }
-                        });
+                        var resultDict = ProcessResultMap(result.ToDictionary());
+
+                        var jsObject = new JSObject(resultDict);
+
+                        call.Resolve(jsObject);
                         return;
                     }
                 }
             }
 
             call.Resolve();
+        }
+
+        private Dictionary<string, object> ProcessResultMap(Dictionary<string, object> map) {
+            var newMap = new Dictionary<string, object>();
+            string commonAlias = null;
+            Regex commonPattern = new Regex("(.*)\\.$");
+
+            foreach (var key in map.Keys) {
+                var m = commonPattern.Match(key);
+                if (m.Success) {
+                    var foundAlias = m.Groups[1].Value;
+                    newMap.Add(foundAlias, map[key]);
+                } else {
+                    newMap.Add(key, map[key]);
+                }
+            }
+
+            return newMap;
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]
@@ -775,38 +867,45 @@ namespace IonicCouchbaseLite {
 
         }
 
-        [PluginMethod(PluginMethodReturnType.Promise)]
+        [PluginMethod(PluginMethodReturnType.Callback)]
         public void ResultSet_AllResults(PluginCall call) {
-            var dbName = call.GetString("name");
-            var resultSetId = "" + call.Data["resultSetId"];
-            var db = getDatabase(dbName);
-            if (db == null) {
-                call.Reject("Database not found");
-                return;
-            }
-
-            var docs = new List<Doc>();
-
-            var rsId = resultSetId;
-
-            if (queryResultSets.ContainsKey(rsId)) {
-                var rs = queryResultSets[resultSetId];
-                foreach (var r in rs.AllResults()) {
-                    docs.Add(documentDictToJson(r.ToDictionary()));
+            try {
+                var dbName = call.GetString("name");
+                var resultSetId = "" + call.Data["resultSetId"];
+                var db = getDatabase(dbName);
+                if (db == null)
+                {
+                    call.Reject("Database not found");
+                    return;
                 }
+
+                var docs = new List<Doc>();
+
+                var rsId = resultSetId;
+
+                if (queryResultSets.ContainsKey(rsId))
+                {
+                    var rs = queryResultSets[resultSetId];
+                    foreach (var r in rs.AllResults())
+                    {
+                        docs.Add(documentDictToJson(r.ToDictionary()));
+                    }
+                }
+
+                call.KeepAlive = true;
+                call.Resolve(new JSObject() {
+                    { "results", docs.ToArray() }
+                });
+
+                // call.KeepAlive = false;
+
+                // Send empty list to end the response
+                call.Resolve(new JSObject() {
+                    { "results", new List<Doc>() }
+                });
+            } catch (Exception ex) {
+                call.Reject("Unable to execute query", ex);
             }
-
-            call.KeepAlive = true;
-            call.Resolve(new JSObject() {
-                { "results", docs.ToArray() }
-            });
-
-            call.KeepAlive = false;
-
-            // Send empty list to end the response
-            call.Resolve(new JSObject() {
-                { "results", new List<Doc>() }
-            });
         }
 
         [PluginMethod(PluginMethodReturnType.Promise)]
@@ -991,7 +1090,7 @@ namespace IonicCouchbaseLite {
             };
         }
 
-        [PluginMethod(PluginMethodReturnType.Promise)]
+        [PluginMethod(PluginMethodReturnType.Callback)]
         public void Replicator_AddChangeListener(PluginCall call) {
             var replicatorId = call.GetString("replicatorId");
             Replicator r;
@@ -1046,7 +1145,7 @@ namespace IonicCouchbaseLite {
             };
         }
 
-        [PluginMethod(PluginMethodReturnType.Promise)]
+        [PluginMethod(PluginMethodReturnType.Callback)]
         public void Replicator_AddDocumentListener(PluginCall call) {
             var replicatorId = call.GetString("replicatorId");
             Replicator r;

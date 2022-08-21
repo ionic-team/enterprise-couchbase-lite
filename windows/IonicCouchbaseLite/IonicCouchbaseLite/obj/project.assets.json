@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net5.0-windows10.0.19041": {
-      "Capacitor/1.5.3": {
+      "Capacitor/1.5.5": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -1515,7 +1515,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-arm": {
-      "Capacitor/1.5.3": {
+      "Capacitor/1.5.5": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -3274,7 +3274,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-arm-aot": {
-      "Capacitor/1.5.3": {
+      "Capacitor/1.5.5": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -4986,7 +4986,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-arm64-aot": {
-      "Capacitor/1.5.3": {
+      "Capacitor/1.5.5": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -6704,7 +6704,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-x64": {
-      "Capacitor/1.5.3": {
+      "Capacitor/1.5.5": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -8469,7 +8469,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-x64-aot": {
-      "Capacitor/1.5.3": {
+      "Capacitor/1.5.5": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -10187,7 +10187,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-x86": {
-      "Capacitor/1.5.3": {
+      "Capacitor/1.5.5": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -11952,7 +11952,7 @@
       }
     },
     "net5.0-windows10.0.19041/win10-x86-aot": {
-      "Capacitor/1.5.3": {
+      "Capacitor/1.5.5": {
         "type": "package",
         "dependencies": {
           "DesktopBridge.Helpers": "1.2.2",
@@ -13671,13 +13671,13 @@
     }
   },
   "libraries": {
-    "Capacitor/1.5.3": {
-      "sha512": "mNv6oTkm8RJuChmTZfsYhUA/uo8/SXAO7+LUX7mBy+ZUrbWzNTs1ubiojolBytm8clHn/uZLTwqlvdbeBIKjSQ==",
+    "Capacitor/1.5.5": {
+      "sha512": "CTMVjnkygvmFTyQ2jbElgY9EQUVIjcTNztoal0v650XsH0pE/tg+RiAKrp5wfOJQjGEcBL1iPRCmpVYoomM73g==",
       "type": "package",
-      "path": "capacitor/1.5.3",
+      "path": "capacitor/1.5.5",
       "files": [
         ".nupkg.metadata",
-        "capacitor.1.5.3.nupkg.sha512",
+        "capacitor.1.5.5.nupkg.sha512",
         "capacitor.nuspec",
         "lib/net5.0-windows10.0.19041/Capacitor.dll",
         "lib/net5.0-windows10.0.19041/Capacitor.pri"
@@ -19270,7 +19270,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0-windows10.0.19041": [
-      "Capacitor >= 1.5.3",
+      "Capacitor >= 1.5.5",
       "Couchbase.Lite.Enterprise >= 2.8.6",
       "Lib.Harmony >= 2.2.2",
       "Microsoft.Win32.Primitives >= 4.3.0",
@@ -19288,7 +19288,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "2.5.6",
+    "version": "2.5.7",
     "restore": {
       "projectUniqueName": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj",
       "projectName": "IonicCouchbaseLite",
@@ -19301,7 +19301,7 @@
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "E:\\GitHub\\enterprise-couchbase-lite\\example\\windows\\App\\NuGet.Config",
+        "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\NuGet.Config",
         "C:\\Users\\max\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -19311,8 +19311,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
-        "E:\\GitHub\\enterprise-couchbase-lite\\example\\node_modules\\@ionic-enterprise\\couchbase-lite\\windows": {},
+        "E:\\GitHub\\enterprise-couchbase-lite\\node_modules\\@ionic-enterprise\\capacitor-windows\\": {},
         "E:\\apps\\BlankPackaged\\node_modules\\@ionic-enterprise\\capacitor-windows": {},
         "https://api.nuget.org/v3/index.json": {}
       },
@@ -19334,7 +19333,7 @@
         "dependencies": {
           "Capacitor": {
             "target": "Package",
-            "version": "[1.5.3, )"
+            "version": "[1.5.5, )"
           },
           "Couchbase.Lite.Enterprise": {
             "include": "Compile",

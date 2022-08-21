@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "iWRo+xcThse4tacFY4oE4etdNF+tZQ+7FGMEhuwOHWCfcJJ4B0mHE8LZCeRwJcDAHKeT6POb6BbZDKng+QELZA==",
+  "dgSpecHash": "dykVBn37g+M93Bu79YClPVFtDaCQtAMgmPyl526KrIvchJ9jEQiUg6kUPSLWciAUCNetFKpvZSNWmSL1B/6NOQ==",
   "success": true,
   "projectFilePath": "E:\\GitHub\\enterprise-couchbase-lite\\windows\\IonicCouchbaseLite\\IonicCouchbaseLite\\IonicCouchbaseLite.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\max\\.nuget\\packages\\capacitor\\1.5.3\\capacitor.1.5.3.nupkg.sha512",
+    "C:\\Users\\max\\.nuget\\packages\\capacitor\\1.5.5\\capacitor.1.5.5.nupkg.sha512",
     "C:\\Users\\max\\.nuget\\packages\\couchbase.lite.enterprise\\2.8.6\\couchbase.lite.enterprise.2.8.6.nupkg.sha512",
     "C:\\Users\\max\\.nuget\\packages\\couchbase.lite.enterprise.support.netdesktop\\2.8.6\\couchbase.lite.enterprise.support.netdesktop.2.8.6.nupkg.sha512",
     "C:\\Users\\max\\.nuget\\packages\\desktopbridge.helpers\\1.2.2\\desktopbridge.helpers.1.2.2.nupkg.sha512",

@@ -13,11 +13,11 @@ using System.Reflection;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("IonicCouchbaseLite")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("2.5.6.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.5.6")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("2.5.7.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.5.7")]
 [assembly: System.Reflection.AssemblyProductAttribute("IonicCouchbaseLite")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IonicCouchbaseLite")]
-[assembly: System.Reflection.AssemblyVersionAttribute("2.5.6.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("2.5.7.0")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows10.0.19041.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows10.0.19041.0")]
 
