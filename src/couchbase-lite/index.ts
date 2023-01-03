@@ -1,5 +1,6 @@
 export * from './abstract-index';
 export * from './authenticator';
+export * from './array-expression';
 export * from './array-function';
 export * from './basic-authenticator';
 export * from './blob';
@@ -43,4 +44,5 @@ export * from './select';
 export * from './session-authenticator';
 export * from './url-endpoint';
 export * from './value-index';
+export * from './variable-expression';
 export * from './where';
