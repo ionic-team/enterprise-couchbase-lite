@@ -24,6 +24,7 @@ import {
 import './Home.css';
 
 import {
+  ArrayExpression,
   ArrayFunction,
   BasicAuthenticator,
   Blob,
@@ -707,6 +708,28 @@ class CBLTester {
     console.log('Executed fts query', ret);
 
     this.out(`Executed fts query`);
+  }
+
+  async arrayExpressionQuery() {
+    console.log('Building array expression');
+    const v = ArrayExpression.variable("initems");
+    let query = QueryBuilder.select(
+      SelectResult.all(),
+    )
+      .from(DataSource.database(this.database).as('fun'))
+      .where(
+        Expression.property('type')
+          .from('fun')
+          .equalTo(Expression.string('hotel'))
+          .and(ArrayExpression.any(v).in(Expression.property("items").from('fun'))
+          .satisfies(v.like(Expression.string("hel%")))))
+      .orderBy(Ordering.expression(Expression.property('fun').from('fun')));
+
+    const ret = await query.execute();
+    this._query1Results = ret;
+    console.log('Executed query', ret);
+
+    this.out(`Executed query`);
   }
 
   async next1() {
@@ -1464,6 +1487,9 @@ const Home: React.FC = () => {
           </IonButton>
           <IonButton size="small" onClick={() => tester.ftsQuery()}>
             FTS Query
+          </IonButton>
+          <IonButton size="small" onClick={() => tester.arrayExpressionQuery()}>
+            ArrayExpression Query
           </IonButton>
           <IonButton size="small" onClick={() => tester.next1()}>
             Next Result 1
