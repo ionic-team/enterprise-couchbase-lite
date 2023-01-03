@@ -715,6 +715,7 @@ class CBLTester {
     const v = ArrayExpression.variable("initems");
     let query = QueryBuilder.select(
       SelectResult.all(),
+      SelectResult.expression(Expression.property("items").from('fun'))
     )
       .from(DataSource.database(this.database).as('fun'))
       .where(
