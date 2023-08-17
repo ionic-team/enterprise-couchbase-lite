@@ -17,7 +17,6 @@ export class ResultSet {
         db,
         this.resultSetId,
         (ret: any, err: any) => {
-          debugger;
           const data = ret.results;
           if (err) {
             reject(err);
