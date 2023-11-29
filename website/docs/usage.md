@@ -3,8 +3,6 @@ title: Usage
 sidebar_label: Usage
 ---
 
-**Interested in Couchbase Lite support?** [Get in touch](https://ionic.io/contact/sales).
-
 # Getting Started
 
 After installing the plugin, import `@ionic-enterprise/couchbase-lite` into the desired class (A dedicated service class that encapsulates Couchbase Lite logic is recommended).
